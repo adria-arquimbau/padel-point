@@ -1,0 +1,49 @@
+﻿@page "/Account"
+
+@using EventsManager.Client.Components.User
+@using EventsManager.Shared.Dtos
+@using Microsoft.AspNetCore.Authorization
+
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [Authorize(Roles = "User")] 
+
+<h3>My account</h3>
+
+@if(User != null)
+{
+    <FluentDivider></FluentDivider>
+    <UserInformation User="@User"></UserInformation>
+    <FluentDivider></FluentDivider>
+}
+@if(User == null)
+{
+    <FluentProgressRing></FluentProgressRing>
+}
+
+@code {
+    private UserDto? User { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            await GetUserInformation();
+        }
+    }
+
+    private async Task GetUserInformation()
+    {
+        try
+        {
+            User = await Http.GetFromJsonAsync<UserDto>("User");
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong while getting user information.");
+        }
+    }
+}

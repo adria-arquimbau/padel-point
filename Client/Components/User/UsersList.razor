@@ -1,0 +1,209 @@
+﻿@using EventsManager.Shared.Dtos
+@using System.Text.Json
+@using System.Text
+@using EventsManager.Shared.Requests
+
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@inject IJSRuntime JSRuntime
+
+<input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch" />
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">User Name</th>
+            <th scope="col">Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in filteredUsers)
+        {
+            <tr class="@((bool)user.IsOrganizer ? "organizer" : "regular-user")" @onclick="@(() => OpenModal(user))">
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    
+    <div class="legend">
+        <span class="organizer">Organizer</span>
+        <span class="regular-user">Regular User</span>
+    </div>
+</div>
+
+<p>Total: <strong>@numResults results found</strong></p>
+
+@if (selectedUser != null)
+{
+    <div class="modal" tabindex="-1" id="deleteUserModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDeleteModal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete user '@selectedUser.UserName'? This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" @onclick="@(() => DeleteUserConfirmed(selectedUser.Id))">Delete User</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" tabindex="-1" id="userModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Details</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">User Id:</dt>
+                        <dd class="col-sm-8">@selectedUser.Id</dd>
+                        
+                        <dt class="col-sm-4">User Name:</dt>
+                        <dd class="col-sm-8">@selectedUser.UserName</dd>
+
+                        <dt class="col-sm-4">Email:</dt>
+                        <dd class="col-sm-8">@selectedUser.Email</dd>
+
+                        <dt class="col-sm-4">Postal Code:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.PostalCode) ? "-" : selectedUser.PostalCode)</dd>
+
+                        <dt class="col-sm-4">Country:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.Country) ? "-" : selectedUser.Country)</dd>
+
+                        <dt class="col-sm-4">City:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.City) ? "-" : selectedUser.City)</dd>
+
+                        <dt class="col-sm-4">Address:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.Address) ? "-" : selectedUser.Address)</dd>
+
+                        <dt class="col-sm-4">Family Name:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.FamilyName) ? "-" : selectedUser.FamilyName)</dd>
+
+                        <dt class="col-sm-4">Name:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.Name) ? "-" : selectedUser.Name)</dd>
+
+                        <dt class="col-sm-4">Phone Number:</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(selectedUser.PhoneNumber) ? "-" : selectedUser.PhoneNumber)</dd>
+
+                        <dt class="col-sm-4">Email Confirmed:</dt>
+                        <dd class="col-sm-8">@selectedUser.EmailConfirmed</dd>
+
+                        <dt class="col-sm-4">Is Organizer:</dt>
+                        <dd class="col-sm-8">@(selectedUser.IsOrganizer == false ? "No" : "Yes")</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    @if (!selectedUser.EmailConfirmed)
+                    {
+                        <button type="button" class="btn btn-primary" @onclick="@(() => ConfirmEmail(selectedUser.Id))">Confirm Email</button>
+                    }
+                    @if ((bool)!selectedUser.IsOrganizer)
+                    {
+                        <button type="button" class="btn btn-primary" @onclick="@(() => SetAsOrganizer(selectedUser.Id))">Set as Organizer</button>
+                    }
+                    @if ((bool)selectedUser.IsOrganizer)
+                    {
+                        <button type="button" class="btn btn-danger" @onclick="@(() => RemoveOrganizerRole(selectedUser.Id))">Remove Organizer role</button>
+                    }
+                    
+                    <button type="button" class="btn btn-danger" @onclick="@(() => DeleteUser(selectedUser.Id))">Delete User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<UserDto> users = new List<UserDto>();
+    List<UserDto> filteredUsers = new List<UserDto>();
+    int numResults = 0;
+    UserDto? selectedUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllUsers();
+    }
+    
+    private void OnSearch(ChangeEventArgs e)
+    {
+        var value = e.Value.ToString().ToLower();
+        filteredUsers = users.Where(user => user.UserName.ToLower().Contains(value) || user.Email.ToLower().Contains(value)).ToList();
+        numResults = filteredUsers.Count;
+        StateHasChanged();
+    }
+
+    private async Task GetAllUsers()
+    {
+        var response = await Http.GetFromJsonAsync<List<UserDto>>("User/all-users");
+        users = response;
+        numResults = users.Count;
+        filteredUsers = new List<UserDto>(users); // Here, filteredUsers is set to the full list of users
+    }
+
+    private async Task ConfirmEmail(string idToConfirm)
+    {
+        var request = JsonSerializer.Serialize(new ConfirmEmailRequest
+        {
+            IdToConfirm = idToConfirm
+        });
+        await Http.PutAsync($"User/confirm-email", new StringContent(request, Encoding.UTF8, "application/json"));
+        await GetAllUsers();
+        await CloseModal();
+    }
+    
+    private async Task DeleteUser(string idToDelete)
+    {
+        selectedUser = users.FirstOrDefault(u => u.Id == idToDelete);
+        await CloseModal();
+        await JSRuntime.InvokeVoidAsync("eval", "$('#deleteUserModal').modal('show');");
+    }
+    
+    private async Task SetAsOrganizer(string id)    
+    {
+        await Http.PutAsync($"User/{id}/set-organizer", null);
+        await GetAllUsers();
+        await CloseModal();
+    }
+        
+    private async Task RemoveOrganizerRole(string id)    
+    {
+        await Http.PutAsync($"User/{id}/remove-organizer", null);
+        await GetAllUsers();
+        await CloseModal();
+    }
+    
+    private async Task DeleteUserConfirmed(string idToDelete)
+    {
+        await Http.DeleteAsync($"User/{idToDelete}");
+        await GetAllUsers();
+        await CloseDeleteModal();
+    }
+
+    private async Task CloseDeleteModal()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "$('#deleteUserModal').modal('hide');");
+    }
+
+    
+    private async Task OpenModal(UserDto user)
+    {
+        selectedUser = user;
+        await JSRuntime.InvokeVoidAsync("eval", "$('#userModal').modal('show');");
+    }
+
+    private async Task CloseModal()
+    {
+        await JSRuntime.InvokeVoidAsync("eval", "$('#userModal').modal('hide');");
+    }
+
+}   

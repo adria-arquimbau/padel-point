@@ -1,0 +1,175 @@
+﻿@using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Enums
+@using EventsManager.Shared.Requests
+@using EventsManager.Client.Components.Modals
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+
+@if (_registrations == null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <ConfirmationModal Title="Delete registration" Message="Are you sure you want to delete this registration?" Visible="@_showConfirmModal" ConfirmationChanged="ConfirmDelete" />
+
+    <div class="search-bar">
+        <div class="input-group">
+            <input type="search" class="form-control" placeholder="Search by user name" @oninput="HandleSearchInput" />
+            <select class="form-control" @onchange="HandleRoleChange">
+                @foreach (RegistrationRole role in Enum.GetValues(typeof(RegistrationRole)))
+                {
+                    @if(role == RegistrationRole.None)
+                    {
+                        <option value="@role">All roles</option>
+                    }
+                    else
+                    {
+                        <option value="@role">@role</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="registrations-table">
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>Creation Date</th>
+                    <th>Role</th>
+                    <th>State</th>
+                    <th>Bib</th>
+                    <th>Checked In</th>
+                    <th>User Name</th>
+                    <th>User Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var registration in _registrations)
+                {
+                    <tr>
+                        <td>@registration.CreationDate</td>
+                        <td>@registration.Role</td>
+                        <td>
+                            <select value="@registration.State" @onchange="((e) => UpdateRegistrationState(registration, e))">
+                                @foreach (RegistrationState state in Enum.GetValues(typeof(RegistrationState)))
+                                {
+                                    <option value="@state" selected="@(state == registration.State)">@state</option>
+                                }
+                            </select>
+                        </td>
+                        <td>@registration.Bib</td>
+                        <td>@registration.CheckedIn <button class="btn btn-success" @onclick="() => GoToCheckIn(registration.Id)">Go</button></td>
+                        <td>@registration.RegisteredUser.UserName</td>
+                        <td>@registration.RegisteredUser.Email</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="(() => PromptDelete(registration.Id))">Delete</button>
+                        </td>
+                    </tr>
+                }
+            <tr>
+                <td colspan="8">Total Registrations: @_registrations.Count</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public Guid? EventId { get; set; }
+    
+    private bool _showConfirmModal = false;
+    private Guid _selectedRegistrationId;
+    private RegistrationRole _selectedRegistrationRole;
+    
+    private List<RegistrationDto>? _registrations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRegistrations();
+    }
+
+    private async Task HandleRoleChange(ChangeEventArgs e)
+    {
+        _selectedRegistrationRole = Enum.TryParse<RegistrationRole>(e.Value?.ToString(), out var newRole) 
+            ? newRole : RegistrationRole.None;
+    
+        await LoadRegistrations();
+    }
+
+    
+    private async Task LoadRegistrations(string? search = null)
+    {
+        var roleQuery = _selectedRegistrationRole != RegistrationRole.None ? $"&role={_selectedRegistrationRole}" : "";
+        _registrations = await Http.GetFromJsonAsync<List<RegistrationDto>>($"Event/{EventId}/registrations?search={search}{roleQuery}");
+    }
+
+
+    private async Task HandleSearchInput(ChangeEventArgs e)
+    {
+        await LoadRegistrations(e.Value?.ToString());
+    }
+    
+    private void PromptDelete(Guid id)
+    {
+        _selectedRegistrationId = id;
+        _showConfirmModal = true;
+    }
+    
+    private async Task ConfirmDelete(bool confirmed)
+    {
+        _showConfirmModal = false;
+
+        if (confirmed)
+        {
+            await DeleteRegistration(_selectedRegistrationId);
+        }
+    }
+
+    private async Task DeleteRegistration(Guid id)
+    {
+        var response = await Http.DeleteAsync($"Registration/{id}");
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(errorContent);
+        }
+        await LoadRegistrations();
+    }
+    
+    private async Task UpdateRegistrationState(RegistrationDto registration, ChangeEventArgs e)
+    {
+        if(Enum.TryParse(e.Value?.ToString(), out RegistrationState newState))
+        {
+            registration.State = newState;
+        
+            var updateRequest = new RegistrationUpdateRequest
+            {
+                Id = registration.Id,
+                State = newState,
+                Bib = registration.Bib,
+                CheckedIn = registration.CheckedIn
+            };
+
+            var response = await Http.PutAsJsonAsync($"Registration", updateRequest);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(errorContent);
+            }   
+        
+            await LoadRegistrations();
+        }
+    }
+
+    private void GoToCheckIn(Guid registrationId)
+    {
+        NavigationManager.NavigateTo($"/Check-in/{registrationId}");
+    }
+}

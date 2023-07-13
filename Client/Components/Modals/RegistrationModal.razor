@@ -1,0 +1,138 @@
+﻿@using EventsManager.Shared.Enums
+@using EventsManager.Shared.Requests
+@using EventsManager.Shared.Dtos
+@inject HttpClient Http
+
+<div class="modal" tabindex="-1" style="display: @(Visible ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" @onclick="CloseModal"></button>
+            </div>
+            <div class="modal-body">
+                <p>@Message</p>
+                @if (requiresPassword)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" @bind="passwordInput" />
+                        @if (!isPasswordCorrect)
+                        {
+                            <div class="text-danger">The password you entered is incorrect.</div>
+                        }
+                    </div>
+                    <button type="button" class="btn btn-primary" @onclick="VerifyPassword">Verify</button>
+                    <button type="button" class="btn btn-secondary" @onclick="BackToRoles">Back</button>
+                }
+            </div>
+            <div class="modal-footer" style="display: @(requiresPassword ? "none" : "block")">
+                <button type="button" class="btn btn-primary" @onclick="(() => ProcessRole(RegistrationRole.Rider, EventDto.RiderHaveRegistrationRolePassword))" 
+                        disabled="@(IsRegistrationClosed())">
+                    Register as a Rider @if(EventDto.RiderHaveRegistrationRolePassword){<small class="text-danger">(Password Required)</small>}
+                </button>
+                
+                @if (IsRegistrationClosed())
+                {
+                    <p class="text-danger mt-2">Rider registrations are currently closed for this event.</p>
+                }
+                <button type="button" class="btn btn-primary" @onclick="(() => ProcessRole(RegistrationRole.Staff, EventDto.StaffHaveRegistrationRolePassword))">
+                    Register as a Staff @if(EventDto.StaffHaveRegistrationRolePassword){<small class="text-danger">(Password Required)</small>}
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="(() => ProcessRole(RegistrationRole.Marshal, EventDto.MarshallHaveRegistrationRolePassword))">
+                    Register as a Marshall @if(EventDto.MarshallHaveRegistrationRolePassword){<small class="text-danger">(Password Required)</small>}
+                </button>
+                <button type="button" class="btn btn-primary" @onclick="(() => ProcessRole(RegistrationRole.RiderMarshal, EventDto.RiderMarshallHaveRegistrationRolePassword))">
+                    Register as a Rider-Marshall @if(EventDto.RiderMarshallHaveRegistrationRolePassword){<small class="text-danger">(Password Required)</small>}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string Message { get; set; }
+    [Parameter] public EventDto EventDto { get; set; }
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public Guid? EventId { get; set; }
+    [Parameter] public EventCallback<RoleConfirmation?> ConfirmationChanged { get; set; }
+
+    private RegistrationRole selectedRole;
+    private bool requiresPassword = false;
+    private bool isPasswordCorrect = true;  
+    private string passwordInput = string.Empty;
+
+    private bool IsRegistrationClosed()
+    {
+        return EventDto.PreAndAcceptedRidersRegistrationsCount >= EventDto.MaxRegistrations
+               || DateTime.UtcNow < EventDto.OpenRegistrationsDate
+               || DateTime.UtcNow > EventDto.CloseRegistrationsDate;
+    }
+
+    private async Task ProcessRole(RegistrationRole role, bool requiredPassword)
+    {   
+        if (requiredPassword)   
+        {
+            PreparePasswordVerification(role);
+        }
+        else
+        {
+            await ChooseRole(role);
+        }
+    }
+    
+    private void BackToRoles()
+    {       
+        requiresPassword = false;
+        isPasswordCorrect = true;
+        passwordInput = string.Empty;
+    }
+    
+    private async Task ChooseRole(RegistrationRole role)
+    {   
+        Visible = false;
+        await ConfirmationChanged.InvokeAsync(new RoleConfirmation
+        {
+            Role = role,
+            Password = passwordInput
+        });
+    }
+    
+    private void PreparePasswordVerification(RegistrationRole role)
+    {   
+        selectedRole = role;
+        requiresPassword = true;
+    }
+
+    private async Task VerifyPassword()
+    {   
+        var response = await Http.PostAsJsonAsync($"Event/{EventId}/registration/{selectedRole}/verify-password", new VerifyRegistrationRolePasswordRequest{ Password = passwordInput });
+        if (response.IsSuccessStatusCode)
+        {
+            requiresPassword = false;
+            await ChooseRole(selectedRole);
+        }
+        else
+        {
+            isPasswordCorrect = false;
+        }
+    }
+    
+    private void CloseModal()
+    {       
+        Visible = false;
+        requiresPassword = false;
+        isPasswordCorrect = true;
+        passwordInput = string.Empty;
+        ConfirmationChanged.InvokeAsync(null);
+    }
+    
+    public class RoleConfirmation
+    {
+        public RegistrationRole Role { get; set; }
+        public string Password { get; set; }
+    }
+}
+    
+

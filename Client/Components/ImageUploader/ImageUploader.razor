@@ -1,0 +1,121 @@
+﻿@using EventsManager.Shared.Dtos
+@using Microsoft.AspNetCore.Authorization
+@using System.Net.Http.Headers
+@using EventsManager.Shared
+@using System.Drawing
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@attribute [Authorize(Roles = "User")] 
+
+<div class="user-image-container text-center">
+    @if (ImageUrl == null)
+    {
+        if (RequestingUploadImage)
+        {
+            <div class="d-flex justify-content-center">
+                <FluentProgressRing></FluentProgressRing>
+            </div>
+        }
+        <div class="input-file-container">
+            <InputFile OnChange="@OnInputFileChange" class="form-control">Select a picture, Max size 2MB</InputFile>
+            <span class="text-danger">@ErrorMessage</span>
+        </div>
+    }
+    @if (ImageUrl != null)
+    {
+       
+            @if (!RequestingDeleteImage)
+            {
+                <FluentButton Appearance="Appearance.Accent" @onclick="DeleteImage" class="btn btn-danger mt-2">Delete image</FluentButton>
+            }
+            else
+            {
+                <FluentButton Disabled="true" Appearance="Appearance.Accent" @onclick="DeleteImage" class="btn btn-danger mt-2">Deleting...</FluentButton>
+            }
+       
+    }
+</div>
+
+@code {
+    [Parameter]
+        public Uri? ImageUrl { get; set; } 
+    
+    [Parameter]
+    public ImageType? Type { get; set; }
+    
+    [Parameter]
+    public Guid? EventId { get; set; }
+    
+    private int imageUpdateCount = 0;
+    
+    [Parameter]
+    public EventCallback RefreshInformation { get; set; }
+    
+    private string? ErrorMessage = null;
+    
+    string[] imageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/jpg" };
+    
+    private bool RequestingDeleteImage; 
+    private bool RequestingUploadImage;         
+    
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        RequestingUploadImage = true;
+        ErrorMessage = null;
+        using var content = new MultipartFormDataContent();
+
+        if (!imageTypes.Contains(e.File.ContentType))
+        {
+            ErrorMessage = "Only JPEG, JPG, PNG and GIF images are allowed.";
+            RequestingUploadImage = false;
+            return;
+        }
+        
+        var resizedFile = await e.File.RequestImageFileAsync(e.File.ContentType, 300, int.MaxValue);
+        
+        var fileContent = new StreamContent(resizedFile.OpenReadStream());
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(resizedFile.ContentType);
+        
+        content.Add(content: fileContent, name: "\"file\"", fileName: resizedFile.Name);
+
+        if (Type == ImageType.Event)
+        {
+            await Http.PostAsync($"Event/{EventId}/image", content);
+        }
+        if (Type == ImageType.User)
+        {
+            await Http.PostAsync("User/image", content);
+        }
+        
+        await RefreshInformation.InvokeAsync();
+        imageUpdateCount++;
+        RequestingUploadImage = false;
+    }
+    
+    private async Task DeleteImage()    
+    {
+        RequestingDeleteImage = true;
+        if (Type == ImageType.User)
+        {
+            await Http.DeleteAsync("User/image");
+        }
+        if (Type == ImageType.Event)
+        {
+            await Http.DeleteAsync($"Event/{EventId}/image");
+        }
+        
+        await RefreshInformation.InvokeAsync();
+        imageUpdateCount++;
+        RequestingDeleteImage = false;
+    }   
+    
+    public enum ImageType
+    {
+        User,
+        Event
+    }
+}
+
+

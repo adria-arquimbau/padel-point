@@ -1,0 +1,57 @@
+﻿@page "/Suggestions"
+@using System.ComponentModel.DataAnnotations
+@using EventsManager.Shared.Requests
+@using Microsoft.AspNetCore.Authorization
+@inject IToastService ToastService
+@inject HttpClient Http
+
+@attribute [Authorize(Roles = "User")]
+
+<h3>Suggestions</h3>
+<p>Thank you for using our app. As we are in alpha version, we would appreciate your feedback. Please let us know how we can improve.</p>
+
+@if (!_suggestionSubmitted)
+{
+    <EditForm Model="_userSuggestion" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="suggestion">Your Suggestion:</label>
+            <InputTextArea id="suggestion" class="form-control" @bind-Value="_userSuggestion.Content" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
+}
+else
+{
+    <p>Thank you for your suggestion!</p>
+}
+
+@code {
+    private SuggestionRequest _userSuggestion = new();
+    private bool _suggestionSubmitted = false;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync($"Suggestion", _userSuggestion);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowSuccess("Suggestion sent successfully");
+                _suggestionSubmitted = true;
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later");
+        }
+    }
+}

@@ -1,0 +1,33 @@
+﻿@using EventsManager.Shared.Dtos
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider authenticationStateProvider
+
+@if (UserImageUrl != null)
+{
+    <img class="user-image" src="@UserImageUrl" alt=""/>
+}
+
+@code {
+    [Parameter]
+    public Uri? UserImageUrl { get; set; } 
+    
+    public bool RequestingImage;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            await GetUserInformation();
+        }
+    }
+
+    private async Task GetUserInformation()
+    {
+        RequestingImage = true;
+        var user = await Http.GetFromJsonAsync<UserDto>("User");
+        UserImageUrl = user?.ImageUrl;
+        RequestingImage = false;
+    }
+}

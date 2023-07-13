@@ -1,0 +1,242 @@
+﻿@using EventsManager.Shared.Dtos
+@using EventsManager.Client.Components.ImageUploader
+@using EventsManager.Client.Components.Modals
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+
+@inject HttpClient Http
+
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3>@Event?.Name</h3>
+            <button class="btn btn-light" @onclick="() => ToggleEditMode.InvokeAsync()">Edit</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    @if (Event?.ImageUrl != null)
+                    {
+                        <img src="@($"{Event.ImageUrl}?v={_imageUpdateCount}")" alt="Event Image" class="img-fluid"/>
+                    }
+                    <ImageUploader RefreshInformation="RefreshEventData" EventId="@Event?.Id" Type="ImageUploader.ImageType.Event" ImageUrl="@Event?.ImageUrl"/>
+                </div>
+                @if(!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @_errorMessage
+                    </div>
+                }
+                <div>
+                    <div>
+                        <label for="isPublic">Public Event:</label>
+                        <input id="isPublic" type="checkbox" @onchange="OpenModalPublicState" checked="@Event.IsPublic" class="form-check-input my-2"/>
+                    </div>
+                    <div>
+                        <label for="isFree">Free Event:</label>
+                        <input id="isFree" type="checkbox" @onchange="OpenModalFreeState" checked="@Event.IsFree" class="form-check-input my-2"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Id:</strong> @Event?.Id</li>
+                    <li class="list-group-item"><strong>Product id:</strong> @Event?.ProductId</li>
+                    <li class="list-group-item"><strong>Description:</strong> @Event?.Description</li>
+                    <li class="list-group-item"><strong>Location:</strong> @Event?.Location</li>
+                    <li class="list-group-item"><strong>Max Registrations:</strong> @Event?.MaxRegistrations</li>
+                    <li class="list-group-item"><strong>Open Registrations Date:</strong> @Event?.OpenRegistrationsDate.ToLocalTime().ToLongDateString() at @Event?.OpenRegistrationsDate.ToLocalTime().ToShortTimeString()</li>
+                    <li class="list-group-item"><strong>Close Registrations Date:</strong> @Event?.CloseRegistrationsDate.ToLocalTime().ToLongDateString() at @Event?.CloseRegistrationsDate.ToLocalTime().ToShortTimeString()</li>
+                    <li class="list-group-item"><strong>Start Date:</strong> @Event?.StartDate.ToLocalTime().ToLongDateString() at @Event?.StartDate.ToLocalTime().ToShortTimeString()</li>
+                    <li class="list-group-item"><strong>Finish Date:</strong> @Event?.FinishDate.ToLocalTime().ToLongDateString() at  @Event?.FinishDate.ToLocalTime().ToShortTimeString()</li>
+                    <li class="list-group-item"><strong>Creation Date:</strong> @Event?.CreationDate.ToLocalTime().ToLongDateString() at @Event?.CreationDate.ToLocalTime().ToShortTimeString()</li>
+                    <li class="list-group-item"><strong>Riders Pre-registrations:</strong> @Event?.RidersPreRegistrationsCount</li>
+                    <li class="list-group-item"><strong>Riders Accepted registrations:</strong> @Event?.RidersAcceptedRegistrationsCount</li>
+                    <li class="list-group-item"><strong>Marshall Accepted registrations:</strong> @Event?.MarshallAcceptedRegistrationsCount</li>
+                    <li class="list-group-item"><strong>Rider-Marshall Accepted registrations:</strong> @Event?.RiderMarshallAcceptedRegistrationsCount</li>
+                    @foreach (var role in new[] 
+                    {
+                        ("Rider registration password", Event?.RiderRegistrationPassword),
+                        ("Staff registration password", Event?.StaffRegistrationPassword),
+                        ("Marshall registration password", Event?.MarshallRegistrationPassword),
+                        ("Rider-Marshall registration password", Event?.RiderMarshallRegistrationPassword)
+                    })
+                    {
+                        <li class="list-group-item">
+                            <strong>@role.Item1:</strong> 
+                            <span class="@(string.IsNullOrWhiteSpace(role.Item2) ? "text-danger" : "")">
+                                @DisplayPassword(role.Item2)
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        @if (_noPriceWithinCurrentTime)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>Any price configured within the current date time.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<ConfirmationModal Title="Change Public state" Message="Are you sure you want to change the public state of the event?" ConfirmationChanged="UpdateIsPublic" Visible="_editIsPublicShowModal"></ConfirmationModal>
+<ConfirmationModal Title="Change Free state" Message="Are you sure you want to change the free state of the event?" ConfirmationChanged="UpdateIsFree" Visible="_editIsFreeShowModal"></ConfirmationModal>
+
+@code {
+    [Parameter]
+    public MyEventDto? Event { get; set; }
+
+    private string? _errorMessage = null;
+
+    private int _imageUpdateCount = 0;
+
+    private bool _showConfirmDeleteModal = false;
+    private bool _requesting = false;
+    private bool _editIsPublicShowModal = false;
+    private bool _editIsFreeShowModal = false;
+    
+    private bool _noPriceWithinCurrentTime = false;
+
+    private Guid _selectedEventId;
+    
+    [Parameter]
+    public EventCallback ToggleEditMode { get; set; }
+    
+    [Parameter]
+    public EventCallback<MyEventDto> HandleValidSubmit { get; set; }
+    
+    private string[] _allowedImageFormats  = { "image/jpeg", "image/png", "image/gif", "image/jpg" };
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var now = DateTime.UtcNow;
+        var orderedPrices = Event.Prices.OrderBy(price => price.EndDate).ToList();
+        var currentPrice = orderedPrices.LastOrDefault(price => price.EndDate >= now);
+    
+        _noPriceWithinCurrentTime = currentPrice == null || Event.OpenRegistrationsDate > now;
+    }
+
+    
+    private string DisplayPassword(string password)
+    {
+        return string.IsNullOrWhiteSpace(password) ? "NO PASSWORD SET" : password;
+    }   
+    
+    private async Task UploadImage(InputFileChangeEventArgs e)
+    {
+        if (!_allowedImageFormats.Contains(e.File.ContentType))
+        {
+            _errorMessage = "Only JPEG, JPG, PNG and GIF images are allowed.";
+            return;
+        }
+
+        try 
+        {
+            _requesting = true;
+
+    // Resize the image while maintaining the aspect ratio
+            var image = await e.File.RequestImageFileAsync(e.File.ContentType, 300, int.MaxValue);
+            
+            await UploadFileToServer(image);
+            await RefreshEventData();
+        }
+        catch (Exception ex) 
+        {
+            _errorMessage = "Error occurred while processing the image: " + ex.Message;
+        }
+        finally 
+        {
+            _requesting = false;
+        }
+    } 
+
+    private async Task UploadFileToServer(IBrowserFile file)
+    {
+        using var content = new MultipartFormDataContent();
+
+        var fileContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 2097152));
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+        content.Add(content: fileContent, name: "\"file\"", fileName: file.Name);
+
+        var response = await Http.PostAsync($"Event/{Event?.Id}/image", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            //ToastService.ShowError("Something went wrong while updating your image");
+        }
+        _imageUpdateCount++;
+    }
+
+    private async Task RefreshEventData()
+    {
+        try
+        {
+            Event = await Http.GetFromJsonAsync<MyEventDto>($"Event/{Event?.Id}-organizer");
+        }
+        catch (Exception)
+        {
+            //ToastService.ShowError("Something went wrong when retrieving your event information");
+        }
+        
+        _imageUpdateCount++;
+    }
+
+    private void PromptDelete(Guid id)
+    {
+        _selectedEventId = id;
+        _showConfirmDeleteModal = true;
+    }
+
+    private async Task ConfirmDelete(bool confirmed)
+    {
+        _showConfirmDeleteModal = false;
+
+        if (confirmed)
+        {
+            await DeleteImage(_selectedEventId);
+        }
+    }
+
+    private async Task DeleteImage(Guid id)
+    {
+        _requesting = true;
+        await Http.DeleteAsync($"Event/{id}/image");
+        _imageUpdateCount++;
+        await RefreshEventData();
+        _requesting = false;
+    }
+
+    private void OpenModalPublicState()
+    {
+        _editIsPublicShowModal = true;
+    }
+    private void UpdateIsPublic(bool confirmed)
+    {
+        if (confirmed)
+        {   
+            Event.IsPublic = !Event.IsPublic;
+        }
+        
+        HandleValidSubmit.InvokeAsync(Event);
+        _editIsPublicShowModal = false;
+    }
+
+    private void OpenModalFreeState()
+    {
+        _editIsFreeShowModal = true;
+    }
+    private void UpdateIsFree(bool confirmed)
+    {
+        if (confirmed)
+        {
+            Event.IsFree = !Event.IsFree;
+        }
+        
+        HandleValidSubmit.InvokeAsync(Event);
+        _editIsFreeShowModal = false;
+    }
+}

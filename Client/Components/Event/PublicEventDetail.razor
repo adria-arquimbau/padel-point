@@ -1,0 +1,326 @@
+﻿@using EventsManager.Shared.Dtos
+@using EventsManager.Client.Components.Modals
+@using EventsManager.Client.Pages
+@using System.Security.Claims
+@using System.Net
+@using EventsManager.Shared.Enums
+@using EventsManager.Shared.Requests
+@using EventsManager.Shared.Responses
+@using QRCoder
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+
+@if (_eventDetail == null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <h3>@_eventDetail.Name</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="image-container">
+                        @if (_eventDetail.ImageUrl != null)
+                        {
+                            <img src="@_eventDetail.ImageUrl" alt="@_eventDetail.Name" class="img-fluid" />
+                        }
+                        else
+                        {
+                            <div style="width: 100%; height: 100%;"></div>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <p>@_eventDetail.Description</p>
+                    <p><strong>Start Date:</strong> @_eventDetail.StartDate.ToLocalTime().ToLongDateString() at @_eventDetail.StartDate.ToLocalTime().ToShortTimeString()</p>
+                    <p><strong>End Date:</strong> @_eventDetail.EndDate.ToLocalTime().ToLongDateString() at @_eventDetail.EndDate.ToLocalTime().ToShortTimeString()</p>
+                    <p><strong>Location:</strong> @_eventDetail.Location</p>
+                    <p><strong>Registrations state:</strong> <span style="color: @(GetRegistrationStateColor())">@GetRegistrationStateText()</span></p>
+                    <p><strong>Open registrations date:</strong> @_eventDetail.OpenRegistrationsDate.ToLocalTime().ToLongDateString() at @_eventDetail.OpenRegistrationsDate.ToLocalTime().ToShortTimeString()</p>
+                    @if(_eventDetail.IsFree)
+                    {
+                        <p><strong>Price:</strong> Free</p>
+                    }
+                    @if(!_eventDetail.IsFree)
+                    {
+                        @if (_eventDetail.CurrentPrice.HasValue)
+                        {
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Price</th>
+                                    <th>End Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var price in _eventDetail.Prices)
+                                {
+                                    <tr style="color:@(price.IsTheCurrentPrice ? "green" : "black")">
+                                        <td>@price.Price €</td>
+                                        <td>@price.EndDate.ToLocalTime().ToString("dd MMM yy ddd") at @price.EndDate.ToLocalTime().ToShortTimeString()</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        }
+                        @if (!_eventDetail.CurrentPrice.HasValue)
+                        { 
+                            <div class="alert alert-warning" role="alert">
+                                An administrator has not set the price yet for this current period.
+                            </div>
+                        }
+                    }
+                    <p><strong>Accepted registrations:</strong> @_eventDetail.PreAndAcceptedRidersRegistrationsCount/@_eventDetail.MaxRegistrations</p>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if(_myRegistration != null)
+                            {
+                                <div class="card mt-4">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Your Registration Details</h5>
+                                        <button class="btn btn-success" @onclick="NavigateToTicket">Open a ticket</button>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Registration date:</strong> @_myRegistration.CreationDate.ToLocalTime().ToString("g")</p>
+                                        <p><strong>Role:</strong> @_myRegistration.Role</p>
+                                        <p><strong>State:</strong> @_myRegistration.State</p>
+                                        <p><strong>Checked In:</strong> @(_myRegistration.CheckedIn ? "Yes" : "No")</p>
+
+                                        @if(_myRegistration.Role == RegistrationRole.Staff && _myRegistration.State == RegistrationState.Accepted)
+                                        {
+                                            <button class="btn btn-success" @onclick="NavigateToOrganizerPanel">Go to Organizer Panel</button>
+                                            @if (_checkInQrCode != null)
+                                            {
+                                                <div>
+                                                    <p>Here is your QR Code to check-in at the event:</p>
+                                                    <img src="@_checkInQrCode" alt="QR Code" class="img-fluid" />
+                                                </div>
+                                            }
+                                        }
+                                        
+                                        @if(_myRegistration.State == RegistrationState.PreRegistered)
+                                        {
+                                            @if(_myRegistration.Role == RegistrationRole.Rider && !_eventDetail.IsFree)
+                                            {
+                                               @if (GetRegistrationStateText() == "OPEN")
+                                               {
+                                                   <div class="alert alert-warning" role="alert">
+                                                       You need to pay for the registration. Until the payment is done, your registration is not accepted.
+                                                       <button class="btn btn-primary" @onclick="CreateCheckoutSession">Pay Now</button>
+                                                       
+                                                       **TEST SYSTEM, any charge would be applyed. Palabra del Arki, use this card numbers for specific cases: Test Card for Success: 4242 4242 4242 4242
+                                                                                                                                                               Test Card for Authentication Required: 4000 0025 0000 3155
+                                                                                                                                                               Test Card for Insufficient Funds: 4000 0000 0000 9995
+                                                                                                                                                               Test Card for Declined: 4000 0000 0000 0002
+                                                                                                                                                               Test Card for Expired Card: 4000 0000 0000 0069
+                                                                                                                                                               Test Card for Incorrect CVC: 4000 0000 0000 0127
+                                                                                                                                                               Test Card for Card Declined: 4000 0000 0000 0119
+                                                                                                                                                               Test Card for Processing Error: 4000 0000 0000 0101
+                                                   </div>
+                                               }
+                                                @if (GetRegistrationStateText() == "CLOSED")
+                                                {
+                                                    <div class="alert alert-danger" role="alert">
+                                                        The registrations are closed. You can't pay for the registration anymore.
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-warning" role="alert">
+                                                    Your registration is awaiting approval from the event owner.
+                                                </div>
+                                            }
+                                        }
+                                        @if (_myRegistration.State == RegistrationState.Accepted && _myRegistration.Role == RegistrationRole.Rider)
+                                        {
+                                            <div class="alert alert-success" role="alert">
+                                                Your registration is accepted. You can now check-in at the event.
+                                            </div>
+                                            @if (_checkInQrCode != null)
+                                            {
+                                                <div>
+                                                    <p>Here is your QR Code to check-in at the event:</p>
+                                                    <img src="@_checkInQrCode" alt="QR Code" class="img-fluid" />
+                                                </div>
+                                            }
+                                        }
+                    
+                                        @if(_myRegistration.State == RegistrationState.Cancelled)
+                                        {
+                                            <div class="alert alert-danger" role="alert">
+                                                Your registration is cancelled. If you don't know why, please contact the organization.
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <AuthorizeView>
+        <Authorized>
+            @if(_myRegistration == null)
+            {
+                <button class="btn btn-primary" @onclick="() => _isModalOpen = true">Pre-Register</button>
+            }
+        </Authorized>
+    </AuthorizeView>
+
+    @if (_isModalOpen)
+    {
+        <RegistrationModal EventDto="@_eventDetail" EventId="EventId" Title="Registration type" Message="Select what type of registration you want to proceed." 
+                           Visible="@_isModalOpen" 
+                           ConfirmationChanged="PreRegister" />
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid? EventId { get; set; }
+    
+    private EventDto? _eventDetail;
+    private RegistrationDto? _myRegistration;
+    private string? _checkInQrCode;
+    private bool _isModalOpen;
+    private ClaimsPrincipal? _user;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetBasicInfoAboutEventDetails();
+    }
+
+    private async Task GetBasicInfoAboutEventDetails()
+    {
+        var http = HttpClientFactory.CreateClient("EventsManager.ServerAPI.Anonymous");
+        _eventDetail = await http.GetFromJsonAsync<EventDto>($"Event/{EventId}");
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _user = authState.User;
+        var isAuthenticated = _user.Identity?.IsAuthenticated ?? false;
+        if (isAuthenticated)
+        {
+            try
+            {
+                var response = await Http.GetFromJsonAsync<RegistrationDto?>($"Registration/event/{EventId}");
+                if (response != null)
+                {
+                    _myRegistration = response;
+                    if (_myRegistration.State == RegistrationState.Accepted)
+                    {
+                        _checkInQrCode = GenerateQRCode($"{NavigationManager.BaseUri}Check-in/{_myRegistration.Id}");
+                    }   
+                }
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+    }
+
+    private async Task PreRegister(RegistrationModal.RoleConfirmation? roleConfirmation)   
+    {
+        _isModalOpen = false;
+
+        if (roleConfirmation != null)   
+        {
+            await Http.PostAsync($"Registration/event/{EventId}/{roleConfirmation.Role}/password/{roleConfirmation.Password}", null);
+            await GetBasicInfoAboutEventDetails();
+        }
+    }
+
+    private void NavigateToOrganizerPanel()
+    {
+        NavigationManager.NavigateTo($"event-detail-organizer/{EventId}");
+    }
+
+    private void NavigateToTicket()
+    {
+        NavigationManager.NavigateTo($"ticket-chat/{_myRegistration.Id}/event/{EventId}");
+    }
+    
+    private string GetRegistrationStateText()
+    {
+        if (_eventDetail.PreAndAcceptedRidersRegistrationsCount >= _eventDetail.MaxRegistrations
+            || DateTime.Now < _eventDetail.OpenRegistrationsDate
+            || DateTime.Now > _eventDetail.CloseRegistrationsDate)
+        {
+            return "CLOSED";
+        }
+
+        if (_eventDetail.CurrentPrice == null)
+        {
+            return "CLOSED";
+        }
+    
+        return "OPEN";
+    }
+
+    private string GetRegistrationStateColor()
+    {
+        if (_eventDetail.PreAndAcceptedRidersRegistrationsCount >= _eventDetail.MaxRegistrations
+            || DateTime.UtcNow < _eventDetail.OpenRegistrationsDate
+            || DateTime.UtcNow > _eventDetail.CloseRegistrationsDate)
+        {
+            return "red"; // Apply red color for CLOSED state
+        }
+        
+        if (_eventDetail.CurrentPrice == null)
+        {
+            return "red";
+        }
+
+        return "green"; // Apply green color for OPEN state
+    }
+
+    private async Task CreateCheckoutSession()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync("/create-checkout-session", new CheckoutRequest
+            {
+                RegistrationId = _myRegistration.Id.ToString(),
+                EventId = EventId.ToString()
+            });
+
+            if (response.IsSuccessStatusCode)
+            {
+                var checkoutSession = await response.Content.ReadFromJsonAsync<CheckoutResponse>();
+                NavigationManager.NavigateTo(checkoutSession.Url);
+            }
+            else
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(errorMessage);
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        
+    }
+    
+    private string GenerateQRCode(string input) 
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(input, QRCodeGenerator.ECCLevel.Q);
+        using var pngQrCode = new PngByteQRCode(qrCodeData);
+        var graphic = pngQrCode.GetGraphic(10);
+        var base64String = Convert.ToBase64String(graphic, 0, graphic.Length); // Convert the bytes to base64 string  
+        return $"data:image/png;base64,{base64String}";
+    }
+}
