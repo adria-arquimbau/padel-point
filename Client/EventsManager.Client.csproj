@@ -35,4 +35,18 @@
     <None Include="wwwroot\success.html" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Ticket\ManageTicket.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\AllEvents.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\CreateEvent.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\FilesManager.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\MyEventDetail.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\MyEventEdit.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\MyEventsList.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\OwnersManager.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\PriceEdit.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\RegistrationRolePasswordsEdit.razor" />
+    <_ContentIncludedByDefault Remove="Components\Event\TicketsManager.razor" />
+  </ItemGroup>
+
 </Project>
