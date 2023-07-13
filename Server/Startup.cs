@@ -6,7 +6,6 @@ using EventsManager.Server.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Stripe;
 
 namespace EventsManager.Server;
 
@@ -92,8 +91,6 @@ public class Startup {
         }
         
         app.UseDeveloperExceptionPage();
-        
-        StripeConfiguration.ApiKey = "sk_test_51NIGzHKiJO2GrIfAqD6y7dOzdabQBMgaEYtqR5DpoqUpKv3fJFku07qPxKzYJ8kIpppp733PHISdvibsXZbg2xwb00o6fnTu5j";
         
         app.UseHttpsRedirection();
 
