@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsManager.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230630112826_RemovePaymentColumn")]
-    partial class RemovePaymentColumn
+    [Migration("20230713163415_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,21 +24,6 @@ namespace EventsManager.Server.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("ApplicationUserEvent", b =>
-                {
-                    b.Property<Guid>("OwnedEventsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("OwnersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("OwnedEventsId", "OwnersId");
-
-                    b.HasIndex("OwnersId");
-
-                    b.ToTable("UserEventOwner", (string)null);
-                });
 
             modelBuilder.Entity("Duende.IdentityServer.EntityFramework.Entities.DeviceFlowCodes", b =>
                 {
@@ -273,190 +258,6 @@ namespace EventsManager.Server.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("EventsManager.Server.Models.Event", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CloseRegistrationsDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FinishDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFree")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MaxRegistrations")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("OpenRegistrationsDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatorId");
-
-                    b.ToTable("Events");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.EventPrice", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventPrices");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EventRawJObject")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RegistrationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("StripeCreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RegistrationId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Registration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Bib")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("CheckedIn")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Registrations");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.RegistrationRolePassword", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("RegistrationRolePasswords");
-                });
-
             modelBuilder.Entity("EventsManager.Server.Models.Suggestion", b =>
                 {
                     b.Property<Guid>("Id")
@@ -478,75 +279,6 @@ namespace EventsManager.Server.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Suggestions");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Ticket", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("RegistrationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("Solved")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SolvedById")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("SolvedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RegistrationId");
-
-                    b.HasIndex("SolvedById");
-
-                    b.ToTable("Tickets");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.TicketResponse", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsAdminResponse")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RespondedById")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("ResponseDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("TicketId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RespondedById");
-
-                    b.HasIndex("TicketId");
-
-                    b.ToTable("TicketResponses");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -686,84 +418,6 @@ namespace EventsManager.Server.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ApplicationUserEvent", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Event", null)
-                        .WithMany()
-                        .HasForeignKey("OwnedEventsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EventsManager.Server.Models.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("OwnersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Event", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.ApplicationUser", "Creator")
-                        .WithMany("CreatorEvents")
-                        .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.EventPrice", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Event", "Event")
-                        .WithMany("Prices")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Payment", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Registration", "Registration")
-                        .WithMany("Payments")
-                        .HasForeignKey("RegistrationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Registration");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Registration", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Event", "Event")
-                        .WithMany("Registrations")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EventsManager.Server.Models.ApplicationUser", "User")
-                        .WithMany("Registrations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.RegistrationRolePassword", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Event", "Event")
-                        .WithMany("RegistrationRolePasswords")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-                });
-
             modelBuilder.Entity("EventsManager.Server.Models.Suggestion", b =>
                 {
                     b.HasOne("EventsManager.Server.Models.ApplicationUser", "User")
@@ -771,40 +425,6 @@ namespace EventsManager.Server.Data.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Ticket", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.Registration", "Registration")
-                        .WithMany("Tickets")
-                        .HasForeignKey("RegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EventsManager.Server.Models.ApplicationUser", "SolvedBy")
-                        .WithMany()
-                        .HasForeignKey("SolvedById");
-
-                    b.Navigation("Registration");
-
-                    b.Navigation("SolvedBy");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.TicketResponse", b =>
-                {
-                    b.HasOne("EventsManager.Server.Models.ApplicationUser", "RespondedBy")
-                        .WithMany()
-                        .HasForeignKey("RespondedById");
-
-                    b.HasOne("EventsManager.Server.Models.Ticket", "Ticket")
-                        .WithMany("Responses")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RespondedBy");
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -856,34 +476,6 @@ namespace EventsManager.Server.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("CreatorEvents");
-
-                    b.Navigation("Registrations");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Event", b =>
-                {
-                    b.Navigation("Prices");
-
-                    b.Navigation("RegistrationRolePasswords");
-
-                    b.Navigation("Registrations");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Registration", b =>
-                {
-                    b.Navigation("Payments");
-
-                    b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("EventsManager.Server.Models.Ticket", b =>
-                {
-                    b.Navigation("Responses");
                 });
 #pragma warning restore 612, 618
         }
