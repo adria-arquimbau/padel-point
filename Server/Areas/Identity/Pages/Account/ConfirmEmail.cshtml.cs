@@ -3,6 +3,7 @@
 #nullable disable
 
 using System.Text;
+using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +16,12 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context;
 
-        public ConfirmEmailModel(UserManager<ApplicationUser> userManager)
+        public ConfirmEmailModel(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
         /// <summary>
@@ -46,6 +49,14 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             {
                 StatusMessage = "Thank you for confirming your email.";
                 await _userManager.AddToRoleAsync(user, RoleConstants.User);
+                var newPlayer = new Player
+                {
+                    UserId = Guid.Parse(user.Id),
+                    NickName = user.UserName,
+                    SkillLevel = 0
+                };
+                _context.Player.Add(newPlayer);
+                await _context.SaveChangesAsync();
             }
             else
                 StatusMessage = "Error confirming your email.";

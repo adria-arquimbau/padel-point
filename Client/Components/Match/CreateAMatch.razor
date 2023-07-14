@@ -1,0 +1,116 @@
+@page "/creatematch"
+@using EventsManager.Shared.Dtos
+
+@inject HttpClient Http
+
+<h3>Create Match</h3>
+
+<!-- Search Bar for Players -->
+<div>
+    <input placeholder="Search for player" @bind="searchTerm" @oninput="SearchPlayers" />
+    <ul>
+        @if(searchedPlayers != null)
+        {
+            @foreach (var player in searchedPlayers)
+            {
+                <li>
+                    @player.NickName
+                    <button @onclick="() => AddPlayer(player)">Add</button>
+                </li>
+            }
+        }
+    </ul>
+</div>
+
+<!-- Selected Players List -->
+<div>
+    <h4>Selected Players</h4>
+    <ul>
+        @foreach (var player in selectedPlayers)
+        {
+            <li>@player.NickName <button @onclick="() => RemovePlayer(player)">Remove</button></li>
+        }
+    </ul>
+</div>
+
+<!-- Match creation -->
+@if(selectedPlayers.Count == 4)
+{
+    <button @onclick="CreateMatch">Create Match</button>
+}
+
+<!-- Input Scores for Sets -->
+@if(matchCreated)
+{
+    <h4>Input Set Scores</h4>
+    @for (int i = 0; i < numberOfSets; i++)
+    {
+        int j = i; // local copy for correct lambda capturing
+        <div>
+            <label>Set @i Team1 Score:</label>
+            <input type="number" @bind="setScores[j].Team1Score" min="0" />
+            <label>Set @i Team2 Score:</label>
+            <input type="number" @bind="setScores[j].Team2Score" min="0" />
+        </div>
+    }
+    <button @onclick="SubmitScores">Submit Scores</button>
+}
+
+@code {
+    string searchTerm = "";
+    List<PlayerDto> searchedPlayers = null;
+    List<PlayerDto> selectedPlayers = new List<PlayerDto>();
+    List<SetDto> setScores = new List<SetDto>();
+    int numberOfSets = 3; // number of sets to play
+    bool matchCreated = false;
+
+    async Task SearchPlayers(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            searchedPlayers = await Http.GetFromJsonAsync<List<PlayerDto>>($"Player/search?term={searchTerm}");
+        }
+    }
+
+    void AddPlayer(PlayerDto player)
+    {
+        if (selectedPlayers.Count < 4) // maximum four players
+        {
+            selectedPlayers.Add(player);
+            searchedPlayers.Remove(player);
+        }
+    }
+
+    void RemovePlayer(PlayerDto player)
+    {
+        selectedPlayers.Remove(player);
+        searchedPlayers.Add(player);
+    }
+
+    async Task CreateMatch()
+    {
+        var match = new MatchDto { CreationDate = DateTime.UtcNow, Status = "scheduled" }; // assuming a status
+        await Http.PostAsJsonAsync("api/Match", match);
+        matchCreated = true;
+        for (int i = 0; i < numberOfSets; i++)
+        {
+            setScores.Add(new SetDto { SetNumber = i + 1 }); // initialize with set numbers
+        }
+    }
+
+    async Task SubmitScores()
+    {
+        // Assume we have the match ID
+        foreach (var set in setScores)
+        {
+            await Http.PostAsJsonAsync("api/Set", set);
+        }
+        // reset the form after submitting scores
+        searchTerm = "";
+        searchedPlayers = null;
+        selectedPlayers = new List<PlayerDto>();
+        setScores = new List<SetDto>();
+        matchCreated = false;
+    }
+}
