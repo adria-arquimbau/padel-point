@@ -1,4 +1,5 @@
 using EventsManager.Server.Data;
+using EventsManager.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,11 @@ public class PlayerController : ControllerBase
 
         var players = await _dbContext.Player
             .Where(p => p.NickName.ToLower().Contains(lowerTerm))
+            .Select(x => new PlayerDto
+            {
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl
+            })
             .ToListAsync(cancellationToken: cancellationToken);
 
         return Ok(players);
