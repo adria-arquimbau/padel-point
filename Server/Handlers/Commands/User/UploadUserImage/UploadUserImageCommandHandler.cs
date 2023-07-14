@@ -27,8 +27,8 @@ public class UploadUserImageCommandHandler : IRequestHandler<UploadUserImageComm
     {
         var uploadResult = new UploadResult();
         
-        var user = await _dbContext.Users
-            .SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
+        var user = await _dbContext.Player
+            .SingleAsync(x => x.User.Id == request.UserId, cancellationToken: cancellationToken);
         
         var blobClient = new BlobClient(_blobStorageOptions.ConnectionString, _blobStorageOptions.ProfileImageContainerName, user.Id + "-user-picture");
         await blobClient.UploadAsync(request.File.OpenReadStream(), new BlobHttpHeaders { ContentType = request.File.ContentType }, conditions: null, cancellationToken: cancellationToken);

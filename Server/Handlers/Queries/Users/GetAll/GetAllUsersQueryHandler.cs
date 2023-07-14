@@ -21,15 +21,7 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             Id = x.Id,
             UserName = x.UserName,
             Email = x.Email,
-            EmailConfirmed = x.EmailConfirmed,
-            ImageUrl = x.ImageUrl,
-            Address = x.Address,
-            City = x.City,
-            Country = x.Country,
-            PhoneNumber = x.PhoneNumber,
-            PostalCode = x.PostalCode,
-            FamilyName = x.FamilyName,
-            Name = x.Name
+            EmailConfirmed = x.EmailConfirmed
         })
         .ToListAsync(cancellationToken: cancellationToken);
 

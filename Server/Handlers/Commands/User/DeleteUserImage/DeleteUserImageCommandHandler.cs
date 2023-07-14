@@ -21,19 +21,19 @@ public class DeleteUserImageCommandHandler : IRequestHandler<DeleteUserImageComm
     
     public async Task Handle(DeleteUserImageCommandRequest request, CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Users
-            .SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
+        var player = await _dbContext.Player
+            .SingleAsync(x => x.User.Id == request.UserId, cancellationToken: cancellationToken);
 
-        if (user.ImageUrl == null)
+        if (player.ImageUrl == null)
         {
             throw new UserDoesNotHavePictureException();
         }
         
-        var blobClient = new BlobClient(_blobStorageOptions.ConnectionString, _blobStorageOptions.ProfileImageContainerName, user.Id + "-user-picture");
+        var blobClient = new BlobClient(_blobStorageOptions.ConnectionString, _blobStorageOptions.ProfileImageContainerName, player.Id + "-user-picture");
         
         await blobClient.DeleteAsync(cancellationToken: cancellationToken);
             
-        user.ImageUrl = null;
+        player.ImageUrl = null;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

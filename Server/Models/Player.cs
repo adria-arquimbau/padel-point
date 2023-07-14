@@ -3,9 +3,11 @@ namespace EventsManager.Server.Models;
 public class Player
 {
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
     public string NickName { get; set; }
     public int SkillLevel { get; set; }
+    public Uri? ImageUrl { get; set; }
+    public string UserId { get; set; }
+    public ApplicationUser User { get; set; }
 }
 
 public class Match

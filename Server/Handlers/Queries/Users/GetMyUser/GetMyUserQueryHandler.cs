@@ -19,6 +19,7 @@ public class GetMyUserQueryHandler : IRequestHandler<GetMyUserQueryRequest, User
     public async Task<UserDto> Handle(GetMyUserQueryRequest request, CancellationToken cancellationToken)
     {
         var user = await _dbContext.Users
+            .Include(x => x.Player)
             .SingleAsync(x => x.Id == request.UserId, cancellationToken);
 
         if(user == null)
@@ -31,14 +32,7 @@ public class GetMyUserQueryHandler : IRequestHandler<GetMyUserQueryRequest, User
             Id = user.Id,
             UserName = user.UserName!,
             Email = user.Email!,
-            Name = user.Name,
-            FamilyName = user.FamilyName,
-            Address = user.Address,
-            City = user.City,
-            Country = user.Country,
-            PostalCode = user.PostalCode,
-            PhoneNumber = user.PhoneNumber,
-            ImageUrl = user.ImageUrl
+            ImageUrl = user.Player.ImageUrl
         };
     }
 }

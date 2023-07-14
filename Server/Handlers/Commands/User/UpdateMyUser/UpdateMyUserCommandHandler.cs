@@ -23,14 +23,6 @@ public class UpdateMyUserCommandHandler : IRequestHandler<UpdateMyUserCommandReq
 
         var userEntity = await _dbContext.Users.SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
         
-        userEntity.Name = request.UserDto.Name;
-        userEntity.FamilyName = request.UserDto.FamilyName;
-        userEntity.Address = request.UserDto.Address;
-        userEntity.City = request.UserDto.City;
-        userEntity.Country = request.UserDto.Country;
-        userEntity.PostalCode = request.UserDto.PostalCode;
-        userEntity.PhoneNumber = request.UserDto.PhoneNumber;
-        
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

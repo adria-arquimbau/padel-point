@@ -17,12 +17,13 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
     public void Configure(EntityTypeBuilder<Player> builder)
     {
         builder.HasKey(p => p.Id);
-        builder.Property(p => p.UserId)
-            .IsRequired();
         builder.Property(p => p.NickName)
             .IsRequired();
         builder.Property(p => p.SkillLevel)
             .IsRequired();
+        builder.HasOne(p => p.User)
+            .WithOne(u => u.Player)
+            .HasForeignKey<Player>(x => x.UserId);
     }
 }
 
