@@ -7,11 +7,11 @@
 
 <!-- Search Bar for Players -->
 <div>
-    <input placeholder="Search for player" @bind="searchTerm" @oninput="SearchPlayers" />
+    <input placeholder="Search for player" @bind="_searchTerm" @oninput="SearchPlayers" />
     <ul>
-        @if(searchedPlayers != null)
+        @if(_searchedPlayers != null)
         {
-            @foreach (var player in searchedPlayers)
+            @foreach (var player in _searchedPlayers)
             {
                 <li>
                     @player.NickName
@@ -22,95 +22,99 @@
     </ul>
 </div>
 
-<!-- Selected Players List -->
-<div>
-    <h4>Selected Players</h4>
-    <ul>
-        @foreach (var player in selectedPlayers)
-        {
-            <li>@player.NickName <button @onclick="() => RemovePlayer(player)">Remove</button></li>
-        }
-    </ul>
+<!-- Padel Court Visualization -->
+<div style="border: 1px solid black; width: 200px; height: 400px; position: relative;">
+    <!-- Top Team Area -->
+    <div style="position: absolute; top: 0; left: 0; width: 200px; height: 200px; border-bottom: 1px solid blue;"></div>
+    <!-- Bottom Team Area -->
+    <div style="position: absolute; bottom: 0; left: 0; width: 200px; height: 200px; border-top: 1px solid red;"></div>
+    <!-- Net -->
+    <div style="position: absolute; top: 50%; left: 0; width: 200px; height: 1px; background: black;"></div>
+    
+   @for (int i = 0; i < _selectedPlayers.Count; i++)
+   {
+       var player = _selectedPlayers[i];
+       var positionTop = (i < 2) ? "10px" : "350px";
+       var positionLeft = ((i == 0) || (i == 2)) ? "50px" : "150px";
+       var teamColor = (i < 2) ? "blue" : "red"; // team 1 is blue, team 2 is red
+       <div style="position: absolute; top: @positionTop; left: @positionLeft; color: @teamColor;">
+           @player.NickName
+           <div style="font-size: 0.8em;">Player @(i+1)</div>
+       </div>
+   }
+
 </div>
 
-<!-- Match creation -->
-@if(selectedPlayers.Count == 4)
-{
-    <button @onclick="CreateMatch">Create Match</button>
-}
 
 <!-- Input Scores for Sets -->
-@if(matchCreated)
+@if(_selectedPlayers.Count == 4)
 {
     <h4>Input Set Scores</h4>
-    @for (int i = 0; i < numberOfSets; i++)
+    @for (int i = 0; i < NumberOfSets; i++)
     {
         int j = i; // local copy for correct lambda capturing
         <div>
             <label>Set @i Team1 Score:</label>
-            <input type="number" @bind="setScores[j].Team1Score" min="0" />
+            <input type="number" @bind="_setScores[j].Team1Score" min="0" />
             <label>Set @i Team2 Score:</label>
-            <input type="number" @bind="setScores[j].Team2Score" min="0" />
+            <input type="number" @bind="_setScores[j].Team2Score" min="0" />
         </div>
     }
-    <button @onclick="SubmitScores">Submit Scores</button>
+    <button @onclick="CreateMatch">Submit Match</button>
 }
 
 @code {
-    string searchTerm = "";
-    List<PlayerDto> searchedPlayers = null;
-    List<PlayerDto> selectedPlayers = new List<PlayerDto>();
-    List<SetDto> setScores = new List<SetDto>();
-    int numberOfSets = 3; // number of sets to play
-    bool matchCreated = false;
+    string _searchTerm = "";
+    List<PlayerDto>? _searchedPlayers;
+    List<PlayerDto> _selectedPlayers = new();
+    List<SetDto> _setScores = new();
+    private const int NumberOfSets = 3;
+    bool _matchCreated;
 
     async Task SearchPlayers(ChangeEventArgs e)
     {
-        searchTerm = e.Value.ToString();
-        if (!string.IsNullOrEmpty(searchTerm))
+        _searchTerm = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(_searchTerm))
         {
-            searchedPlayers = await Http.GetFromJsonAsync<List<PlayerDto>>($"Player/search?term={searchTerm}");
+            _searchedPlayers = await Http.GetFromJsonAsync<List<PlayerDto>>($"Player/search?term={_searchTerm}");
         }
     }
 
     void AddPlayer(PlayerDto player)
     {
-        if (selectedPlayers.Count < 4) // maximum four players
+        if (_selectedPlayers.Count < 4) // maximum four players
         {
-            selectedPlayers.Add(player);
-            searchedPlayers.Remove(player);
+            _selectedPlayers.Add(player);
+            _searchedPlayers.Remove(player);
+            if (_selectedPlayers.Count == 4)
+            {
+                for (var i = 0; i < NumberOfSets; i++)
+                {
+                    _setScores.Add(new SetDto { SetNumber = i + 1 }); // initialize with set numbers
+                }
+            }
         }
     }
 
     void RemovePlayer(PlayerDto player)
     {
-        selectedPlayers.Remove(player);
-        searchedPlayers.Add(player);
+        _selectedPlayers.Remove(player);
+        _searchedPlayers.Add(player);
+        if (_selectedPlayers.Count < 4)
+        {
+            _setScores.Clear();
+        }
     }
 
     async Task CreateMatch()
     {
-        var match = new MatchDto { CreationDate = DateTime.UtcNow, Status = "scheduled" }; // assuming a status
-        await Http.PostAsJsonAsync("api/Match", match);
-        matchCreated = true;
-        for (int i = 0; i < numberOfSets; i++)
-        {
-            setScores.Add(new SetDto { SetNumber = i + 1 }); // initialize with set numbers
-        }
-    }
-
-    async Task SubmitScores()
-    {
-        // Assume we have the match ID
-        foreach (var set in setScores)
-        {
-            await Http.PostAsJsonAsync("api/Set", set);
-        }
+        //var match = new MatchDto { CreationDate = DateTime.UtcNow, Status = "scheduled", Players = _selectedPlayers, Sets = _setScores }; // assuming a status
+        //await Http.PostAsJsonAsync("api/Match", match);
         // reset the form after submitting scores
-        searchTerm = "";
-        searchedPlayers = null;
-        selectedPlayers = new List<PlayerDto>();
-        setScores = new List<SetDto>();
-        matchCreated = false;
+        _searchTerm = "";
+        _searchedPlayers = null;
+        _selectedPlayers = new List<PlayerDto>();
+        _setScores = new List<SetDto>();
+        _matchCreated = false;
     }
 }
