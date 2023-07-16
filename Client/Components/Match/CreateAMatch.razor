@@ -4,85 +4,74 @@
 
 <h3>Create Match</h3>
 
-<!-- Player 1 -->
-<div class="player-area player-one">
-    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(0)">
-        @if (_playerOne != null)
-        {
-            <div class="player-card">
-                <img class="player-image" src="@_playerOne.ImageUrl" alt="Player's image" />
-                <span class="player-nickname">@_playerOne.NickName</span>
-                <button class="remove-player-btn" @onclick="() => UnassignPlayer(0)">X</button>
-            </div>
-        }
-        else
-        {
-            <div class="assign-player">
-                Assign Player
-            </div>
-        }
-    </div>
-</div>
-
-<!-- Player 2 -->
-<div class="player-area player-two">
-    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(1)">
-        @if (_playerTwo != null)
-        {
-            <div class="player-card">
-                <img class="player-image" src="@_playerTwo.ImageUrl" alt="Player's image" />
-                <span class="player-nickname">@_playerTwo.NickName</span>
-                <button class="remove-player-btn" @onclick="() => UnassignPlayer(1)">X</button>
-            </div>
-        }
-        else
-        {
-            <div class="assign-player">
-                Assign Player
-            </div>
-        }
-    </div>
-</div>
-
-<!-- Player 3 -->
-<div class="player-area player-three">
-    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(2)">
-        @if (_playerThree != null)
-        {
-            <div class="player-card">
-                <img class="player-image" src="@_playerThree.ImageUrl" alt="Player's image" />
-                <span class="player-nickname">@_playerThree.NickName</span>
-                <button class="remove-player-btn" @onclick="() => UnassignPlayer(2)">X</button>
-            </div>
-        }
-        else
-        {
-            <div class="assign-player">
-                Assign Player
-            </div>
-        }
-    </div>
-</div>
-
-<!-- Player 4 -->
-<div class="player-area player-four">
-    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(3)">
-        @if (_playerFour != null)
-        {
-            <div class="player-card">
-                <img class="player-image" src="@_playerFour.ImageUrl" alt="Player's image" />
-                <span class="player-nickname">@_playerFour.NickName</span>
-                <button class="remove-player-btn" @onclick="() => UnassignPlayer(3)">X</button>
-            </div>
-        }
-        else
-        {
-            <div class="assign-player">
-                Assign Player
-            </div>
-        }
-    </div>
-</div>
+<!-- Player Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Team</th>
+            <th>Player</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Team 1</td>
+            <td>@_player1?.NickName</td>
+            <td>
+                @if (_player1 == null)
+                {
+                    <button @onclick="() => OpenPlayerAssignmentModal(1)">Assign</button>
+                }
+                else
+                {
+                    <button @onclick="() => UnassignPlayer(1)">Remove</button>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Team 1</td>
+            <td>@_player2?.NickName</td>
+            <td>
+                @if (_player2 == null)
+                {
+                    <button @onclick="() => OpenPlayerAssignmentModal(2)">Assign</button>
+                }
+                else
+                {
+                    <button @onclick="() => UnassignPlayer(2)">Remove</button>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Team 2</td>
+            <td>@_player3?.NickName</td>
+            <td>
+                @if (_player3 == null)
+                {
+                    <button @onclick="() => OpenPlayerAssignmentModal(3)">Assign</button>
+                }
+                else
+                {
+                    <button @onclick="() => UnassignPlayer(3)">Remove</button>
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Team 2</td>
+            <td>@_player4?.NickName</td>
+            <td>
+                @if (_player4 == null)
+                {
+                    <button @onclick="() => OpenPlayerAssignmentModal(4)">Assign</button>
+                }
+                else
+                {
+                    <button @onclick="() => UnassignPlayer(4)">Remove</button>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <!-- Player Assignment Modal -->
 @if (_showPlayerAssignmentModal)
@@ -114,14 +103,13 @@
     </div>
 }
 
-
 @code {
     string _searchTerm = "";
     List<PlayerDto>? _searchedPlayers;
-    PlayerDto? _playerOne = null;
-    PlayerDto? _playerTwo = null;
-    PlayerDto? _playerThree = null;
-    PlayerDto? _playerFour = null;
+    PlayerDto? _player1 = null;
+    PlayerDto? _player2 = null;
+    PlayerDto? _player3 = null;
+    PlayerDto? _player4 = null;
     bool _showPlayerAssignmentModal;
     int _currentPlayerNumber;
 
@@ -130,7 +118,13 @@
         _searchTerm = e.Value?.ToString();
         if (!string.IsNullOrEmpty(_searchTerm))
         {
-            _searchedPlayers = await Http.GetFromJsonAsync<List<PlayerDto>>($"Player/search?term={_searchTerm}");
+            var searchPlayersWithoutAssigned = await Http.GetFromJsonAsync<List<PlayerDto>>($"Player/search?term={_searchTerm}");
+            searchPlayersWithoutAssigned.RemoveAll(player =>
+                player.NickName == _player1?.NickName || 
+                player.NickName == _player2?.NickName || 
+                player.NickName == _player3?.NickName || 
+                player.NickName == _player4?.NickName);
+            _searchedPlayers = searchPlayersWithoutAssigned;
         }
     }
 
@@ -142,36 +136,71 @@
 
     void AssignPlayer(PlayerDto player)
     {
-        if (_currentPlayerNumber == 0)
-            _playerOne = player;
-        else if (_currentPlayerNumber == 1)
-            _playerTwo = player;
-        else if (_currentPlayerNumber == 2)
-            _playerThree = player;
-        else if (_currentPlayerNumber == 3)
-            _playerFour = player;
+        if (_currentPlayerNumber == 1)
+        {
+            _player1 = player;
+        }
+        if (_currentPlayerNumber == 2)
+        {
+            _player2 = player;
+        }
+        if (_currentPlayerNumber == 3)
+        {
+            _player3 = player;
+        }
+        if (_currentPlayerNumber == 4)
+        {
+            _player4 = player;
+        }
 
-        _searchedPlayers.Remove(player);
+        _searchedPlayers = null;
         _searchTerm = ""; 
         _showPlayerAssignmentModal = false;
     }
 
     void UnassignPlayer(int playerNumber)
     {
-        if (playerNumber == 0)
-            _playerOne = null;
-        else if (playerNumber == 1)
-            _playerTwo = null;
-        else if (playerNumber == 2)
-            _playerThree = null;
-        else if (playerNumber == 3)
-            _playerFour = null;
+        if (playerNumber == 1)
+        {
+            _player1 = null;
+        }
+        if (playerNumber == 2)
+        {
+            _player2 = null;
+        }
+        if (playerNumber == 3)
+        {
+            _player3 = null;
+        }
+        if (playerNumber == 4)
+        {
+            _player4 = null;
+        }
     }
 }
 
-<!-- Add your existing style section here -->
-
 <style>
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #4CAF50;
+    color: white;
+}
 body {
     font-family: Arial, sans-serif;
 }
@@ -202,6 +231,7 @@ body {
 .player-slot:hover {
     background-color: #f0f0f0;
 }
+
 
 .player-card {
     display: flex;
