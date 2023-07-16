@@ -1,84 +1,129 @@
 @page "/creatematch"
 @using EventsManager.Shared.Dtos
-
 @inject HttpClient Http
 
 <h3>Create Match</h3>
 
-<!-- Search Bar for Players -->
-<div>
-    <input placeholder="Search for player" @bind="_searchTerm" @oninput="SearchPlayers" />
-    <ul>
-        @if(_searchedPlayers != null)
+<!-- Player 1 -->
+<div class="player-area player-one">
+    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(0)">
+        @if (_playerOne != null)
         {
-            @foreach (var player in _searchedPlayers)
-            {
-                <li>
-                    @player.NickName
-                    <button @onclick="() => AddPlayer(player)">Add</button>
-                </li>
-            }
+            <div class="player-card">
+                <img class="player-image" src="@_playerOne.ImageUrl" alt="Player's image" />
+                <span class="player-nickname">@_playerOne.NickName</span>
+                <button class="remove-player-btn" @onclick="() => UnassignPlayer(0)">X</button>
+            </div>
         }
-    </ul>
+        else
+        {
+            <div class="assign-player">
+                Assign Player
+            </div>
+        }
+    </div>
 </div>
 
-<!-- Padel Court Visualization -->
-<div style="border: 1px solid black; width: 300px; height: 600px; position: relative;">
-    <!-- Top Team Area -->
-    <div style="position: absolute; top: 0; left: 0; width: 300px; height: 300px; border-bottom: 1px solid blue;"></div>
-    <!-- Bottom Team Area -->
-    <div style="position: absolute; bottom: 0; left: 0; width: 300px; height: 300px; border-top: 1px solid red;"></div>
-    <!-- Net -->
-    <div style="position: absolute; top: 50%; left: 0; width: 300px; height: 1px; background: black;"></div>
-    
-    @for (int i = 0; i < _selectedPlayers.Count; i++)
-    {
-        var player = _selectedPlayers[i];
-        var positionTop = (i < 2) ? "30px" : "530px";
-        var positionLeft = ((i == 0) || (i == 2)) ? "70px" : "220px";
-        var teamColor = (i < 2) ? "blue" : "red"; // team 1 is blue, team 2 is red
-        var fontSize = (i == 0) ? "0.7em" : "0.8em";
-        <div style="position: absolute; top: @positionTop; left: @positionLeft; color: @teamColor; font-size: @fontSize;">
-            @if(player.ImageUrl != null)
-            {
-                <img src="@player.ImageUrl" alt="Player's image" style="width: 50px; height: 50px;" />
-            }
-            else
-            {
-                <div style="width: 50px; height: 50px; background: gray;"></div> <!-- Placeholder for missing image -->
-            }
-            @player.NickName <button @onclick="() => RemovePlayer(player)" style="font-size: 0.7em; color: black;">X</button>
-            <div>Player @(i+1)</div>
-        </div>
-    }
-
-
+<!-- Player 2 -->
+<div class="player-area player-two">
+    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(1)">
+        @if (_playerTwo != null)
+        {
+            <div class="player-card">
+                <img class="player-image" src="@_playerTwo.ImageUrl" alt="Player's image" />
+                <span class="player-nickname">@_playerTwo.NickName</span>
+                <button class="remove-player-btn" @onclick="() => UnassignPlayer(1)">X</button>
+            </div>
+        }
+        else
+        {
+            <div class="assign-player">
+                Assign Player
+            </div>
+        }
+    </div>
 </div>
 
-<!-- Input Scores for Sets -->
-@if(_selectedPlayers.Count == 4)
+<!-- Player 3 -->
+<div class="player-area player-three">
+    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(2)">
+        @if (_playerThree != null)
+        {
+            <div class="player-card">
+                <img class="player-image" src="@_playerThree.ImageUrl" alt="Player's image" />
+                <span class="player-nickname">@_playerThree.NickName</span>
+                <button class="remove-player-btn" @onclick="() => UnassignPlayer(2)">X</button>
+            </div>
+        }
+        else
+        {
+            <div class="assign-player">
+                Assign Player
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Player 4 -->
+<div class="player-area player-four">
+    <div class="player-slot" @onclick="() => OpenPlayerAssignmentModal(3)">
+        @if (_playerFour != null)
+        {
+            <div class="player-card">
+                <img class="player-image" src="@_playerFour.ImageUrl" alt="Player's image" />
+                <span class="player-nickname">@_playerFour.NickName</span>
+                <button class="remove-player-btn" @onclick="() => UnassignPlayer(3)">X</button>
+            </div>
+        }
+        else
+        {
+            <div class="assign-player">
+                Assign Player
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Player Assignment Modal -->
+@if (_showPlayerAssignmentModal)
 {
-    <h4>Input Set Scores</h4>
-    @for (int i = 0; i < NumberOfSets; i++)
-    {
-        int j = i; // local copy for correct lambda capturing
-        <div>
-            <label>Set @i Team1 Score:</label>
-            <input type="number" @bind="_setScores[j].Team1Score" min="0" />
-            <label>Set @i Team2 Score:</label>
-            <input type="number" @bind="_setScores[j].Team2Score" min="0" />
+    <div class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Assign Player</h5>
+                <button type="button" class="modal-close-btn" @onclick="() => _showPlayerAssignmentModal = false">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input class="search-input" placeholder="Search for player" @bind="_searchTerm" @oninput="SearchPlayers" />
+                @if(_searchedPlayers != null)
+                {
+                    <ul class="player-list">
+                        @foreach (var player in _searchedPlayers)
+                        {
+                            <li class="player-list-item">
+                                <span class="player-list-nickname">@player.NickName</span>
+                                <button class="assign-btn" @onclick="() => AssignPlayer(player)">Assign</button>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
         </div>
-    }
-    <button @onclick="CreateMatch">Submit Match</button>
+    </div>
 }
+
 
 @code {
     string _searchTerm = "";
     List<PlayerDto>? _searchedPlayers;
-    List<PlayerDto> _selectedPlayers = new();
-    List<SetDto> _setScores = new();
-    private const int NumberOfSets = 3;
-    bool _matchCreated;
+    PlayerDto? _playerOne = null;
+    PlayerDto? _playerTwo = null;
+    PlayerDto? _playerThree = null;
+    PlayerDto? _playerFour = null;
+    bool _showPlayerAssignmentModal;
+    int _currentPlayerNumber;
 
     async Task SearchPlayers(ChangeEventArgs e)
     {
@@ -89,41 +134,174 @@
         }
     }
 
-    void AddPlayer(PlayerDto player)
+    void OpenPlayerAssignmentModal(int playerNumber)
     {
-        if (_selectedPlayers.Count < 4) // maximum four players
-        {
-            _selectedPlayers.Add(player);
-            _searchedPlayers.Remove(player);
-            if (_selectedPlayers.Count == 4)
-            {
-                for (var i = 0; i < NumberOfSets; i++)
-                {
-                    _setScores.Add(new SetDto { SetNumber = i + 1 }); // initialize with set numbers
-                }
-            }
-        }
+        _currentPlayerNumber = playerNumber;
+        _showPlayerAssignmentModal = true;
     }
 
-    void RemovePlayer(PlayerDto player)
+    void AssignPlayer(PlayerDto player)
     {
-        _selectedPlayers.Remove(player);
-        _searchedPlayers.Add(player);
-        if (_selectedPlayers.Count < 4)
-        {
-            _setScores.Clear();
-        }
+        if (_currentPlayerNumber == 0)
+            _playerOne = player;
+        else if (_currentPlayerNumber == 1)
+            _playerTwo = player;
+        else if (_currentPlayerNumber == 2)
+            _playerThree = player;
+        else if (_currentPlayerNumber == 3)
+            _playerFour = player;
+
+        _searchedPlayers.Remove(player);
+        _searchTerm = ""; 
+        _showPlayerAssignmentModal = false;
     }
 
-    async Task CreateMatch()
+    void UnassignPlayer(int playerNumber)
     {
-        //var match = new MatchDto { CreationDate = DateTime.UtcNow, Status = "scheduled", Players = _selectedPlayers, Sets = _setScores }; // assuming a status
-        //await Http.PostAsJsonAsync("api/Match", match);
-        // reset the form after submitting scores
-        _searchTerm = "";
-        _searchedPlayers = null;
-        _selectedPlayers = new List<PlayerDto>();
-        _setScores = new List<SetDto>();
-        _matchCreated = false;
+        if (playerNumber == 0)
+            _playerOne = null;
+        else if (playerNumber == 1)
+            _playerTwo = null;
+        else if (playerNumber == 2)
+            _playerThree = null;
+        else if (playerNumber == 3)
+            _playerFour = null;
     }
 }
+
+<!-- Add your existing style section here -->
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+}
+
+.team-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 50%;
+    border-bottom: 1px solid #00f;
+    position: relative;
+}
+
+.player-slot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 120px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.player-slot:hover {
+    background-color: #f0f0f0;
+}
+
+.player-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.player-nickname {
+    margin-top: 8px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.remove-player-btn {
+    margin-top: 8px;
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.assign-player {
+    text-align: center;
+    font-size: 16px;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    padding: 16px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-close-btn {
+    border: none;
+    background-color: transparent;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.player-list {
+    margin-top: 16px;
+    list-style: none;
+    padding: 0;
+}
+
+.player-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.assign-btn {
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+</style>
