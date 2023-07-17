@@ -34,8 +34,6 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
         builder.HasKey(m => m.Id);
         builder.Property(m => m.CreationDate)
             .IsRequired();
-        builder.Property(m => m.Status)
-            .IsRequired();
     }
 }
 

@@ -1,0 +1,54 @@
+@page "/create-match"
+
+@using EventsManager.Shared.Requests
+@using EventsManager.Shared.Responses
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@inject IToastService ToastService
+
+<h3>Create Match</h3>
+
+<EditForm Model="@_newMatch" OnValidSubmit="HandleValidSubmit" class="my-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    <div class="form-group">
+        <label for="date">Date and Time:</label>
+        <InputDate @bind-Value="_newMatch.Date" id="date" name="date" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="location">Location:</label>
+        <InputText @bind-Value="_newMatch.Location" id="location" name="location" class="form-control" />
+    </div>
+    
+    <div class="form-group">
+        <label for="isPrivate">Private Match:</label>
+        <InputCheckbox @bind-Value="_newMatch.IsPrivate" id="isPrivate" name="isPrivate" class="form-control" />
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Create Match</button>
+</EditForm>
+
+@code {
+    private CreateMatchRequest _newMatch = new()
+    {
+        Date = DateTime.Now
+    };
+
+    private async Task HandleValidSubmit()
+    {
+        var response = await Http.PostAsJsonAsync("match", _newMatch);
+        
+        if(response.IsSuccessStatusCode)
+        {
+            var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
+            NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
+            ToastService.ShowSuccess("Match created successfully.");
+        }
+        else
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+    }
+}

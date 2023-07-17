@@ -10,12 +10,12 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddHttpClient("EventsManager.ServerAPI.Anonymous", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("EventsManager.ServerAPI.Anonymous"));
+builder.Services.AddHttpClient("PadelPoint.ServerAPI.Anonymous", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("PadelPoint.ServerAPI.Anonymous"));
 
-builder.Services.AddHttpClient("EventsManager.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+builder.Services.AddHttpClient("PadelPoint.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("EventsManager.ServerAPI"));
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("PadelPoint.ServerAPI"));
 builder.Services.AddBlazoredToast();
 builder.Services.AddApiAuthorization()
     .AddAccountClaimsPrincipalFactory<CustomUserFactory>();

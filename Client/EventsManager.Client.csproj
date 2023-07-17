@@ -49,4 +49,8 @@
     <_ContentIncludedByDefault Remove="Components\Event\TicketsManager.razor" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Match\" />
+  </ItemGroup>
+
 </Project>

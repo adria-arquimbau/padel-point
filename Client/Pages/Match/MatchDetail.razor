@@ -1,0 +1,43 @@
+@page "/match/{MatchId:guid}/detail"
+
+@using EventsManager.Shared.Responses
+@inject HttpClient Http
+@inject IToastService ToastService
+
+<h3>Match Detail</h3>
+
+@if (_match == null)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+else
+{
+    <p><strong>Date:</strong> @_match.CreationDate</p>
+    <p><strong>Location:</strong> @_match.Location</p>
+    <p><strong>Private:</strong> @_match.IsPrivate</p>
+}
+
+@code {
+    [Parameter]
+    public Guid? MatchId { get; set; }
+
+    private MatchResponse? _match;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (MatchId.HasValue)
+        {
+            var response = await Http.GetAsync($"match/{MatchId.Value}");
+
+            if(response.IsSuccessStatusCode)
+            {
+                _match = await response.Content.ReadFromJsonAsync<MatchResponse>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+    }
+}
