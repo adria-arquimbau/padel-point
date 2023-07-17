@@ -18,6 +18,7 @@ public class Match
     public ICollection<Set> Sets { get; set; }
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
+    public DateTime DateTime { get; set; }
 }   
 
 public class MatchPlayer

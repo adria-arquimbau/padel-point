@@ -29,7 +29,8 @@ public class MatchController : ControllerBase
         
         var newMatch = new Match
         {
-            CreationDate = request.Date.ToUniversalTime(),
+            CreationDate = DateTime.UtcNow,
+            DateTime = request.Date.ToUniversalTime(),
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -57,7 +58,7 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
-                CreationDate = x.CreationDate,
+                DateTime = x.DateTime,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate
             })

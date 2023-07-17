@@ -12,7 +12,53 @@
 }
 else
 {
-    <p><strong>Date:</strong> @_match.CreationDate</p>
+    
+    <div class="border info">
+        <div>
+            PADEL
+        </div>
+        <div>
+            @_match.DateTime.ToLongDateString() - @_match.DateTime.ToShortTimeString()
+        </div>
+        <div class="separation"></div>
+        <div class="border info-footer">
+            <div class="info-footer-box">
+                <div>
+                    Gender     
+                </div>
+                <div>
+                    Not set     
+                </div>
+            </div>
+            <div class="info-footer-box">
+                <div>
+                    Level     
+                </div>
+                <div>
+                    All
+                </div>
+            </div>
+            <div class="info-footer-box">
+                <div>
+                    Price     
+                </div>
+                <div>
+                    -
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="border match-detail-private">
+        @_match.IsPrivate   
+    </div>
+    <div class="border match-detail-players">
+        Players                      
+    </div>
+    <div class="border match-detail-location">
+        Location                        
+    </div>
+    
+    <p><strong>Date:</strong> @_match.DateTime</p>
     <p><strong>Location:</strong> @_match.Location</p>
     <p><strong>Private:</strong> @_match.IsPrivate</p>
 }
@@ -41,3 +87,35 @@ else
         }
     }
 }
+<style>
+    .border
+    {
+        margin: 15px;
+        padding: 15px;
+        border: 2px solid grey;
+        border-radius: 10px;   
+        display: flex;  
+    }
+    
+    .info
+    {
+        flex-direction: column;
+    }
+    
+    .info-footer
+    {
+        display: flex;  
+        flex-direction: row;
+    }
+    
+    .info-footer-box
+    {
+        display: flex;  
+        flex-direction: column;    
+    }
+    
+    .separation
+    {
+        border: 0.5px solid grey;
+    }
+</style>
