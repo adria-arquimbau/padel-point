@@ -18,7 +18,7 @@ else
             PADEL
         </div>
         <div>
-            @_match.DateTime.ToLongDateString() - @_match.DateTime.ToShortTimeString()
+            @_match.DateTime.ToLocalTime().ToLongDateString() - @_match.DateTime.ToLocalTime().ToShortTimeString()
         </div>
         <div class="separation"></div>
         <div class="border info-footer">
