@@ -4,63 +4,109 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-<h3>Match Detail</h3>
-
 @if (_match == null)
 {
     <LoadingSpinner></LoadingSpinner>
 }
 else
 {
-    
     <div class="border info">
         <div>
             PADEL
         </div>
         <div>
-            @_match.DateTime.ToLocalTime().ToLongDateString() - @_match.DateTime.ToLocalTime().ToShortTimeString()
+            @_match.StartDateTime.ToLocalTime().ToLongDateString() / @_match.StartDateTime.ToLocalTime().ToShortTimeString() - @_match.EndDateTime.ToLocalTime().ToShortTimeString()
         </div>
         <div class="separation"></div>
-        <div class="border info-footer">
+        <div class="info-footer">
             <div class="info-footer-box">
-                <div>
+                <div class="info-footer-box-content">
                     Gender     
                 </div>
-                <div>
+                <div class="info-footer-box-content grey-typo">
                     Not set     
                 </div>
             </div>
             <div class="info-footer-box">
-                <div>
+                <div class="info-footer-box-content">
                     Level     
                 </div>
-                <div>
+                <div class="info-footer-box-content grey-typo">
                     All
                 </div>
             </div>
             <div class="info-footer-box">
-                <div>
+                <div class="info-footer-box-content">
                     Price     
                 </div>
-                <div>
+                <div class="info-footer-box-content grey-typo">
                     -
                 </div>
             </div>
         </div>
     </div>
     <div class="border match-detail-private">
-        @_match.IsPrivate   
+        @if (_match.IsPrivate)
+        {
+            <i class="bi bi-lock"></i> <p> Private</p>
+        }
+        else
+        {
+            <i class="bi bi-unlock"></i> <p> Public</p>
+        }
     </div>
     <div class="border match-detail-players">
-        Players                      
+        <div>
+            Players
+        </div>
+        <div class="teams">
+            <div class="team">
+                Team 1
+                <div class="players">
+                    @foreach(var player in _match.PlayersTeamOne.Take(2))
+                    {
+                        <div class="player">
+                            @if (player?.ImageUrl != null)
+                            {
+                                <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                            }
+                            else
+                            {
+                                <div class="default-avatar"></div>
+                            }
+                            <p>@player?.NickName</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="separation"></div>
+
+            <div class="team">
+                Team 2  
+                <div class="players">
+                    @foreach(var player in _match.PlayersTeamTwo.Take(2))
+                    {
+                        <div class="player">
+                            @if (player?.ImageUrl != null)
+                            {
+                                <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                            }
+                            else
+                            {
+                                <div class="default-avatar"></div>
+                            }
+                            <p>@player?.NickName</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
+
     <div class="border match-detail-location">
-        Location                        
+        @_match.Location                        
     </div>
-    
-    <p><strong>Date:</strong> @_match.DateTime</p>
-    <p><strong>Location:</strong> @_match.Location</p>
-    <p><strong>Private:</strong> @_match.IsPrivate</p>
 }
 
 @code {
@@ -90,11 +136,17 @@ else
 <style>
     .border
     {
-        margin: 15px;
-        padding: 15px;
+        margin: 12px;
+        padding: 12px;
         border: 2px solid grey;
         border-radius: 10px;   
         display: flex;  
+        background-color: white;
+    }
+    
+    .grey-typo
+    {
+        color: grey;
     }
     
     .info
@@ -106,16 +158,69 @@ else
     {
         display: flex;  
         flex-direction: row;
+        justify-content: space-between;
     }
     
     .info-footer-box
     {
         display: flex;  
         flex-direction: column;    
+        margin: 12px;
     }
     
+    .info-footer-box-content
+    {
+        text-align: center;
+    }
+    
+    .match-detail-players {
+      display: flex;
+      flex-direction: column;
+    }
     .separation
     {
+        margin-top: 5px;
+        margin-bottom: 5px;
         border: 0.5px solid grey;
+    }
+    
+    .teams {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .team {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .players {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+    
+    .player {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60px;
+        font-size: 10px;
+    }
+    
+    .player-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .default-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: grey;
     }
 </style>

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -30,7 +31,8 @@ public class MatchController : ControllerBase
         var newMatch = new Match
         {
             CreationDate = DateTime.UtcNow,
-            DateTime = request.Date.ToUniversalTime(),
+            StartDateTime = request.StartDateTime.ToUniversalTime(),
+            EndDateTime = request.StartDateTime.ToUniversalTime(),
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -58,9 +60,22 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
-                DateTime = x.DateTime,
+                StartDateTime = x.StartDateTime,
+                EndDateTime = x.EndDateTime,
                 Location = x.Location,
-                IsPrivate = x.IsPrivate
+                IsPrivate = x.IsPrivate,
+                PlayersTeamOne = x.MatchPlayers.Where(p => p.Team == Team.Team1)
+                    .Select(p => new PlayerDto
+                {
+                    NickName = p.Player.NickName,
+                    ImageUrl = p.Player.ImageUrl
+                }),
+                PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
+                    .Select(p => new PlayerDto
+                    {
+                        NickName = p.Player.NickName,
+                        ImageUrl = p.Player.ImageUrl
+                    })
             })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
         
