@@ -11,5 +11,6 @@ public class MatchResponse
     public bool IsPrivate { get; set; }
     public List<PlayerDto> PlayersTeamOne { get; set; }
     public List<PlayerDto> PlayersTeamTwo { get; set; }
+    public decimal AverageElo { get; set; }
 }
         

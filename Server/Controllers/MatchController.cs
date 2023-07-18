@@ -127,6 +127,8 @@ public class MatchController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var matches = await _dbContext.Match
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(x => x.Player)
             .Select(x => new MatchResponse
             {
                 Id = x.Id,

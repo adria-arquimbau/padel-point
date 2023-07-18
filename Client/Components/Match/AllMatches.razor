@@ -14,10 +14,9 @@ else
         @foreach (var match in _matches)
         {
             <div class="border match-card">
-                <h3>Match Id: @match.Id</h3>
-                <p><b>Start:</b> @match.StartDateTime.ToLocalTime().ToLongDateString() / @match.StartDateTime.ToLocalTime().ToShortTimeString()</p>
-                <p><b>End:</b> @match.EndDateTime.ToLocalTime().ToShortTimeString()</p>
+                @match.StartDateTime.ToLocalTime().ToLongDateString() / @match.StartDateTime.ToLocalTime().ToShortTimeString() - @match.EndDateTime.ToLocalTime().ToShortTimeString()
                 <p><b>Location:</b> @match.Location</p>
+                <p><b>Average Elo:</b> @match.AverageElo</p>
                 <a href="/match/@match.Id/detail">View Details</a>
             </div>
         }
@@ -55,9 +54,10 @@ else
         border-radius: 8px;
         padding: 10px;
         margin: 10px;
+        background-color: white;
     }
-    
+        
     .match-card {
         margin-bottom: 15px;
-    }
+    }   
 </style>
