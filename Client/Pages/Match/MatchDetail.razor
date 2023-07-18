@@ -72,7 +72,7 @@ else
                         {
                             var player = _match.PlayersTeamOne[i];
                             <div class="player">
-                                @if (player?.ImageUrl != null)
+                                @if (player.ImageUrl != null)
                                 {
                                     <div class="player-avatar">
                                         <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
@@ -88,8 +88,8 @@ else
                                     <div class="default-avatar">
                                     </div>
                                 }
-                                <p>@player?.NickName</p>
-                                <p>Skill: @player?.Elo</p>
+                                <p>@player.NickName</p>
+                                <p>Skill: @player.Elo</p>
                             </div>
                         }
                         else
@@ -107,13 +107,13 @@ else
             <div class="team">
                 Team 2
                 <div class="players-grid">
-                    @for(int i=0; i<2; i++)
+                    @for(var i=0; i<2; i++)
                     {
                         if (i < _match.PlayersTeamTwo.Count())
                         {
                             var player = _match.PlayersTeamTwo[i];
                             <div class="player">
-                                @if (player?.ImageUrl != null)
+                                @if (player.ImageUrl != null)
                                 {
                                     <div class="player-avatar">
                                         <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
@@ -129,8 +129,8 @@ else
                                     <div class="default-avatar">
                                     </div>
                                 }
-                                <p>@player?.NickName</p>
-                                <p>Skill: @player?.Elo</p>
+                                <p>@player.NickName</p>
+                                <p>Skill: @player.Elo</p>
                             </div>
                         }
                         else

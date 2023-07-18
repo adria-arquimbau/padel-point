@@ -122,6 +122,23 @@ public class MatchController : ControllerBase
         return Ok(match);
     }
     
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var matches = await _dbContext.Match
+            .Select(x => new MatchResponse
+            {
+                Id = x.Id,
+                StartDateTime = x.StartDateTime,
+                EndDateTime = x.EndDateTime,
+                Location = x.Location
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        return Ok(matches);
+    }
+    
     [HttpDelete("{matchId:guid}/remove/{playerId:guid}")]
     [Authorize(Roles = "User")]
     public async Task<IActionResult> AddMeAsAPlayer([FromRoute] Guid matchId, [FromRoute] Guid playerId, CancellationToken cancellationToken)

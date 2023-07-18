@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @using EventsManager.Client.Components.User
+@using EventsManager.Client.Components.Match
 
 <PageTitle>Welcome</PageTitle>
 
@@ -15,6 +16,6 @@
     </NotAuthorized>
 </AuthorizeView>
 
+<FluentDivider></FluentDivider>
 
-
-
+<AllMatches></AllMatches>

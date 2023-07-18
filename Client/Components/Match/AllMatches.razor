@@ -1,0 +1,63 @@
+@using EventsManager.Shared.Responses
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+
+@if (_matches == null)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+else
+{
+    <div>
+        @foreach (var match in _matches)
+        {
+            <div class="border match-card">
+                <h3>Match Id: @match.Id</h3>
+                <p><b>Start:</b> @match.StartDateTime.ToLocalTime().ToLongDateString() / @match.StartDateTime.ToLocalTime().ToShortTimeString()</p>
+                <p><b>End:</b> @match.EndDateTime.ToLocalTime().ToShortTimeString()</p>
+                <p><b>Location:</b> @match.Location</p>
+                <a href="/match/@match.Id/detail">View Details</a>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<MatchResponse>? _matches;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllMatches();
+    }
+
+    private async Task GetAllMatches()
+    {
+        var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+        var response = await http.GetAsync("match");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(error);
+        }
+    }
+}
+
+<style>
+    .border {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        margin: 10px;
+    }
+    
+    .match-card {
+        margin-bottom: 15px;
+    }
+</style>
