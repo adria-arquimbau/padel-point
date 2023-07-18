@@ -9,6 +9,8 @@ public class MatchResponse
     public DateTime EndDateTime { get; set; }
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
+    public bool ScoreConfirmedTeamOne { get; set; }
+    public bool ScoreConfirmedTeamTwo { get; set; }
     public List<PlayerDto> PlayersTeamOne { get; set; } 
     public List<PlayerDto> PlayersTeamTwo { get; set; }
     public decimal AverageElo { get; set; }

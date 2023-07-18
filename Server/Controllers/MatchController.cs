@@ -54,6 +54,55 @@ public class MatchController : ControllerBase
         return Ok(new CreateMatchResponse { Id = newMatch.Id });
     }
     
+    [HttpPut("{matchId:guid}/remove-score")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> Edit([FromRoute] Guid matchId, [FromBody] CreateMatchRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.Creator.UserId != userId)
+        {
+            return Conflict("Only creator can edit the match");
+        }
+
+        match.StartDateTime = request.StartDateTime.ToUniversalTime();
+        match.EndDateTime = request.EndDateTime.ToUniversalTime();
+        match.Location = request.Location;
+        match.IsPrivate = request.IsPrivate;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+    
+    [HttpDelete("{matchId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> Delete([FromRoute] Guid matchId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.Creator.UserId != userId)
+        {
+            return Conflict("Only creator can delete the match.");
+        }
+
+        _dbContext.Match.Remove(match);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+    
     [HttpPost("{matchId:guid}/add-me/{team}")]
     [Authorize(Roles = "User")]
     public async Task<IActionResult> AddMeAsAPlayer([FromRoute] Guid matchId, [FromRoute] Team team, CancellationToken cancellationToken)
@@ -99,6 +148,8 @@ public class MatchController : ControllerBase
                 EndDateTime = x.EndDateTime,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
+                ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
+                ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
                 PlayersTeamOne = x.MatchPlayers.Where(p => p.Team == Team.Team1)
                     .Select(p => new PlayerDto
                 {
