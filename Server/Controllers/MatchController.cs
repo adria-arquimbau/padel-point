@@ -98,17 +98,19 @@ public class MatchController : ControllerBase
                 PlayersTeamOne = x.MatchPlayers.Where(p => p.Team == Team.Team1)
                     .Select(p => new PlayerDto
                 {
+                    Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
                     Elo = p.Player.Elo
                 }).ToList(),
                 PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
                     .Select(p => new PlayerDto
-                    {
-                        NickName = p.Player.NickName,
-                        ImageUrl = p.Player.ImageUrl,
-                        Elo = p.Player.Elo
-                    }).ToList()
+                {
+                    Id = p.Player.Id,
+                    NickName = p.Player.NickName,
+                    ImageUrl = p.Player.ImageUrl,
+                    Elo = p.Player.Elo
+                }).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
         
@@ -118,5 +120,34 @@ public class MatchController : ControllerBase
         }
         
         return Ok(match);
+    }
+    
+    [HttpDelete("{matchId:guid}/remove/{playerId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> AddMeAsAPlayer([FromRoute] Guid matchId, [FromRoute] Guid playerId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var player = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        if (userId != player.UserId)
+        {
+            return Conflict("You can only remove yourself.");
+        }
+        
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(x => x.Player)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
+
+        match.MatchPlayers.Remove(matchPlayer);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
     }
 }

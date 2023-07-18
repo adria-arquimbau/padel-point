@@ -74,7 +74,14 @@ else
                             <div class="player">
                                 @if (player?.ImageUrl != null)
                                 {
-                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                                    <div class="player-avatar">
+                                        <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
+                                        <AuthorizeView>
+                                            <Authorized>
+                                                <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </div>
                                 }
                                 else
                                 {
@@ -89,7 +96,7 @@ else
                         {
                             <div class="player">
                                 <div class="default-avatar">
-                                    <button onclick="@(() => AddPlayer("Team2"))">+</button>
+                                    <button onclick="@(() => AddPlayer("Team1"))">+</button>
                                 </div>
                             </div>
                         }
@@ -108,7 +115,14 @@ else
                             <div class="player">
                                 @if (player?.ImageUrl != null)
                                 {
-                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                                    <div class="player-avatar">
+                                        <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
+                                        <AuthorizeView>
+                                            <Authorized>
+                                                <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </div>
                                 }
                                 else
                                 {
@@ -190,6 +204,23 @@ else
             ToastService.ShowError(error);
         }
     }
+    
+    async Task RemovePlayer(Guid playerId)
+    {
+        var response = await Http.DeleteAsync($"match/{MatchId!.Value}/remove/{playerId}");
+
+        if(response.IsSuccessStatusCode)
+        {
+            ToastService.ShowInfo("Removed player from the match.");
+            await GetMatch();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(error);
+        }
+    }
+
 }
 
 <style>
@@ -297,6 +328,32 @@ else
         position: absolute;
     }
 
+.player-avatar {
+    position: relative;
+}
+
+.remove-button {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: none;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
     
     .default-avatar {
         width: 40px;
