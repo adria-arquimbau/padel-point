@@ -2,7 +2,9 @@
 
 @using EventsManager.Shared.Responses
 @inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_match == null)
 {
@@ -87,7 +89,7 @@ else
                         {
                             <div class="player">
                                 <div class="default-avatar">
-                                    <button onclick="@(() => AddPlayer(1, i))">+</button>
+                                    <button onclick="@(() => AddPlayer("Team2"))">+</button>
                                 </div>
                             </div>
                         }
@@ -121,7 +123,7 @@ else
                         {
                             <div class="player">
                                 <div class="default-avatar">
-                                    <button onclick="@(() => AddPlayer(2, i))">+</button>
+                                    <button onclick="@(() => AddPlayer("Team2"))">+</button>
                                 </div>
                             </div>
                         }
@@ -144,11 +146,17 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await GetMatch();
+    }
+
+    private async Task GetMatch()
+    {
         if (MatchId.HasValue)
         {
-            var response = await Http.GetAsync($"match/{MatchId.Value}");
+            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+            var response = await http.GetAsync($"match/{MatchId.Value}");
 
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 _match = await response.Content.ReadFromJsonAsync<MatchResponse>();
             }
@@ -159,12 +167,31 @@ else
             }
         }
     }
-    
-    void AddPlayer(int team, int position)
+
+    async Task AddPlayer(string team)
     {
-    // Your code goes here
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == false)
+        {
+            ToastService.ShowError("You must be logged in to register for this match.");
+            return;
+        }
+        
+        var response = await Http.PostAsync($"match/{MatchId!.Value}/add-me/{team}", null);
+
+        if(response.IsSuccessStatusCode)
+        {
+            ToastService.ShowInfo($"Added yourself to the match.");
+            await GetMatch();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(error);
+        }
     }
 }
+
 <style>
     .border
     {
@@ -234,6 +261,7 @@ else
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
+        margin-top: 10px;
     }
     
     .player {

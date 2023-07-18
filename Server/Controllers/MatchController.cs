@@ -50,6 +50,37 @@ public class MatchController : ControllerBase
 
         return Ok(new CreateMatchResponse { Id = newMatch.Id });
     }
+    
+    [HttpPost("{matchId:guid}/add-me/{team}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> AddMeAsAPlayer([FromRoute] Guid matchId, [FromRoute] Team team, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var player = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(x => x.Player)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.MatchPlayers.Any(x => x.Player.Id == player.Id))
+        {
+            return Conflict("You're already registered for this match.");
+        }   
+        
+        match.MatchPlayers.Add(new MatchPlayer
+        {
+            Player = player,
+            Team = team
+        });
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
 
     [HttpGet("{matchId:guid}")]
     [AllowAnonymous]
@@ -83,7 +114,7 @@ public class MatchController : ControllerBase
         
         if (match == null)
         {
-            return NotFound();
+            return NotFound("Match not found");
         }
         
         return Ok(match);

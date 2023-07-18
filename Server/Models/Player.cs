@@ -14,7 +14,7 @@ public class Match
 {   
     public Guid Id { get; set; }
     public DateTime CreationDate { get; set; }
-    public ICollection<MatchPlayer> MatchPlayers { get; set; }
+    public ICollection<MatchPlayer> MatchPlayers { get; set; } = new List<MatchPlayer>();
     public ICollection<Set> Sets { get; set; }
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
