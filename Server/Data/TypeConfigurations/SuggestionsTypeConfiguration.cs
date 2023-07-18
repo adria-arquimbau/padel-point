@@ -19,7 +19,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.HasKey(p => p.Id);
         builder.Property(p => p.NickName)
             .IsRequired();
-        builder.Property(p => p.SkillLevel)
+        builder.Property(p => p.Elo)
             .IsRequired();
         builder.HasOne(p => p.User)
             .WithOne(u => u.Player)

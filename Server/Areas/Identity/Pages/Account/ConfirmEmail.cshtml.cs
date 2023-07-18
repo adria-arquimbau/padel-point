@@ -53,7 +53,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 {
                     User = user,
                     NickName = user.UserName,
-                    SkillLevel = 0
+                    Elo = 0
                 };
                 _context.Player.Add(newPlayer);
                 await _context.SaveChangesAsync();

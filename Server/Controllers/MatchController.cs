@@ -69,14 +69,14 @@ public class MatchController : ControllerBase
                 {
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.SkillLevel
+                    Elo = p.Player.Elo
                 }).ToList(),
                 PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
                     .Select(p => new PlayerDto
                     {
                         NickName = p.Player.NickName,
                         ImageUrl = p.Player.ImageUrl,
-                        Elo = p.Player.SkillLevel
+                        Elo = p.Player.Elo
                     }).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
