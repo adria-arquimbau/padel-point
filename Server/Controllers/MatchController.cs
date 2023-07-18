@@ -129,16 +129,19 @@ public class MatchController : ControllerBase
         var matches = await _dbContext.Match
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
-            .Select(x => new MatchResponse
-            {
-                Id = x.Id,
-                StartDateTime = x.StartDateTime,
-                EndDateTime = x.EndDateTime,
-                Location = x.Location
-            })
+           
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return Ok(matches);
+        var response = matches.Select(x => new MatchResponse
+        {
+            Id = x.Id,
+            StartDateTime = x.StartDateTime,
+            EndDateTime = x.EndDateTime,
+            Location = x.Location,
+            AverageElo = x.MatchPlayers.Any() ? Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo), 2) : 0
+        }).ToList();
+        
+        return Ok(response);
     }
     
     [HttpDelete("{matchId:guid}/remove/{playerId:guid}")]
