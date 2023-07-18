@@ -129,7 +129,6 @@ public class MatchController : ControllerBase
         var matches = await _dbContext.Match
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
-           
             .ToListAsync(cancellationToken: cancellationToken);
 
         var response = matches.Select(x => new MatchResponse
@@ -139,18 +138,19 @@ public class MatchController : ControllerBase
             EndDateTime = x.EndDateTime,
             Location = x.Location,
             AverageElo = x.MatchPlayers.Any() ? Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo), 2) : 0
-        }).ToList();
+        }).OrderBy(x => x.StartDateTime).ToList();
         
         return Ok(response);
     }
     
     [HttpDelete("{matchId:guid}/remove/{playerId:guid}")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> AddMeAsAPlayer([FromRoute] Guid matchId, [FromRoute] Guid playerId, CancellationToken cancellationToken)
+    public async Task<IActionResult> DeletePlayer([FromRoute] Guid matchId, [FromRoute] Guid playerId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
         var player = await _dbContext.Player
-            .Where(x => x.UserId == userId)
+            .Where(x => x.Id == playerId)
             .SingleAsync(cancellationToken: cancellationToken);
         
         if (userId != player.UserId)

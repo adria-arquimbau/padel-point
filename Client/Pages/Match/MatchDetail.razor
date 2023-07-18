@@ -50,12 +50,20 @@ else
     <div class="border match-detail-private">
         @if (_match.IsPrivate)
         {
-            <i class="bi bi-lock"></i> <p> Private</p>
+            <div class="status">
+                <i class="bi bi-lock"></i> <p> Private</p>
+            </div>
         }
         else
         {
-            <i class="bi bi-unlock"></i> <p> Public</p>
+            <div class="status">
+                <i class="bi bi-unlock"></i> <p> Public</p>
+            </div>
         }
+        <div class="separator"></div>
+        <div class="creator">
+            <p>Created By: Arki</p>
+        </div>
     </div>
     <div class="border match-detail-players">
         <div>
@@ -102,6 +110,7 @@ else
                         }
                     }
                 </div>
+                <p style="font-size: 12px">Average Skill: @_averageEloTeamOne</p>
             </div>
 
             <div class="team">
@@ -143,6 +152,7 @@ else
                         }
                     }
                 </div>
+                <p style="font-size: 12px">Average Skill: @_averageEloTeamTwo</p>
             </div>
         </div>
     </div>
@@ -157,6 +167,9 @@ else
     public Guid? MatchId { get; set; }
 
     private MatchResponse? _match;
+    
+    private decimal _averageEloTeamOne;
+    private decimal _averageEloTeamTwo;
 
     protected override async Task OnInitializedAsync()
     {
@@ -173,6 +186,14 @@ else
             if (response.IsSuccessStatusCode)
             {
                 _match = await response.Content.ReadFromJsonAsync<MatchResponse>();
+                if (_match != null)
+                {
+                    _averageEloTeamOne = _match.PlayersTeamOne.Any()
+                        ? Math.Round(_match.PlayersTeamOne.Average(mp => mp.Elo), 2) : 0;
+
+                    _averageEloTeamTwo = _match.PlayersTeamTwo.Any()
+                        ? Math.Round(_match.PlayersTeamTwo.Average(mp => mp.Elo), 2) : 0;
+                }
             }
             else
             {
@@ -195,7 +216,7 @@ else
 
         if(response.IsSuccessStatusCode)
         {
-            ToastService.ShowInfo($"Added yourself to the match.");
+            ToastService.ShowInfo("You have been added to the match.");
             await GetMatch();
         }
         else
@@ -211,8 +232,9 @@ else
 
         if(response.IsSuccessStatusCode)
         {
-            ToastService.ShowInfo("Removed player from the match.");
+            ToastService.ShowInfo("You have been removed from the match.");
             await GetMatch();
+            StateHasChanged();
         }
         else
         {
@@ -267,6 +289,7 @@ else
       display: flex;
       flex-direction: column;
     }
+    
     .separation
     {
         margin-top: 5px;
@@ -285,8 +308,6 @@ else
         flex-direction: column;
         align-items: center;
     }
-    
-    /* Rest of your styles */
     
     .players-grid {
         display: grid;
@@ -327,33 +348,58 @@ else
         cursor: pointer;
         position: absolute;
     }
-
-.player-avatar {
-    position: relative;
-}
-
-.remove-button {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    border: none;
-    background-color: red;
-    color: white;
-    cursor: pointer;
-    font-size: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.player-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    
+    .remove-button {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: none;
+        background-color: red;
+        color: white;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .match-detail-private {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+    }
+    
+    .match-detail-private i {
+        margin-right: 8px;
+    }
+    
+    .match-detail-private p {
+        margin: 0;
+    }
+    
+    .status, .creator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 45%;
+    }
+    
+    .separator {
+        width: 2px;
+        background-color: grey;
+        height: 50%;
+        align-self: center;
+    }
+    
+    .player-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
     
     .default-avatar {
         width: 40px;
@@ -361,4 +407,5 @@ else
         border-radius: 50%;
         background-color: grey;
     }
+
 </style>
