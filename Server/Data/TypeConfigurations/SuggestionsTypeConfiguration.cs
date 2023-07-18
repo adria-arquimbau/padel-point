@@ -34,6 +34,10 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
         builder.HasKey(m => m.Id);
         builder.Property(m => m.CreationDate)
             .IsRequired();
+        builder.HasOne<Player>(m => m.Creator)
+            .WithMany(p => p.CreatedMatches) // Updated this line to reference the collection of created matches in the Player entity
+            .HasForeignKey(m => m.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict); 
     }
 }
 

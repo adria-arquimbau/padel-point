@@ -1,12 +1,14 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
+using EventsManager.Shared;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 
 namespace EventsManager.Server.Controllers;
 
@@ -30,6 +32,7 @@ public class MatchController : ControllerBase
         
         var newMatch = new Match
         {
+            Creator = playerCreator,
             CreationDate = DateTime.UtcNow,
             StartDateTime = request.StartDateTime.ToUniversalTime(),
             EndDateTime = request.StartDateTime.ToUniversalTime(),
@@ -91,6 +94,7 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
+                CreatorId = x.Creator.Id,
                 StartDateTime = x.StartDateTime,
                 EndDateTime = x.EndDateTime,
                 Location = x.Location,
@@ -170,6 +174,59 @@ public class MatchController : ControllerBase
         
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        return Ok();
+    }
+    
+    [HttpPost("{matchId:guid}/set-score")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> SetScore([FromRoute] Guid matchId, [FromBody] SetMatchScoreRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.Creator.UserId != userId)
+        {
+            return Conflict("Only creator can set the score");
+        }
+
+        var score = request.Sets.Select(x => new Set
+        {
+            SetNumber = x.SetNumber,
+            Team1Score = x.Team1Score,
+            Team2Score = x.Team2Score
+        }).ToList();
+
+        match.Sets.AddRange(score);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
+    [HttpDelete("{matchId:guid}/remove-score")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> RemoveScore([FromRoute] Guid matchId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.Creator.UserId != userId)
+        {
+            return Conflict("Only creator can remove the score");
+        }
+        
+        match.Sets = new List<Set>();
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
         return Ok();
     }
 }

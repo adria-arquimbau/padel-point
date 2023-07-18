@@ -4,6 +4,7 @@ using EventsManager.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsManager.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230718161556_AddCreator")]
+    partial class AddCreator
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -263,7 +266,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Match", (string)null);
+                    b.ToTable("Match");
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.MatchPlayer", b =>
@@ -288,7 +291,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("MatchPlayer", (string)null);
+                    b.ToTable("MatchPlayer");
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Player", b =>
@@ -316,7 +319,7 @@ namespace EventsManager.Server.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Player", (string)null);
+                    b.ToTable("Player");
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Set", b =>
@@ -341,7 +344,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("MatchId");
 
-                    b.ToTable("Set", (string)null);
+                    b.ToTable("Set");
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Suggestion", b =>
@@ -364,7 +367,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Suggestions", (string)null);
+                    b.ToTable("Suggestions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
