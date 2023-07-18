@@ -54,7 +54,7 @@ public class MatchController : ControllerBase
         return Ok(new CreateMatchResponse { Id = newMatch.Id });
     }
     
-    [HttpPut("{matchId:guid}/remove-score")]
+    [HttpPut("{matchId:guid}")]
     [Authorize(Roles = "User")]
     public async Task<IActionResult> Edit([FromRoute] Guid matchId, [FromBody] CreateMatchRequest request, CancellationToken cancellationToken)
     {

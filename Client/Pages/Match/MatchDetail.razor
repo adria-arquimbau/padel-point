@@ -1,6 +1,8 @@
 @page "/match/{MatchId:guid}/detail"
 
 @using EventsManager.Shared.Responses
+@using EventsManager.Shared.Requests
+@using EventsManager.Client.Components.Match
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
@@ -160,6 +162,13 @@ else
     <div class="border match-detail-location">
         @_match.Location                        
     </div>
+    
+    @if (_match.RequesterIsTheCreator)
+    {
+        <button class="btn btn-primary" @onclick="ShowEditModal">Edit Match</button>
+    }
+
+    <EditMatch IsModalVisible="_editModalVisible" Match="_match" OnClose="GetMatch"></EditMatch>
 }
 
 @code {
@@ -167,6 +176,7 @@ else
     public Guid? MatchId { get; set; }
 
     private MatchResponse? _match;
+    private bool _editModalVisible;
     
     private decimal _averageEloTeamOne;
     private decimal _averageEloTeamTwo;
@@ -250,6 +260,11 @@ else
             var error = await response.Content.ReadAsStringAsync();
             ToastService.ShowError(error);
         }
+    }
+    
+    void ShowEditModal()
+    {
+        _editModalVisible = true;
     }
 
 }
