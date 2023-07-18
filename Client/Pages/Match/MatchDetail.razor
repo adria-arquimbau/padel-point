@@ -60,44 +60,71 @@ else
             Players
         </div>
         <div class="teams">
+
             <div class="team">
                 Team 1
-                <div class="players">
-                    @foreach(var player in _match.PlayersTeamOne.Take(2))
+                <div class="players-grid">
+                    @for(var i=0; i<2; i++)
                     {
-                        <div class="player">
-                            @if (player?.ImageUrl != null)
-                            {
-                                <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
-                            }
-                            else
-                            {
-                                <div class="default-avatar"></div>
-                            }
-                            <p>@player?.NickName</p>
-                        </div>
+                        if (i < _match.PlayersTeamOne.Count())
+                        {
+                            var player = _match.PlayersTeamOne[i];
+                            <div class="player">
+                                @if (player?.ImageUrl != null)
+                                {
+                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                                }
+                                else
+                                {
+                                    <div class="default-avatar">
+                                    </div>
+                                }
+                                <p>@player?.NickName</p>
+                                <p>@player?.Elo</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="player">
+                                <div class="default-avatar">
+                                    <button onclick="@(() => AddPlayer(1, i))">+</button>
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>
 
-            <div class="separation"></div>
-
             <div class="team">
-                Team 2  
-                <div class="players">
-                    @foreach(var player in _match.PlayersTeamTwo.Take(2))
+                Team 2
+                <div class="players-grid">
+                    @for(int i=0; i<2; i++)
                     {
-                        <div class="player">
-                            @if (player?.ImageUrl != null)
-                            {
-                                <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
-                            }
-                            else
-                            {
-                                <div class="default-avatar"></div>
-                            }
-                            <p>@player?.NickName</p>
-                        </div>
+                        if (i < _match.PlayersTeamTwo.Count())
+                        {
+                            var player = _match.PlayersTeamTwo[i];
+                            <div class="player">
+                                @if (player?.ImageUrl != null)
+                                {
+                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar">
+                                }
+                                else
+                                {
+                                    <div class="default-avatar">
+                                    </div>
+                                }
+                                <p>@player?.NickName</p>
+                                <p>@player?.Elo</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="player">
+                                <div class="default-avatar">
+                                    <button onclick="@(() => AddPlayer(2, i))">+</button>
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>
@@ -131,6 +158,11 @@ else
                 ToastService.ShowError(error);
             }
         }
+    }
+    
+    void AddPlayer(int team, int position)
+    {
+    // Your code goes here
     }
 }
 <style>
@@ -196,10 +228,12 @@ else
         align-items: center;
     }
     
-    .players {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 5px;
+    /* Rest of your styles */
+    
+    .players-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
     }
     
     .player {
@@ -207,15 +241,34 @@ else
         flex-direction: column;
         align-items: center;
         width: 60px;
-        font-size: 10px;
+        font-size: 12px;
     }
     
-    .player-avatar {
+    .player-avatar, .default-avatar {
         width: 40px;
         height: 40px;
         border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .player-avatar img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
     }
+    
+    .default-avatar button {
+        color: green;
+        background: none;
+        border: none;
+        font-size: 30px;
+        cursor: pointer;
+        position: absolute;
+    }
+
     
     .default-avatar {
         width: 40px;

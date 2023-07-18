@@ -9,7 +9,7 @@ public class MatchResponse
     public DateTime EndDateTime { get; set; }
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
-    public IEnumerable<PlayerDto> PlayersTeamOne { get; set; }
-    public IEnumerable<PlayerDto> PlayersTeamTwo { get; set; }
+    public List<PlayerDto> PlayersTeamOne { get; set; }
+    public List<PlayerDto> PlayersTeamTwo { get; set; }
 }
         
