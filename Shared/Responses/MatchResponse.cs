@@ -14,6 +14,6 @@ public class MatchResponse
     public List<PlayerDto> PlayersTeamOne { get; set; } 
     public List<PlayerDto> PlayersTeamTwo { get; set; }
     public decimal AverageElo { get; set; }
-    public Guid CreatorId { get; set; }
+    public bool RequesterIsTheCreator { get; set; }
 }
         

@@ -138,12 +138,14 @@ public class MatchController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromRoute] Guid matchId, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
-                CreatorId = x.Creator.Id,
+                RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
                 EndDateTime = x.EndDateTime,
                 Location = x.Location,

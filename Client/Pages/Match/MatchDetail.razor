@@ -180,8 +180,17 @@ else
     {
         if (MatchId.HasValue)
         {
-            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-            var response = await http.GetAsync($"match/{MatchId.Value}");
+            HttpResponseMessage? response = null;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == false)
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync($"match/{MatchId.Value}");
+            }
+            else
+            {
+                response = await Http.GetAsync($"match/{MatchId.Value}");
+            }
 
             if (response.IsSuccessStatusCode)
             {
