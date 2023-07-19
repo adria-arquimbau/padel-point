@@ -176,6 +176,12 @@ public class MatchController : ControllerBase
             return NotFound("Match not found");
         }
         
+        match.AverageEloTeamOne = match.PlayersTeamOne.Any()
+            ? Math.Round(match.PlayersTeamOne.Average(mp => mp.Elo), 2) : 0;
+
+        match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
+            ? Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo), 2) : 0;
+        
         return Ok(match);
     }
     
