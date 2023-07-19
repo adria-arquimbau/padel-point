@@ -165,7 +165,8 @@ public class MatchController : ControllerBase
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.Elo
+                    Elo = p.Player.Elo,
+                    CanIDeleteIt = userId != null && p.Player.UserId == userId
                 }).ToList(),
                 PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
                     .Select(p => new PlayerDto
@@ -173,7 +174,8 @@ public class MatchController : ControllerBase
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.Elo
+                    Elo = p.Player.Elo,
+                    CanIDeleteIt = userId != null && p.Player.UserId == userId
                 }).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
@@ -224,18 +226,17 @@ public class MatchController : ControllerBase
         var player = await _dbContext.Player
             .Where(x => x.Id == playerId)
             .SingleAsync(cancellationToken: cancellationToken);
-        
-        if (userId != player.UserId)
-        {
-            return Conflict("You can only remove yourself.");
-        }
-        
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
-
+        
+        if (userId != player.UserId && userId != match.Creator.UserId)
+        {
+            return Conflict("You can only remove yourself.");
+        }
+        
         var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
 
         match.MatchPlayers.Remove(matchPlayer);

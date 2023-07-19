@@ -4,103 +4,108 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
+
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+
 <div class="border match-detail-players">
-        <div>
-            Players
+    <div>
+        Players
+    </div>
+    <div class="teams">
+
+        <div class="team">
+            Team 1
+            <div class="players-grid">
+                @for(var i=0; i<2; i++)
+                {
+                    if (i < Match.PlayersTeamOne.Count)
+                    {
+                        var player = Match.PlayersTeamOne[i];
+                        <div class="player">
+                            @if (player.ImageUrl != null)
+                            {
+                                <div class="player-avatar">
+                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
+                                    @if (player.CanIDeleteIt || Match.RequesterIsTheCreator)
+                                    {
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="default-avatar">
+                                </div>
+                            }
+                            <p>@player.NickName</p>
+                            <p>@player.Elo</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="player">
+                            <div class="default-avatar">
+                                @if (!Match.IAmAlreadyRegistered)
+                                {
+                                    <button onclick="@(() => AddPlayer("Team1"))">+</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamOne</p>
         </div>
-        <div class="teams">
 
-            <div class="team">
-                Team 1
-                <div class="players-grid">
-                    @for(var i=0; i<2; i++)
+        <div class="team">
+            Team 2
+            <div class="players-grid">
+                @for(var i=0; i<2; i++)
+                {
+                    if (i < Match.PlayersTeamTwo.Count)
                     {
-                        if (i < Match.PlayersTeamOne.Count)
-                        {
-                            var player = Match.PlayersTeamOne[i];
-                            <div class="player">
-                                @if (player.ImageUrl != null)
-                                {
-                                    <div class="player-avatar">
-                                        <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
-                                        <AuthorizeView>
-                                            <Authorized>
-                                                <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
-                                            </Authorized>
-                                        </AuthorizeView>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="default-avatar">
-                                    </div>
-                                }
-                                <p>@player.NickName</p>
-                                <p>@player.Elo</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="player">
-                                <div class="default-avatar">
-                                    @if (!Match.IAmAlreadyRegistered)
+                        var player = Match.PlayersTeamTwo[i];
+                        <div class="player">
+                            @if (player.ImageUrl != null)
+                            {
+                                <div class="player-avatar">
+                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
+                                   
+                                    @if(player.CanIDeleteIt || Match.RequesterIsTheCreator)
                                     {
-                                        <button onclick="@(() => AddPlayer("Team1"))">+</button>
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
                                     }
                                 </div>
-                            </div>
-                        }
-                    }
-                </div>
-                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamOne</p>
-            </div>
-
-            <div class="team">
-                Team 2
-                <div class="players-grid">
-                    @for(var i=0; i<2; i++)
-                    {
-                        if (i < Match.PlayersTeamTwo.Count)
-                        {
-                            var player = Match.PlayersTeamTwo[i];
-                            <div class="player">
-                                @if (player.ImageUrl != null)
-                                {
-                                    <div class="player-avatar">
-                                        <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img">
-                                        <AuthorizeView>
-                                            <Authorized>
-                                                <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
-                                            </Authorized>
-                                        </AuthorizeView>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="default-avatar">
-                                    </div>
-                                }
-                                <p>@player.NickName</p>
-                                <p>@player.Elo</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="player">
+                            }
+                            else
+                            {
                                 <div class="default-avatar">
-                                    @if (!Match.IAmAlreadyRegistered)
-                                    {
-                                        <button onclick="@(() => AddPlayer("Team2"))">+</button>
-                                    }
                                 </div>
-                            </div>
-                        }
+                            }
+                            <p>@player.NickName</p>
+                            <p>@player.Elo</p>
+                        </div>
                     }
-                </div>
-                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
+                    else
+                    {
+                        <div class="player">
+                            <div class="default-avatar">
+                                @if (!Match.IAmAlreadyRegistered)
+                                {
+                                    <button onclick="@(() => AddPlayer("Team2"))">+</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
             </div>
+            <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
         </div>
     </div>
+</div>
 
 @code {
     [Parameter]
@@ -109,8 +114,11 @@
     [Parameter] 
     public EventCallback RefreshMatch { get; set; }
     
-    async Task AddPlayer(string team)
+    private bool _loading = false;
+    
+    private async Task AddPlayer(string team)
     {
+        _loading = true;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == false)
         {
@@ -130,22 +138,31 @@
             var error = await response.Content.ReadAsStringAsync();
             ToastService.ShowError(error);
         }
+        _loading = false;
     }
     
-    async Task RemovePlayer(Guid playerId)
+    private async Task RemovePlayer(Guid playerId)
     {
-        var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
-
-        if(response.IsSuccessStatusCode)
+        _loading = true;
+        try
         {
-            ToastService.ShowInfo("You have been removed from the match.");
-            await RefreshMatch.InvokeAsync();
-            StateHasChanged();
+            var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("You have been removed from the match.");
+                _loading = false;
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+            
         }
-        else
+        finally
         {
-            var error = await response.Content.ReadAsStringAsync();
-            ToastService.ShowError(error);
+            _loading = false;
         }
     }
 }

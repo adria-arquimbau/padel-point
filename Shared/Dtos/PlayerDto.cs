@@ -6,4 +6,5 @@ public class PlayerDto
     public string NickName { get; set; }
     public Uri? ImageUrl { get; set; }
     public decimal Elo { get; set; }
+    public bool CanIDeleteIt { get; set; }
 }
