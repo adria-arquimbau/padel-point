@@ -3,76 +3,63 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-@if (IsModalVisible)
-{
-    <div class="modal" style="display:block;" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Match</h5>
-                    <button type="button" class="close" @onclick="CloseModal">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <EditForm Model="_editMatchRequest" OnValidSubmit="EditMatchAction">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-
-                        <InputDate id="startDateTime" @bind-Value="_editMatchRequest.StartDateTime" class="form-control" placeholder="Start Date and Time"/>
-                        <InputDate id="endDateTime" @bind-Value="_editMatchRequest.EndDateTime" class="form-control" placeholder="End Date and Time"/>
-                        <InputText id="location" @bind-Value="_editMatchRequest.Location" class="form-control" placeholder="Location"/>
-                        <InputCheckbox id="isPrivate" @bind-Value="_editMatchRequest.IsPrivate"/> Is Private?
-
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </EditForm>
-                </div>
+<div class="modal" tabindex="-1" style="display: @(Visible ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit match</h5>
+                <button type="button" class="btn-close" @onclick="Cancel"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="_editMatchRequest" OnValidSubmit="Confirm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                
+                    <InputDate id="startDateTime" @bind-Value="_editMatchRequest.StartDateTime" class="form-control" placeholder="Start Date and Time"/>
+                    <InputDate id="endDateTime" @bind-Value="_editMatchRequest.EndDateTime" class="form-control" placeholder="End Date and Time"/>
+                    <InputText id="location" @bind-Value="_editMatchRequest.Location" class="form-control" placeholder="Location"/>
+                    <InputCheckbox id="isPrivate" @bind-Value="_editMatchRequest.IsPrivate"/> Is Private?
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Save</button>
             </div>
         </div>
     </div>
-}
+</div>
 
 @code {
-    [Parameter]
-    public bool IsModalVisible { get; set; }
+    [Parameter] public bool Visible { get; set; }
     
     CreateMatchRequest _editMatchRequest = new();
     
     [Parameter]
     public MatchResponse? Match { get; set; }
-    
+        
     [Parameter]
-    public EventCallback OnClose { get; set; }
+    public EventCallback<CreateMatchRequest?> ConfirmationChanged { get; set; }
     
     protected override void OnInitialized()
     {
-        _editMatchRequest.StartDateTime = Match.StartDateTime;
-        _editMatchRequest.EndDateTime = Match.EndDateTime;
-        _editMatchRequest.Location = Match.Location;
-        _editMatchRequest.IsPrivate = Match.IsPrivate;
-    }
-    
-    async Task EditMatchAction()
-    {
-        var response = await Http.PutAsJsonAsync($"match/{Match.Id}", _editMatchRequest);
-
-        if(response.IsSuccessStatusCode)
-        {
-            ToastService.ShowInfo("Match has been updated successfully.");
-            IsModalVisible = false;
-            CloseModal();
-        }
-        else
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            ToastService.ShowError(error);
-            IsModalVisible = false;
+        if (Match != null)
+        {   
+            _editMatchRequest.StartDateTime = Match.StartDateTime;
+            _editMatchRequest.EndDateTime = Match.EndDateTime;
+            _editMatchRequest.Location = Match.Location;
+            _editMatchRequest.IsPrivate = Match.IsPrivate;
         }
     }
 
-    void CloseModal()
+    private async Task Confirm()
     {
-        IsModalVisible = false;
-        OnClose.InvokeAsync();
+        Visible = false;
+        await ConfirmationChanged.InvokeAsync(_editMatchRequest);
+    }
+
+    private async Task Cancel()
+    {
+        Visible = false;
+        await ConfirmationChanged.InvokeAsync(null);
     }
 }
