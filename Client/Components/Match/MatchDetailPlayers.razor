@@ -119,31 +119,41 @@
     private async Task AddPlayer(string team)
     {
         _loading = true;
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == false)
+        StateHasChanged();
+        try
         {
-            ToastService.ShowError("You must be logged in to register for this match.");
-            return;
-        }
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == false)
+            {
+                ToastService.ShowError("You must be logged in to register for this match.");
+                return;
+            }
         
-        var response = await Http.PostAsync($"match/{Match.Id}/add-me/{team}", null);
+            var response = await Http.PostAsync($"match/{Match.Id}/add-me/{team}", null);
 
-        if(response.IsSuccessStatusCode)
-        {
-            ToastService.ShowInfo("You have been added to the match.");
-            await RefreshMatch.InvokeAsync();
+            if(response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("You have been added to the match.");
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+            
         }
-        else
+        finally
         {
-            var error = await response.Content.ReadAsStringAsync();
-            ToastService.ShowError(error);
+            _loading = false;
+            StateHasChanged();
         }
-        _loading = false;
     }
     
     private async Task RemovePlayer(Guid playerId)
     {
         _loading = true;
+        StateHasChanged();
         try
         {
             var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
@@ -163,6 +173,7 @@
         finally
         {
             _loading = false;
+            StateHasChanged();
         }
     }
 }
