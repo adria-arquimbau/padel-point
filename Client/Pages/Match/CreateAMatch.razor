@@ -34,7 +34,7 @@
     private CreateMatchRequest _newMatch = new()
     {
         StartDateTime = DateTime.Now,
-        EndDateTime = DateTime.Now
+        EndDateTime = DateTime.Now.AddHours(1.5)
     };
 
     private async Task HandleValidSubmit()
