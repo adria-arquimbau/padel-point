@@ -18,5 +18,7 @@ public class MatchResponse
     public decimal AverageEloTeamTwo { get; set; }
     public bool RequesterIsTheCreator { get; set; }
     public bool IAmAlreadyRegistered { get; set; }
+    public int PlayersCount { get; set; }
+    public List<string> PlayersNames { get; set; }
 }
-        
+            

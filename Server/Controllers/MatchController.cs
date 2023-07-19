@@ -207,6 +207,8 @@ public class MatchController : ControllerBase
             StartDateTime = x.StartDateTime,
             EndDateTime = x.EndDateTime,
             Location = x.Location,
+            PlayersCount = x.MatchPlayers.Count,
+            PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
             AverageElo = x.MatchPlayers.Any() ? Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo), 2) : 0
         }).OrderByDescending(x => x.StartDateTime).ToList();
         
