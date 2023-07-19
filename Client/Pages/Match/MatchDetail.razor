@@ -11,6 +11,10 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
 @if (_match == null)
 {
     <LoadingSpinner></LoadingSpinner>
@@ -93,6 +97,7 @@ else
 @code {
     [Parameter]
     public Guid? MatchId { get; set; }
+    private bool _loading = false;
 
     private MatchResponse? _match;
     private bool _editModalVisible;
@@ -105,6 +110,7 @@ else
 
     private async Task GetMatch()
     {
+        _loading = true;
         if (MatchId.HasValue)
         {
             HttpResponseMessage? response;
@@ -129,6 +135,7 @@ else
                 ToastService.ShowError(error);
             }
         }
+        _loading = false;
     }
     
     private void ShowEditModal()
@@ -143,6 +150,7 @@ else
     
     private async Task RemoveMatch(bool removeIt)
     {
+        _loading = true;
         if (removeIt)
         {
             var response = await Http.DeleteAsync($"match/{MatchId.Value}");
@@ -158,12 +166,13 @@ else
                 ToastService.ShowError(error);
             }
         }
-        
+        _loading = false;
         _deleteModalVisible = false;
     }
     
     private async Task EditMatch(CreateMatchRequest? editMatchRequest)
     {
+        _loading = true;
         if (editMatchRequest != null)
         {   
             var response = await Http.PutAsJsonAsync($"match/{MatchId.Value}", editMatchRequest);
@@ -181,6 +190,7 @@ else
         }
         
         _editModalVisible = false;
+        _loading = false;
     }
 }
 
