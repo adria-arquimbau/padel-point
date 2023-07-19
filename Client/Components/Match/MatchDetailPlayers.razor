@@ -43,7 +43,10 @@
                         {
                             <div class="player">
                                 <div class="default-avatar">
-                                    <button onclick="@(() => AddPlayer("Team1"))">+</button>
+                                    @if (!Match.IAmAlreadyRegistered)
+                                    {
+                                        <button onclick="@(() => AddPlayer("Team1"))">+</button>
+                                    }
                                 </div>
                             </div>
                         }
@@ -57,7 +60,7 @@
                 <div class="players-grid">
                     @for(var i=0; i<2; i++)
                     {
-                        if (i < Match.PlayersTeamTwo.Count())
+                        if (i < Match.PlayersTeamTwo.Count)
                         {
                             var player = Match.PlayersTeamTwo[i];
                             <div class="player">
@@ -85,7 +88,10 @@
                         {
                             <div class="player">
                                 <div class="default-avatar">
-                                    <button onclick="@(() => AddPlayer("Team2"))">+</button>
+                                    @if (!Match.IAmAlreadyRegistered)
+                                    {
+                                        <button onclick="@(() => AddPlayer("Team2"))">+</button>
+                                    }
                                 </div>
                             </div>
                         }

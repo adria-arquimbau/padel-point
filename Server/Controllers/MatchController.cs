@@ -145,6 +145,7 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
+                IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
                 EndDateTime = x.EndDateTime,
