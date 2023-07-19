@@ -121,7 +121,13 @@ public class MatchController : ControllerBase
         if (match.MatchPlayers.Any(x => x.Player.Id == player.Id))
         {
             return Conflict("You're already registered for this match.");
-        }   
+        }
+
+        var requestedTeamRegistered = match.MatchPlayers.Count(x => x.Team == team);
+        if (requestedTeamRegistered >= 2)
+        {
+            return Conflict("This team is already full.");
+        }
         
         match.MatchPlayers.Add(new MatchPlayer
         {
