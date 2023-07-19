@@ -1,12 +1,13 @@
 @page "/match/{MatchId:guid}/detail"
 
 @using EventsManager.Shared.Responses
-@using EventsManager.Shared.Requests
+@using EventsManager.Client.Components.Modals
 @using EventsManager.Client.Components.Match
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 @if (_match == null)
 {
@@ -165,10 +166,12 @@ else
     
     @if (_match.RequesterIsTheCreator)
     {
-        <button class="btn btn-primary" @onclick="ShowEditModal">Edit Match</button>
+        <button class="btn btn-primary" @onclick="ShowEditModal">Edit</button>
+        <button class="btn btn-danger" @onclick="ShowRemoveModal">Delete</button>
     }
 
     <EditMatch IsModalVisible="_editModalVisible" Match="_match" OnClose="GetMatch"></EditMatch>
+    <ConfirmationModal ConfirmationChanged="RemoveMatch" Visible="_deleteModalVisible" Title="Delete Match" Message="Are you sure you want to delete this match?"></ConfirmationModal>
 }
 
 @code {
@@ -176,7 +179,8 @@ else
     public Guid? MatchId { get; set; }
 
     private MatchResponse? _match;
-    private bool _editModalVisible;
+    private bool _editModalVisible = false;
+    private bool _deleteModalVisible = false;
     
     private decimal _averageEloTeamOne;
     private decimal _averageEloTeamTwo;
@@ -262,11 +266,35 @@ else
         }
     }
     
-    void ShowEditModal()
+    private void ShowEditModal()
     {
         _editModalVisible = true;
     }
-
+    
+    private void ShowRemoveModal()
+    {
+        _deleteModalVisible = true;
+    }
+    
+    private async Task RemoveMatch(bool removeIt)
+    {
+        if (removeIt)
+        {
+            var response = await Http.DeleteAsync($"match/{MatchId.Value}");
+        
+            if(response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        
+        _deleteModalVisible = false;
+    }
 }
 
 <style>
