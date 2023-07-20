@@ -31,7 +31,7 @@
             </div>
         }
     }
-    
+
     @if (Match?.Sets?.Count > 0)
     {
         <table>
@@ -56,18 +56,21 @@
     }
     @if (Match.RequesterIsTheCreator)
     {
-        @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
+        @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
         {
-            <div class="button-container">
-                <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
-            </div>
-        }
-        @if (Match.Sets.Count > 0)
-        {
-            <div class="button-container">
-                <button style="font-size: 15px" @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
-                <button style="font-size: 15px" @onclick="RemoveResults" class="btn btn-danger btn-20">Delete</button>
-            </div>
+            @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
+            {
+                <div class="button-container">
+                    <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
+                </div>
+            }
+            @if (Match.Sets.Count > 0)
+            {
+                <div class="button-container">
+                    <button style="font-size: 15px" @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
+                    <button style="font-size: 15px" @onclick="ShowDeleteScoreModal" class="btn btn-danger btn-20">Delete</button>
+                </div>
+            }
         }
     }
 </div>
@@ -75,7 +78,7 @@
 <AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 <ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
 <ConfirmationModal ConfirmationChanged="DeleteConfirmResult" Visible="_deleteConfirmResultVisible" Title="Delete confirmed result" Message="Are you sure you want to delete the confirmed the result?"></ConfirmationModal>
-
+<ConfirmationModal ConfirmationChanged="DeleteScoreResult" Visible="_deleteScoreModalVisible" Title="Delete score" Message="Are you sure you want to delete the score?"></ConfirmationModal>
 
 @code {
     [Parameter]
@@ -87,6 +90,7 @@
     private bool _loading = false;
     private bool _addResultsVisible = false;
     private bool _confirmResultVisible = false;
+    private bool _deleteScoreModalVisible = false;
     private bool _deleteConfirmResultVisible = false;
 
     private bool MyTeamHaveConfirmedResult()
@@ -111,6 +115,11 @@
     private void ShowDeleteConfirmationResultsModal()
     {
         _deleteConfirmResultVisible = true;
+    }
+    
+    private void ShowDeleteScoreModal()
+    {
+        _deleteScoreModalVisible = true;
     }
     
     private void ShowAddResultsModal()
@@ -167,8 +176,37 @@
             }
         }
         
-        _deleteConfirmResultVisible = false;
         _loading = false;
+    }
+    
+    private async Task DeleteScoreResult(bool confirm)
+    {
+        _loading = true;
+
+        if (confirm)
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowInfo("Results removed.");
+                    await RefreshMatch.InvokeAsync();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        }
+        _loading = false;
+        _deleteScoreModalVisible = false;
     }
     
     private async Task ResultAdded(SetMatchScoreRequest? addResultRequest)

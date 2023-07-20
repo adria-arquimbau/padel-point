@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
+using EventsManager.Server.Handlers.Commands.Elo;
 using EventsManager.Server.Models;
 using EventsManager.Shared;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +19,12 @@ namespace EventsManager.Server.Controllers;
 public class MatchController : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly IMediator _mediator;
 
-    public MatchController(ApplicationDbContext dbContext)
+    public MatchController(ApplicationDbContext dbContext, IMediator mediator)
     {
         _dbContext = dbContext;
+        _mediator = mediator;
     }
 
     [HttpPost]
@@ -175,7 +179,12 @@ public class MatchController : ControllerBase
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);
-
+        
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            //await _mediator.Send(new CalculateNewEloCommandRequest(matchId), cancellationToken);
+        }
+        
         return Ok();
     }
 
@@ -315,6 +324,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("Match is not full");
         }
+        
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            return Conflict("Score is already confirmed");
+        }
 
         var score = request.Sets?.Select(x => new Set
         {
@@ -325,6 +339,8 @@ public class MatchController : ControllerBase
 
         match.Sets = new List<Set>();
         match.Sets.AddRange(score);
+        match.ScoreConfirmedTeamOne = false;
+        match.ScoreConfirmedTeamTwo = false;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         
@@ -347,8 +363,15 @@ public class MatchController : ControllerBase
         {
             return Conflict("Only creator can remove the score");
         }
+
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            return Conflict("Score is already confirmed");
+        }
         
         match.Sets = new List<Set>();
+        match.ScoreConfirmedTeamOne = false;
+        match.ScoreConfirmedTeamTwo = false;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         
