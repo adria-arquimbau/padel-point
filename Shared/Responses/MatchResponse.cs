@@ -18,9 +18,10 @@ public class MatchResponse
     public int AverageEloTeamTwo { get; set; }
     public bool RequesterIsTheCreator { get; set; }
     public bool IAmAlreadyRegistered { get; set; }
-    public int PlayersCount { get; set; }
+    public int PlayersCount { get; set; }   
     public List<string> PlayersNames { get; set; }
     public List<SetDto>? Sets { get; set; }
     public Team? MyTeam { get; set; }
+    public bool Finished { get; set; }
 }
                             

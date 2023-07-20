@@ -14,9 +14,13 @@ else
         @foreach (var match in _matches)
         {
             <div class="border match-card" style="position: relative;">
+                 @if (match.Finished)
+                {
+                    <div class="finished-stamp">FINISHED</div>
+                }
                 <div style="font-size: 12px; text-align: center;">
-                    @match.StartDateTime.ToLocalTime().ToLongDateString() / 
-                    @match.StartDateTime.ToLocalTime().ToShortTimeString() - 
+                    @match.StartDateTime.ToLocalTime().ToLongDateString() /
+                    @match.StartDateTime.ToLocalTime().ToShortTimeString() -
                     @match.EndDateTime.ToLocalTime().ToShortTimeString()
                 </div>
                 <FluentDivider></FluentDivider>
@@ -78,4 +82,21 @@ else
     .match-card {
         margin-bottom: 15px;
     }   
+    
+    .finished-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: limegreen;
+        border: 2px solid limegreen;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
 </style>
