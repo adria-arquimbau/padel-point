@@ -269,6 +269,11 @@ public class MatchController : ControllerBase
             return Conflict("Only creator can set the score");
         }
 
+        if (match.MatchPlayers.Count != 4)
+        {
+            return Conflict("Match is not full");
+        }
+
         var score = request.Sets?.Select(x => new Set
         {
             SetNumber = x.SetNumber,

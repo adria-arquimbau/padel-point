@@ -13,43 +13,45 @@
 }
 
 <div class="match-set-results border info">
-    @if(Match.Sets.Count == 0)
+    @if(Match.Sets.Count > 0)
     {
-        <p>No sets available</p>
+        <table>
+            <thead>
+            <tr>
+                <th>Set</th>
+                <th>Team 1</th>
+                <th>Team 2</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var set in Match.Sets)
+            {
+                <tr>
+                    <td>@set.SetNumber</td>
+                    <td>@set.Team1Score</td>
+                    <td>@set.Team2Score</td>
+                </tr>
+            }
+            </tbody>
+        </table>
     }
-    else
+    @if(Match.RequesterIsTheCreator)
     {
-        <div class="set-results-header info-footer">
-            <div class="set-number-header info-footer-box">Set</div>
-            <div class="team-score-header info-footer-box">Team 1 Score</div>
-            <div class="team-score-header info-footer-box">Team 2 Score</div>
-        </div>
-        @foreach (var set in Match.Sets)
-        {
-            <div class="set-result-row info-footer">
-                <div class="set-number info-footer-box">@set.SetNumber</div>
-                <div class="team-score info-footer-box">@set.Team1Score</div>
-                <div class="team-score info-footer-box">@set.Team2Score</div>
-            </div>
-        }
-    }
-</div>
-@if(Match.RequesterIsTheCreator)
-    {
-        @if (Match.Sets.Count == 0)
+        @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
         {
             <div class="button-container">
-                <button @onclick="ShowAddResultsModal" class="btn btn-primary btn-80">Add results</button>
+                <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
             </div>
         }
         @if (Match.Sets.Count > 0)
         {
             <div class="button-container">
-                <button @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
-                <button @onclick="RemoveResults" class="btn btn-danger btn-20">Remove results</button>
+                <button style="font-size: 15px" @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
+                <button style="font-size: 15px" @onclick="RemoveResults" class="btn btn-danger btn-20">Delete</button>
             </div>
         }
     }
+</div>
 
 <AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 
@@ -124,23 +126,35 @@
 }
 
 <style>
+    .border{
+        margin: 12px;
+        padding: 12px;
+        border: 2px solid grey;
+        border-radius: 10px;   
+        display: flex;  
+        background-color: white;
+    }
     .match-set-results {
-        width: 100%;
         flex-direction: column;
     }
     
-    .set-results-header, .set-result-row {
+    table th, table td {
+        text-align: center;
+    }     
+    
+    .button-container {
         display: flex;
-        justify-content: space-around;
-        margin-bottom: 10px;
     }
     
-    .set-number-header, .team-score-header {
-        font-weight: bold;
-        text-align: center;
+    .btn-80 {
+        width: 70%;
     }
     
-    .set-number, .team-score {
-        text-align: center;
+    .btn-20 {
+        width: 30%;
+    }
+    
+    .btn{
+        margin: 10px 5px 5px;
     }
 </style>
