@@ -163,7 +163,7 @@
             var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
             if (response.IsSuccessStatusCode)
             {
-                ToastService.ShowInfo("You have been removed from the match.");
+                ToastService.ShowInfo("Player removed from the match.");
                 _loading = false;
                 await RefreshMatch.InvokeAsync();
             }
