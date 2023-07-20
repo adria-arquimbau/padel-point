@@ -3,7 +3,7 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-<div class="modal" tabindex="-1" style="display: @(Visible ? "block" : "none")">
+<div class="modal background" tabindex="-1" style="display: @(Visible ? "block" : "none")">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -63,3 +63,8 @@
         await ConfirmationChanged.InvokeAsync(null);
     }
 }
+<style>
+    .background{
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+</style>
