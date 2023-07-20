@@ -1,0 +1,35 @@
+﻿@page "/Documentation"
+
+<h3>Elo Calculation in Our Padel Matches</h3>
+
+<p>Our system calculates Elo rating based on the outcome of each Padel match. This rating system helps us track the relative skill levels of players in a way that takes into account the level of the opponents they play against.</p>
+
+<h4>How It Works</h4>
+
+<p>When a new player joins our system, they start with an Elo rating of 1500. After each match, the system adjusts the players' ratings based on whether they won or lost and who they were playing against.</p>
+
+<h4>The specifics of how we calculate Elo are as follows:</h4>
+
+<ol>
+    <li><strong>Initial Ratings:</strong> Every player starts off with an Elo rating of 1500.</li>
+    <li><strong>Expected Outcome:</strong> For each match, we calculate the expected outcome for each player using the following formula:
+        <br /><code>Expected_Score = 1 / (1 + 10^((Average_Elo_of_Opposing_Team - Player_Elo) / 400))</code>
+        <br />The formula calculates the expected score by taking into account the current Elo rating of the player and the average Elo rating of the opposing team.</li>
+    <li><strong>Actual Outcome:</strong> After the match, we compare the expected outcome with the actual outcome. If a player's team wins, the actual score is 1; if the team loses, the actual score is 0.</li>
+    <li><strong>Rating Update:</strong> We then update each player's Elo rating using the following formula:
+        <br /><code>New_Elo = Old_Elo + K * (Actual_Score - Expected_Score)</code>
+        <br />In this formula, `K` is a constant factor (which we currently set to 32), `Actual_Score` is 1 for a win and 0 for a loss, and `Expected_Score` is the value calculated in step 2. This calculation is done individually for each player, adjusting the `Actual_Score` based on whether their team won or lost.
+        <br />Please note that due to this system, a lower-ranked player on a winning team will gain more points than a higher-ranked player on the same team. Similarly, a higher-ranked player on a losing team will lose more points than a lower-ranked player on the same team.</li>
+</ol>
+
+<h4>Elo History</h4>
+
+<p>To help players track their progress, our system maintains an Elo history. After each match, we record the player's previous and current Elo ratings, the time of the change, and the match in which the change occurred. This way, players can see how their performance in matches affects their Elo rating over time.</p>
+
+<h4>Conclusion</h4>
+
+<p>The Elo rating system is designed to give a fair and accurate representation of a player's skill level, taking into account not only whether they win or lose, but also the skill level of the players they are playing against. It ensures that every match - win or lose - provides a meaningful contribution to your skill rating. Keep playing and watch how your Elo rating evolves!</p>
+
+@code {
+
+}
