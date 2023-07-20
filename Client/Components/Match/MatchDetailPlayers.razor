@@ -1,5 +1,5 @@
 ﻿@using EventsManager.Shared.Responses
-@using EventsManager.Client.Components.Match.AddResults
+@using EventsManager.Client.Components.Match.Results
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
 
@@ -112,11 +112,16 @@
     {
         @if (Match.Sets.Count == 0)
         {
-            <button @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
+            <div class="button-container">
+                <button @onclick="ShowAddResultsModal" class="btn btn-primary btn-80">Add results</button>
+            </div>
         }
         @if (Match.Sets.Count > 0)
         {
-            <button @onclick="ShowEditResultsModal" class="btn btn-primary">Edit results</button>
+            <div class="button-container">
+                <button @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
+                <button @onclick="RemoveResults" class="btn btn-danger btn-20">Remove results</button>
+            </div>
         }
     }
 </div>
@@ -230,6 +235,35 @@
         _addResultsVisible = false;
         _loading = false;
     }
+    
+    private async Task RemoveResults()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
+
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Results removed.");
+                _sets = new List<SetDto>();
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
 }
 
 <style>
@@ -304,5 +338,17 @@
     .match-detail-players {
         display: flex;
         flex-direction: column;
+    }
+    
+    .button-container {
+        display: flex;
+    }
+    
+    .btn-80 {
+        width: 80%;
+    }
+    
+    .btn-20 {
+        width: 20%;
     }
 </style>

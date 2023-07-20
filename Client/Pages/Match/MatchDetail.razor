@@ -3,6 +3,7 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Modals
 @using EventsManager.Client.Components.Match
+@using EventsManager.Client.Components.Match.Results
 @using EventsManager.Shared.Requests
 
 @inject HttpClient Http
@@ -77,6 +78,7 @@ else
     
     <MatchDetailPlayers RefreshMatch="GetMatch" Match="_match"></MatchDetailPlayers>
 
+    <ShowResults Match="_match"></ShowResults>
     <div class="border match-detail-location">
         @_match.Location                        
     </div>

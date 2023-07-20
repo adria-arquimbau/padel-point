@@ -4,5 +4,5 @@ namespace EventsManager.Shared.Requests;
 
 public class SetMatchScoreRequest
 {
-    public List<SetDto>? Sets { get; set; }
+    public List<SetDto> Sets { get; set; } = new();
 }   

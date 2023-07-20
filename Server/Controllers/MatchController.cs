@@ -293,6 +293,7 @@ public class MatchController : ControllerBase
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .Include(x => x.Creator)
+            .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
         if (match.Creator.UserId != userId)

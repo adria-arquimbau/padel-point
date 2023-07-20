@@ -20,6 +20,6 @@ public class MatchResponse
     public bool IAmAlreadyRegistered { get; set; }
     public int PlayersCount { get; set; }
     public List<string> PlayersNames { get; set; }
-    public List<SetDto> Sets { get; set; }
+    public List<SetDto>? Sets { get; set; }
 }
-                
+                    

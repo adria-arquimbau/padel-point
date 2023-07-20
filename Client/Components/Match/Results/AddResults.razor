@@ -12,31 +12,34 @@
                 <button type="button" class="btn-close" @onclick="Cancel"></button>
             </div>
             <div class="modal-body">
-                <EditForm Model="Sets" OnValidSubmit="Confirm">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
+                @if (Sets != null)
+                {
+                    <EditForm Model="SetMatchScoreRequest" OnValidSubmit="Confirm">
+                        <DataAnnotationsValidator/>
+                        <ValidationSummary/>
 
-                    <div class="score-grid">
-                        <div class="score-labels">
-                            <div>Team 1</div>
-                            <div>Team 2</div>
+                        <div class="score-grid">
+                            <div class="score-labels">
+                                <div>Team 1</div>
+                                <div>Team 2</div>
+                            </div>
+
+                            @foreach (var score in Sets)
+                            {
+                                <div class="score-set">
+                                    <small class="set-number">Set @score.SetNumber</small>
+                                    <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
+                                    <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
+                                </div>
+                            }
                         </div>
 
-                        @foreach(var score in Sets)
-                        {
-                            <div class="score-set">
-                                <small class="set-number">Set @score.SetNumber</small>
-                                <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
-                                <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="set-buttons">
-                        <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
-                        <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
-                    </div>
-                </EditForm>
+                        <div class="set-buttons">
+                            <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
+                            <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
+                        </div>
+                    </EditForm>
+                }
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
@@ -48,7 +51,7 @@
 
 @code {
     [Parameter] public bool Visible { get; set; }
-    
+
     [Parameter]
     public List<SetDto>? Sets { get; set; }
 
@@ -57,6 +60,8 @@
         
     [Parameter]
     public EventCallback<SetMatchScoreRequest?> ConfirmationChanged { get; set; }
+
+    public readonly SetMatchScoreRequest SetMatchScoreRequest = new();
 
     protected override void OnInitialized()
     {
@@ -74,7 +79,7 @@
 
     private void RemoveSet()
     {
-        if (Sets.Count == 2)
+        if (Sets.Count <= 2)
         {
             ToastService.ShowError("You must have at least 2 sets");
             return;
@@ -88,10 +93,8 @@
     private async Task Confirm()
     {
         Visible = false;
-        await ConfirmationChanged.InvokeAsync(new SetMatchScoreRequest
-        {
-            Sets = Sets
-        });
+        SetMatchScoreRequest.Sets.AddRange(Sets);
+        await ConfirmationChanged.InvokeAsync(SetMatchScoreRequest);
     }
 
     private async Task Cancel()

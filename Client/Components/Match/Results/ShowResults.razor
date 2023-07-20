@@ -1,0 +1,52 @@
+﻿@using EventsManager.Shared.Responses
+@using EventsManager.Shared.Dtos
+
+<div class="match-set-results border info">
+    @if(Match.Sets.Count == 0)
+    {
+        <p>No sets available</p>
+    }
+    else
+    {
+        <div class="set-results-header info-footer">
+            <div class="set-number-header info-footer-box">Set</div>
+            <div class="team-score-header info-footer-box">Team 1 Score</div>
+            <div class="team-score-header info-footer-box">Team 2 Score</div>
+        </div>
+        @foreach (var set in Match.Sets)
+        {
+            <div class="set-result-row info-footer">
+                <div class="set-number info-footer-box">@set.SetNumber</div>
+                <div class="team-score info-footer-box">@set.Team1Score</div>
+                <div class="team-score info-footer-box">@set.Team2Score</div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public MatchResponse? Match { get; set; }
+}
+
+<style>
+    .match-set-results {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .set-results-header, .set-result-row {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 10px;
+    }
+    
+    .set-number-header, .team-score-header {
+        font-weight: bold;
+        text-align: center;
+    }
+    
+    .set-number, .team-score {
+        text-align: center;
+    }
+</style>
