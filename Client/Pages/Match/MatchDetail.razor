@@ -78,7 +78,8 @@ else
     
     <MatchDetailPlayers RefreshMatch="GetMatch" Match="_match"></MatchDetailPlayers>
 
-    <ShowResults Match="_match"></ShowResults>
+    <ShowResults Match="_match" RefreshMatch="GetMatch"></ShowResults>
+    
     <div class="border match-detail-location">
         @_match.Location                        
     </div>

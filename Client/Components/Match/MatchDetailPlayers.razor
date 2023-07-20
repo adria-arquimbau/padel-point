@@ -108,25 +108,8 @@
             <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
         </div>
     </div>
-    @if(Match.RequesterIsTheCreator)
-    {
-        @if (Match.Sets.Count == 0)
-        {
-            <div class="button-container">
-                <button @onclick="ShowAddResultsModal" class="btn btn-primary btn-80">Add results</button>
-            </div>
-        }
-        @if (Match.Sets.Count > 0)
-        {
-            <div class="button-container">
-                <button @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
-                <button @onclick="RemoveResults" class="btn btn-danger btn-20">Remove results</button>
-            </div>
-        }
-    }
 </div>
 
-<AddResults Sets="_sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 
 @code {
     [Parameter]
@@ -135,10 +118,7 @@
     [Parameter] 
     public EventCallback RefreshMatch { get; set; }
 
-    private List<SetDto>? _sets;
-
     private bool _loading = false;
-    private bool _addResultsVisible = false;
         
     private async Task AddPlayer(string team)
     {
@@ -200,70 +180,6 @@
             StateHasChanged();
         }
     }
-    
-    private void ShowAddResultsModal()
-    {
-        _addResultsVisible = true;
-    }
-        
-    private void ShowEditResultsModal()
-    {
-        _sets = Match.Sets;
-        _addResultsVisible = true;
-    }
-
-    private async Task ResultAdded(SetMatchScoreRequest? addResultRequest)
-    {
-        _loading = true;
-
-        if (addResultRequest != null)
-        {
-            var response = await Http.PostAsJsonAsync($"match/{Match.Id}/set-score", addResultRequest);
-            if (response.IsSuccessStatusCode)
-            {
-                ToastService.ShowInfo("Results added.");
-                _loading = false;
-                await RefreshMatch.InvokeAsync();
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
-            }
-        }
-
-        _addResultsVisible = false;
-        _loading = false;
-    }
-    
-    private async Task RemoveResults()
-    {
-        _loading = true;
-        StateHasChanged();
-
-        try
-        {
-            var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
-
-            if (response.IsSuccessStatusCode)
-            {
-                ToastService.ShowInfo("Results removed.");
-                _sets = new List<SetDto>();
-                await RefreshMatch.InvokeAsync();
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
-            }
-        }
-        finally
-        {
-            _loading = false;
-            StateHasChanged();
-        }
-    }
-
 }
 
 <style>

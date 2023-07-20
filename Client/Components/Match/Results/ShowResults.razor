@@ -1,5 +1,16 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Requests
+@using System.Net
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject HttpClient Http
+@inject IToastService ToastService
+
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
 
 <div class="match-set-results border info">
     @if(Match.Sets.Count == 0)
@@ -23,10 +34,93 @@
         }
     }
 </div>
+@if(Match.RequesterIsTheCreator)
+    {
+        @if (Match.Sets.Count == 0)
+        {
+            <div class="button-container">
+                <button @onclick="ShowAddResultsModal" class="btn btn-primary btn-80">Add results</button>
+            </div>
+        }
+        @if (Match.Sets.Count > 0)
+        {
+            <div class="button-container">
+                <button @onclick="ShowEditResultsModal" class="btn btn-primary btn-80">Edit results</button>
+                <button @onclick="RemoveResults" class="btn btn-danger btn-20">Remove results</button>
+            </div>
+        }
+    }
+
+<AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 
 @code {
     [Parameter]
     public MatchResponse? Match { get; set; }
+    
+    [Parameter] 
+    public EventCallback RefreshMatch { get; set; }
+
+    private bool _loading = false;
+    private bool _addResultsVisible = false;
+
+    private void ShowAddResultsModal()
+    {
+        _addResultsVisible = true;
+    }
+        
+    private void ShowEditResultsModal()
+    {
+        _addResultsVisible = true;
+    }
+    
+    private async Task ResultAdded(SetMatchScoreRequest? addResultRequest)
+    {
+        _loading = true;
+
+        if (addResultRequest != null)
+        {
+            var response = await Http.PostAsJsonAsync($"match/{Match.Id}/set-score", addResultRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Results added.");
+                _loading = false;
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+
+        _addResultsVisible = false;
+        _loading = false;
+    }
+    
+    private async Task RemoveResults()
+    {
+        _loading = true;
+
+        try
+        {
+            var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
+
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Results removed.");
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
 }
 
 <style>
