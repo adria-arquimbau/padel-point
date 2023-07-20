@@ -1,64 +1,63 @@
 ﻿@page "/Documentation"
 
-<h2>Elo Rating System</h2>
+<h2>Elo Rating System Explained</h2>
 
 <p>
-The Elo rating system is used to calculate the relative skill levels of players in games such as chess and padel. It was named after its creator, Arpad Elo, a Hungarian-American physics professor. In our platform, we use it to calculate and adjust the Elo ratings of padel players after each match.
+At our platform, we use the Elo rating system, originally developed for chess, to rank padel players. This system provides a simple, yet effective way to determine a player's skill level relative to others. Each player starts with an initial score of 1500, which changes based on their performance in matches.
 </p>
 
-<h3>How Elo is Calculated</h3>
+<hr />
+
+<h3>How Does the Elo System Work?</h3>
 
 <p>
-Each player starts with a base Elo rating of 1500. After each match, the system calculates the expected outcome of the match based on the current Elo ratings of the players. This expected outcome is then compared to the actual outcome to adjust the players' Elo ratings.
-</p>
-
-<p>
-The expected score for a player is calculated using the following formula:
-</p>
-
-<pre>
-E = 1 / (1 + 10^((R_opponent - R_player) / 400))
-</pre>
-
-<p>
-Where:
-</p>
-<ul>
-    <li><strong>E</strong> is the expected score.</li>
-    <li><strong>R_opponent</strong> is the average Elo rating of the opposing team.</li>
-    <li><strong>R_player</strong> is the Elo rating of the player.</li>
-</ul>
-
-<p>
-The actual score is 1 if the player's team won the match, plus the set score difference divided by 10. If the player's team lost, the actual score is 0, plus the set score difference divided by 10.
+Every time a match is played, the system updates the players' ratings. This is done by predicting the outcome of the match before it starts, based on the players' current ratings. We call this the 'expected outcome'. The real outcome of the match is then compared to this expected outcome to adjust the players' ratings.
 </p>
 
 <p>
-Finally, the new Elo rating for a player is calculated using the following formula:
+If the outcome is as expected (e.g., the player with the higher rating wins), the ratings change slightly. However, if an upset occurs (e.g., the player with the lower rating wins), the ratings shift more significantly. That means if you manage to beat a stronger opponent, your rating will receive a substantial boost!
 </p>
 
-<pre>
-R_new = R_old + K * (S_actual - E)
-</pre>
+<div class="alert alert-info">
+  <strong>Formula:</strong> Expected Score (E) = 1 / (1 + 10<sup>(opponent's rating - player's rating) / 400</sup>)
+</div>
 
-<p>
-Where:
-</p>
-<ul>
-    <li><strong>R_new</strong> is the new Elo rating.</li>
-    <li><strong>R_old</strong> is the old Elo rating.</li>
-    <li><strong>K</strong> is a constant factor that determines the maximum change in rating. In our case, K is 32.</li>
-    <li><strong>S_actual</strong> is the actual score.</li>
-    <li><strong>E</strong> is the expected score.</li>
-</ul>
+<hr />
+
+<h3>Importance of Match Score</h3>
 
 <p>
-Note that a player's Elo change is also tracked and stored as part of their history. This Elo change is simply the difference between the new Elo rating and the old Elo rating.
+In padel, the final score of the match also plays a role in the ratings adjustment. A large margin of victory or defeat will have a greater impact on the rating change compared to a closely fought match. Therefore, even if you lose, a good fight can help maintain your rating.
 </p>
 
+<div class="alert alert-info">
+  <strong>Formula:</strong> New Rating = Old Rating + K * (Actual Score - Expected Score)
+</div>
+
+<hr />
+
+<h3>Team Dynamics</h3>
+
 <p>
-In this way, the system gives more weight to matches between players of different skill levels. A lower-rated player who wins against a higher-rated player will see a larger increase in their Elo rating compared to if they had won against a player of similar rating.
+When you're part of a team, the change in your rating depends on your team's performance as well as your own current rating. If you're a beginner playing with a skilled teammate against high-ranked opponents, you can gain more points from a victory and lose fewer from a defeat.
 </p>
+
+<hr />
+
+<h3>Elo History</h3>
+
+<p>
+We keep a record of your Elo rating changes over time in an 'Elo History'. This allows you to track your progression and see how your skill level has improved with each match. Remember, the key to growth is consistency, so keep playing and strive to improve!
+</p>
+
+<hr />
+
+<h3>Conclusion</h3>
+
+<p>
+The Elo rating system provides a fair and transparent method to rank padel players. While it may seem complex at first, its core principle is simple - performance is rewarded. Win against stronger opponents, hold your ground in every match, and watch your rating soar!
+</p>
+
 
 @code {
 
