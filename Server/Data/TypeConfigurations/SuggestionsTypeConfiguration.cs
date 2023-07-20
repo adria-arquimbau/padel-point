@@ -25,6 +25,14 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.HasOne(p => p.User)
             .WithOne(u => u.Player)
             .HasForeignKey<Player>(x => x.UserId);
+        builder.HasMany(p => p.EloHistories) // Added this line to define the relationship with EloHistory
+            .WithOne(eh => eh.Player)
+            .HasForeignKey(eh => eh.PlayerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(p => p.CreatedMatches)
+            .WithOne(m => m.Creator)
+            .HasForeignKey(m => m.CreatorId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -39,6 +47,10 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .WithMany(p => p.CreatedMatches) // Updated this line to reference the collection of created matches in the Player entity
             .HasForeignKey(m => m.CreatorId)
             .OnDelete(DeleteBehavior.Restrict); 
+        builder.HasMany(m => m.EloHistories) // Added this line to define the relationship with EloHistory
+            .WithOne(eh => eh.Match)
+            .HasForeignKey(eh => eh.MatchId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -75,4 +87,23 @@ public class SetConfiguration : IEntityTypeConfiguration<Set>
             .IsRequired();
     }
 }
+
+public class EloHistoryConfiguration : IEntityTypeConfiguration<EloHistory>
+{
+    public void Configure(EntityTypeBuilder<EloHistory> builder)
+    {
+        builder.HasKey(eh => eh.Id);
+        builder.Property(eh => eh.PreviousElo)
+            .IsRequired();
+        builder.Property(eh => eh.CurrentElo)
+            .IsRequired();
+        builder.HasOne(eh => eh.Player)
+            .WithMany(p => p.EloHistories)
+            .HasForeignKey(eh => eh.PlayerId);
+        builder.HasOne(eh => eh.Match)
+            .WithMany(m => m.EloHistories) // Configure relationship with Match
+            .HasForeignKey(eh => eh.MatchId);
+    }
+}
+
 

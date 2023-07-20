@@ -14,4 +14,5 @@ public class Match
     public Player Creator { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
     public bool ScoreConfirmedTeamTwo { get; set; }
+    public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
 }
