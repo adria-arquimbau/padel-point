@@ -32,8 +32,10 @@
                         }
                     </div>
 
-                    <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
-                    <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
+                    <div class="set-buttons">
+                        <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
+                        <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
+                    </div>
                 </EditForm>
             </div>
             <div class="modal-footer">
@@ -62,12 +64,17 @@
 
     private void AddSet()
     {
-        int nextSetNumber = _editScoresRequest.Sets.Count + 1;
+        var nextSetNumber = _editScoresRequest.Sets.Count + 1;
         _editScoresRequest.Sets.Add(new SetDto() { SetNumber = nextSetNumber });
     }
 
     private void RemoveSet()
     {
+        if (_editScoresRequest.Sets.Count == 2)
+        {
+            ToastService.ShowError("You must have at least 2 sets");
+            return;
+        }
         if (_editScoresRequest.Sets.Any())
         {
             _editScoresRequest.Sets.RemoveAt(_editScoresRequest.Sets.Count - 1);
@@ -119,11 +126,14 @@
         font-size: 0.7em;
     }
 
-    .add-set-button, .remove-set-button {
+    .set-buttons {
+        display: flex;
+        justify-content: space-between;
         margin-top: 20px;
     }
 
-    .remove-set-button {
-        margin-left: 10px;
+    .add-set-button, .remove-set-button {
+        padding: 5px 10px;
+        font-size: 0.8em;
     }
 </style>
