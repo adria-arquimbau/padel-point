@@ -158,6 +158,7 @@ public class MatchController : ControllerBase
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
                 PlayersCount = x.MatchPlayers.Count,
+                MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
                 Sets = x.Sets.Select(s => new SetDto
@@ -263,6 +264,7 @@ public class MatchController : ControllerBase
             .Where(x => x.Id == matchId)
             .Include(x => x.Creator)
             .Include(x => x.Sets)
+            .Include(x => x.MatchPlayers)
             .SingleAsync(cancellationToken: cancellationToken);
 
         if (match.Creator.UserId != userId)

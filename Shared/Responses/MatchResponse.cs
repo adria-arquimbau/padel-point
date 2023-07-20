@@ -21,5 +21,6 @@ public class MatchResponse
     public int PlayersCount { get; set; }
     public List<string> PlayersNames { get; set; }
     public List<SetDto>? Sets { get; set; }
+    public Team? MyTeam { get; set; }
 }
-                    
+                            
