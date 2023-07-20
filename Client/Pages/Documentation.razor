@@ -1,34 +1,64 @@
 ﻿@page "/Documentation"
 
-<h3>Elo Calculation in Our Padel Matches</h3>
+<h2>Elo Rating System</h2>
 
-<p>Our system calculates Elo rating based on the outcome of each Padel match. This rating system helps us track the relative skill levels of players in a way that takes into account the level of the opponents they play against.</p>
+<p>
+The Elo rating system is used to calculate the relative skill levels of players in games such as chess and padel. It was named after its creator, Arpad Elo, a Hungarian-American physics professor. In our platform, we use it to calculate and adjust the Elo ratings of padel players after each match.
+</p>
 
-<h4>How It Works</h4>
+<h3>How Elo is Calculated</h3>
 
-<p>When a new player joins our system, they start with an Elo rating of 1500. After each match, the system adjusts the players' ratings based on whether they won or lost and who they were playing against.</p>
+<p>
+Each player starts with a base Elo rating of 1500. After each match, the system calculates the expected outcome of the match based on the current Elo ratings of the players. This expected outcome is then compared to the actual outcome to adjust the players' Elo ratings.
+</p>
 
-<h4>The specifics of how we calculate Elo are as follows:</h4>
+<p>
+The expected score for a player is calculated using the following formula:
+</p>
 
-<ol>
-    <li><strong>Initial Ratings:</strong> Every player starts off with an Elo rating of 1500.</li>
-    <li><strong>Expected Outcome:</strong> For each match, we calculate the expected outcome for each player using the following formula:
-        <br /><code>Expected_Score = 1 / (1 + 10^((Average_Elo_of_Opposing_Team - Player_Elo) / 400))</code>
-        <br />The formula calculates the expected score by taking into account the current Elo rating of the player and the average Elo rating of the opposing team.</li>
-    <li><strong>Actual Outcome:</strong> After the match, we compare the expected outcome with the actual outcome. If a player's team wins, the actual score is 1; if the team loses, the actual score is 0.</li>
-    <li><strong>Rating Update:</strong> We then update each player's Elo rating using the following formula:
-        <br /><code>New_Elo = Old_Elo + K * (Actual_Score - Expected_Score)</code>
-        <br />In this formula, `K` is a constant factor (which we currently set to 32), `Actual_Score` is 1 for a win and 0 for a loss, and `Expected_Score` is the value calculated in step 2. This calculation is done individually for each player, adjusting the `Actual_Score` based on whether their team won or lost.
-        <br />Please note that due to this system, a lower-ranked player on a winning team will gain more points than a higher-ranked player on the same team. Similarly, a higher-ranked player on a losing team will lose more points than a lower-ranked player on the same team.</li>
-</ol>
+<pre>
+E = 1 / (1 + 10^((R_opponent - R_player) / 400))
+</pre>
 
-<h4>Elo History</h4>
+<p>
+Where:
+</p>
+<ul>
+    <li><strong>E</strong> is the expected score.</li>
+    <li><strong>R_opponent</strong> is the average Elo rating of the opposing team.</li>
+    <li><strong>R_player</strong> is the Elo rating of the player.</li>
+</ul>
 
-<p>To help players track their progress, our system maintains an Elo history. After each match, we record the player's previous and current Elo ratings, the time of the change, and the match in which the change occurred. This way, players can see how their performance in matches affects their Elo rating over time.</p>
+<p>
+The actual score is 1 if the player's team won the match, plus the set score difference divided by 10. If the player's team lost, the actual score is 0, plus the set score difference divided by 10.
+</p>
 
-<h4>Conclusion</h4>
+<p>
+Finally, the new Elo rating for a player is calculated using the following formula:
+</p>
 
-<p>The Elo rating system is designed to give a fair and accurate representation of a player's skill level, taking into account not only whether they win or lose, but also the skill level of the players they are playing against. It ensures that every match - win or lose - provides a meaningful contribution to your skill rating. Keep playing and watch how your Elo rating evolves!</p>
+<pre>
+R_new = R_old + K * (S_actual - E)
+</pre>
+
+<p>
+Where:
+</p>
+<ul>
+    <li><strong>R_new</strong> is the new Elo rating.</li>
+    <li><strong>R_old</strong> is the old Elo rating.</li>
+    <li><strong>K</strong> is a constant factor that determines the maximum change in rating. In our case, K is 32.</li>
+    <li><strong>S_actual</strong> is the actual score.</li>
+    <li><strong>E</strong> is the expected score.</li>
+</ul>
+
+<p>
+Note that a player's Elo change is also tracked and stored as part of their history. This Elo change is simply the difference between the new Elo rating and the old Elo rating.
+</p>
+
+<p>
+In this way, the system gives more weight to matches between players of different skill levels. A lower-rated player who wins against a higher-rated player will see a larger increase in their Elo rating compared to if they had won against a player of similar rating.
+</p>
 
 @code {
 
