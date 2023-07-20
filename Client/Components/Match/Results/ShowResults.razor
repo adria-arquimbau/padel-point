@@ -1,7 +1,9 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
+@using EventsManager.Client.Components.Modals
 @using System.Net
+@using EventsManager.Shared
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
@@ -13,11 +15,17 @@
 }
 
 <div class="match-set-results border info">
-    @if (Match.Sets.Count > 1)
+    @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
     {
-        <div>
-            <button>Team 1 Confirm result</button>
-            <button>Team 2 Confirm result</button>
+        <div class="confirm-buttons">
+            <button @onclick="ShowConfirmResultsModal" class="confirm-button">Confirm @Match.MyTeam result</button>
+        </div>
+    }  
+    @if (MyTeamHaveConfirmedResult())
+    {
+        <div class="confirm-buttons">
+            <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
+            <button @onclick="ShowDeleteConfirmationResultsModal" class="confirm-button">Delete confirmation</button>
         </div>
     }
     @if (Match?.Sets?.Count > 0)
@@ -61,6 +69,9 @@
 </div>
 
 <AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
+<ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
+<ConfirmationModal ConfirmationChanged="DeleteConfirmResult" Visible="_deleteConfirmResultVisible" Title="Delete confirmed result" Message="Are you sure you want to delete the confirmed the result?"></ConfirmationModal>
+
 
 @code {
     [Parameter]
@@ -71,6 +82,32 @@
 
     private bool _loading = false;
     private bool _addResultsVisible = false;
+    private bool _confirmResultVisible = false;
+    private bool _deleteConfirmResultVisible = false;
+
+    private bool MyTeamHaveConfirmedResult()
+    {
+        if (Match.MyTeam == Team.Team1 && Match.ScoreConfirmedTeamOne)
+        {
+            return true;
+        }
+        if (Match.MyTeam == Team.Team2 && Match.ScoreConfirmedTeamTwo)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private void ShowConfirmResultsModal()
+    {
+        _confirmResultVisible = true;
+    }
+    
+    private void ShowDeleteConfirmationResultsModal()
+    {
+        _deleteConfirmResultVisible = true;
+    }
     
     private void ShowAddResultsModal()
     {
@@ -80,6 +117,54 @@
     private void ShowEditResultsModal()
     {
         _addResultsVisible = true;
+    }
+    
+    private async Task ConfirmResult(bool confirm)
+    {
+        _loading = true;
+
+        if (confirm)
+        {
+            var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{true}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Confirmed result.");
+                _loading = false;
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        
+        _confirmResultVisible = false;
+        _loading = false;
+    }
+    
+    private async Task DeleteConfirmResult(bool confirm)
+    {
+        _loading = true;    
+
+        if (confirm)
+        {
+            var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{false}", null);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Deleted confirmed result.");
+                _loading = false;
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        
+        _deleteConfirmResultVisible = false;
+        _loading = false;
     }
     
     private async Task ResultAdded(SetMatchScoreRequest? addResultRequest)
@@ -141,6 +226,17 @@
         display: flex;  
         background-color: white;
     }
+    
+    .confirm-buttons{
+        font-size: 12px;
+        display: flex;
+        align-content: space-between;
+    }
+    
+    .confirm-button{
+        margin: 5px;
+    }
+    
     .match-set-results {
         flex-direction: column;
     }

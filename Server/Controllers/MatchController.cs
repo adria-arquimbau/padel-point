@@ -139,6 +139,40 @@ public class MatchController : ControllerBase
 
         return Ok();
     }
+    
+    [HttpPost("{matchId:guid}/confirm-result/{confirmation:bool}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> ConfirmMyTeamResult([FromRoute] Guid matchId, [FromRoute] bool confirmation, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var player = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(x => x.Player)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
+       
+        var myTeam = matchPlayer.Team;
+
+        if (myTeam == Team.Team1)
+        {
+            match.ScoreConfirmedTeamOne = confirmation;
+        }
+        if (myTeam == Team.Team2)
+        {
+            match.ScoreConfirmedTeamTwo = confirmation;
+        }
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
 
     [HttpGet("{matchId:guid}")]
     [AllowAnonymous]
@@ -157,8 +191,8 @@ public class MatchController : ControllerBase
                 EndDateTime = x.EndDateTime,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
-                PlayersCount = x.MatchPlayers.Count,
                 MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
+                PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
                 Sets = x.Sets.Select(s => new SetDto
