@@ -1,0 +1,77 @@
+﻿@using EventsManager.Shared.Requests
+@using EventsManager.Shared.Responses
+@using EventsManager.Shared.Dtos
+@inject HttpClient Http
+@inject IToastService ToastService
+
+<div class="modal background" tabindex="-1" style="display: @(Visible ? "block" : "none")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Scores</h5>
+                <button type="button" class="btn-close" @onclick="Cancel"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="_editScoresRequest" OnValidSubmit="Confirm">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    @foreach(var score in _editScoresRequest.Sets)
+                    {
+                        <div>
+                            <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
+                            <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
+                        </div>
+                    }
+
+                    <button type="button" class="btn btn-primary" @onclick="AddSet">Add Set</button>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Save Scores</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    
+    SetMatchScoreRequest _editScoresRequest = new();
+
+    [Parameter]
+    public MatchResponse? Match { get; set; }
+        
+    [Parameter]
+    public EventCallback<SetMatchScoreRequest?> ConfirmationChanged { get; set; }
+
+    protected override void OnInitialized()
+    {   
+        // Initialize the scores with two sets
+        _editScoresRequest.Sets = new List<SetDto> { new(), new() };
+    }
+
+    private void AddSet()
+    {
+        _editScoresRequest.Sets.Add(new SetDto());
+    }
+
+    private async Task Confirm()
+    {
+        Visible = false;
+        await ConfirmationChanged.InvokeAsync(_editScoresRequest);
+    }
+
+    private async Task Cancel()
+    {
+        Visible = false;
+        await ConfirmationChanged.InvokeAsync(null);
+    }
+}
+
+<style>
+    .background{
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+</style>

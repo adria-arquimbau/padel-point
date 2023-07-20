@@ -1,4 +1,6 @@
 ﻿@using EventsManager.Shared.Responses
+@using EventsManager.Client.Components.Match.AddResults
+@using EventsManager.Shared.Requests
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
@@ -107,9 +109,11 @@
     </div>
     @if(Match.RequesterIsTheCreator)
     {
-        <button class="btn btn-primary">Add results</button>
+        <button @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
     }
 </div>
+
+<AddResults Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 
 @code {
     [Parameter]
@@ -119,7 +123,8 @@
     public EventCallback RefreshMatch { get; set; }
     
     private bool _loading = false;
-    
+    private bool _addResultsVisible = false;
+        
     private async Task AddPlayer(string team)
     {
         _loading = true;
@@ -179,6 +184,20 @@
             _loading = false;
             StateHasChanged();
         }
+    }
+    
+    private void ShowAddResultsModal()
+    {
+        _addResultsVisible = true;
+    }
+
+    private async Task ResultAdded(SetMatchScoreRequest? addResultRequest)
+    {
+        _loading = true;
+        
+        
+        _addResultsVisible = false;
+        _loading = false;
     }
 }
 
