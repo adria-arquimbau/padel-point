@@ -13,9 +13,9 @@ public class MatchResponse
     public bool ScoreConfirmedTeamTwo { get; set; }
     public List<PlayerDto> PlayersTeamOne { get; set; } 
     public List<PlayerDto> PlayersTeamTwo { get; set; }
-    public decimal AverageElo { get; set; }
-    public decimal AverageEloTeamOne { get; set; }
-    public decimal AverageEloTeamTwo { get; set; }
+    public int AverageElo { get; set; }
+    public int AverageEloTeamOne { get; set; }
+    public int AverageEloTeamTwo { get; set; }
     public bool RequesterIsTheCreator { get; set; }
     public bool IAmAlreadyRegistered { get; set; }
     public int PlayersCount { get; set; }

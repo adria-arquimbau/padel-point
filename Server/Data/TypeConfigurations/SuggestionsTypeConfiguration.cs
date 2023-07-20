@@ -20,6 +20,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.Property(p => p.NickName)
             .IsRequired();
         builder.Property(p => p.Elo)
+            .HasDefaultValue(1500)
             .IsRequired();
         builder.HasOne(p => p.User)
             .WithOne(u => u.Player)

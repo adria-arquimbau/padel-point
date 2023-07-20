@@ -233,10 +233,10 @@ public class MatchController : ControllerBase
         }
         
         match.AverageEloTeamOne = match.PlayersTeamOne.Any()
-            ? Math.Round(match.PlayersTeamOne.Average(mp => mp.Elo), 2) : 0;
+            ? (int)Math.Round(match.PlayersTeamOne.Average(mp => mp.Elo)) : 0;
 
         match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
-            ? Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo), 2) : 0;
+            ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo)) : 0;
         
         return Ok(match);
     }
@@ -258,7 +258,7 @@ public class MatchController : ControllerBase
             Location = x.Location,
             PlayersCount = x.MatchPlayers.Count,
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
-            AverageElo = x.MatchPlayers.Any() ? Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo), 2) : 0
+            AverageElo = x.MatchPlayers.Any() ? (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo)) : 0
         }).OrderByDescending(x => x.StartDateTime).ToList();
         
         return Ok(response);
