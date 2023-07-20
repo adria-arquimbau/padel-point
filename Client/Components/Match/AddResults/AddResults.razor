@@ -12,7 +12,7 @@
                 <button type="button" class="btn-close" @onclick="Cancel"></button>
             </div>
             <div class="modal-body">
-                <EditForm Model="_editScoresRequest" OnValidSubmit="Confirm">
+                <EditForm Model="Sets" OnValidSubmit="Confirm">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -22,7 +22,7 @@
                             <div>Team 2</div>
                         </div>
 
-                        @foreach(var score in _editScoresRequest.Sets)
+                        @foreach(var score in Sets)
                         {
                             <div class="score-set">
                                 <small class="set-number">Set @score.SetNumber</small>
@@ -49,7 +49,8 @@
 @code {
     [Parameter] public bool Visible { get; set; }
     
-    SetMatchScoreRequest _editScoresRequest = new();
+    [Parameter]
+    public List<SetDto>? Sets { get; set; }
 
     [Parameter]
     public MatchResponse? Match { get; set; }
@@ -59,32 +60,38 @@
 
     protected override void OnInitialized()
     {
-        _editScoresRequest.Sets = new List<SetDto> { new() { SetNumber = 1 }, new() { SetNumber = 2 } };
+        if (Sets == null)
+        {
+            Sets = new List<SetDto> { new() { SetNumber = 1 }, new() { SetNumber = 2 } };
+        }
     }
 
     private void AddSet()
     {
-        var nextSetNumber = _editScoresRequest.Sets.Count + 1;
-        _editScoresRequest.Sets.Add(new SetDto() { SetNumber = nextSetNumber });
+        var nextSetNumber = Sets.Count + 1;
+        Sets.Add(new SetDto { SetNumber = nextSetNumber });
     }
 
     private void RemoveSet()
     {
-        if (_editScoresRequest.Sets.Count == 2)
+        if (Sets.Count == 2)
         {
             ToastService.ShowError("You must have at least 2 sets");
             return;
         }
-        if (_editScoresRequest.Sets.Any())
+        if (Sets.Any())
         {
-            _editScoresRequest.Sets.RemoveAt(_editScoresRequest.Sets.Count - 1);
+            Sets.RemoveAt(Sets.Count - 1);
         }
     }
 
     private async Task Confirm()
     {
         Visible = false;
-        await ConfirmationChanged.InvokeAsync(_editScoresRequest);
+        await ConfirmationChanged.InvokeAsync(new SetMatchScoreRequest
+        {
+            Sets = Sets
+        });
     }
 
     private async Task Cancel()

@@ -159,6 +159,12 @@ public class MatchController : ControllerBase
                 IsPrivate = x.IsPrivate,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
+                Sets = x.Sets.Select(s => new SetDto
+                {
+                    SetNumber = s.SetNumber,
+                    Team1Score = s.Team1Score,
+                    Team2Score = s.Team2Score
+                }).ToList(),
                 PlayersTeamOne = x.MatchPlayers.Where(p => p.Team == Team.Team1)
                     .Select(p => new PlayerDto
                 {
@@ -255,6 +261,7 @@ public class MatchController : ControllerBase
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .Include(x => x.Creator)
+            .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
         if (match.Creator.UserId != userId)
@@ -262,13 +269,14 @@ public class MatchController : ControllerBase
             return Conflict("Only creator can set the score");
         }
 
-        var score = request.Sets.Select(x => new Set
+        var score = request.Sets?.Select(x => new Set
         {
             SetNumber = x.SetNumber,
             Team1Score = x.Team1Score,
             Team2Score = x.Team2Score
         }).ToList();
 
+        match.Sets = new List<Set>();
         match.Sets.AddRange(score);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
