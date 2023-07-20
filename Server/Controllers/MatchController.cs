@@ -157,6 +157,7 @@ public class MatchController : ControllerBase
                 EndDateTime = x.EndDateTime,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
+                PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
                 Sets = x.Sets.Select(s => new SetDto
