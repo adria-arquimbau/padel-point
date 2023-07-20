@@ -14,7 +14,7 @@
             <div class="modal-body">
                 @if (Sets != null)
                 {
-                    <EditForm Model="SetMatchScoreRequest" OnValidSubmit="Confirm">
+                    <EditForm Model="Match" OnValidSubmit="Confirm">
                         <DataAnnotationsValidator/>
                         <ValidationSummary/>
 
@@ -61,16 +61,6 @@
     [Parameter]
     public EventCallback<SetMatchScoreRequest?> ConfirmationChanged { get; set; }
 
-    public readonly SetMatchScoreRequest SetMatchScoreRequest = new();
-
-    protected override void OnInitialized()
-    {
-        if (Sets == null)
-        {
-            Sets = new List<SetDto> { new() { SetNumber = 1 }, new() { SetNumber = 2 } };
-        }
-    }
-
     private void AddSet()
     {
         var nextSetNumber = Sets.Count + 1;
@@ -93,8 +83,10 @@
     private async Task Confirm()
     {
         Visible = false;
-        SetMatchScoreRequest.Sets.AddRange(Sets);
-        await ConfirmationChanged.InvokeAsync(SetMatchScoreRequest);
+        await ConfirmationChanged.InvokeAsync(new SetMatchScoreRequest
+        {
+            Sets = Sets
+        });
     }
 
     private async Task Cancel()

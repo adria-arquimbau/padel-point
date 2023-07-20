@@ -13,7 +13,14 @@
 }
 
 <div class="match-set-results border info">
-    @if(Match?.Sets?.Count > 0)
+    @if (Match.Sets.Count > 1)
+    {
+        <div>
+            <button>Team 1 Confirm result</button>
+            <button>Team 2 Confirm result</button>
+        </div>
+    }
+    @if (Match?.Sets?.Count > 0)
     {
         <table>
             <thead>
@@ -35,7 +42,7 @@
             </tbody>
         </table>
     }
-    @if(Match.RequesterIsTheCreator)
+    @if (Match.RequesterIsTheCreator)
     {
         @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
         {
@@ -64,7 +71,7 @@
 
     private bool _loading = false;
     private bool _addResultsVisible = false;
-
+    
     private void ShowAddResultsModal()
     {
         _addResultsVisible = true;
