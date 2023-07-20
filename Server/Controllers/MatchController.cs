@@ -182,7 +182,7 @@ public class MatchController : ControllerBase
         
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
-            //await _mediator.Send(new CalculateNewEloCommandRequest(matchId), cancellationToken);
+            await _mediator.Send(new CalculateNewEloCommandRequest(matchId), cancellationToken);
         }
         
         return Ok();
