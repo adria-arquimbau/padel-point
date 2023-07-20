@@ -15,9 +15,13 @@ else
         {
             <div class="border match-card" style="position: relative;">
                  @if (match.Finished)
-                {
-                    <div class="finished-stamp">FINISHED</div>
-                }
+                 {
+                     <div class="finished-stamp">Finished</div>
+                 }
+                 @if (match.PlayersCount < 4)
+                 {
+                     <div class="searching-stamp">Open slots</div>
+                 }
                 <div style="font-size: 12px; text-align: center;">
                     @match.StartDateTime.ToLocalTime().ToLongDateString() /
                     @match.StartDateTime.ToLocalTime().ToShortTimeString() -
@@ -99,4 +103,22 @@ else
         font-weight: bold;
         font-size: 14px;
     }
+    
+    .searching-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: darkblue;
+        border: 2px solid darkblue;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
 </style>
