@@ -16,15 +16,24 @@
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
-                    @foreach(var score in _editScoresRequest.Sets)
-                    {
-                        <div>
-                            <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
-                            <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
+                    <div class="score-grid">
+                        <div class="score-labels">
+                            <div>Team 1</div>
+                            <div>Team 2</div>
                         </div>
-                    }
 
-                    <button type="button" class="btn btn-primary" @onclick="AddSet">Add Set</button>
+                        @foreach(var score in _editScoresRequest.Sets)
+                        {
+                            <div class="score-set">
+                                <small class="set-number">Set @score.SetNumber</small>
+                                <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
+                                <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
+                            </div>
+                        }
+                    </div>
+
+                    <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
+                    <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
                 </EditForm>
             </div>
             <div class="modal-footer">
@@ -47,14 +56,22 @@
     public EventCallback<SetMatchScoreRequest?> ConfirmationChanged { get; set; }
 
     protected override void OnInitialized()
-    {   
-        // Initialize the scores with two sets
-        _editScoresRequest.Sets = new List<SetDto> { new(), new() };
+    {
+        _editScoresRequest.Sets = new List<SetDto> { new() { SetNumber = 1 }, new() { SetNumber = 2 } };
     }
 
     private void AddSet()
     {
-        _editScoresRequest.Sets.Add(new SetDto());
+        int nextSetNumber = _editScoresRequest.Sets.Count + 1;
+        _editScoresRequest.Sets.Add(new SetDto() { SetNumber = nextSetNumber });
+    }
+
+    private void RemoveSet()
+    {
+        if (_editScoresRequest.Sets.Any())
+        {
+            _editScoresRequest.Sets.RemoveAt(_editScoresRequest.Sets.Count - 1);
+        }
     }
 
     private async Task Confirm()
@@ -73,5 +90,40 @@
 <style>
     .background{
         background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .score-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .score-labels {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .score-set {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .set-number {
+        position: absolute;
+        left: 0;
+        top: -10px;
+        font-size: 0.7em;
+    }
+
+    .add-set-button, .remove-set-button {
+        margin-top: 20px;
+    }
+
+    .remove-set-button {
+        margin-left: 10px;
     }
 </style>
