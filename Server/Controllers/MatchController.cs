@@ -155,6 +155,11 @@ public class MatchController : ControllerBase
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            return Conflict("Score is already confirmed.");
+        }
         
         var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
        

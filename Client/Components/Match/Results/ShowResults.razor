@@ -15,19 +15,23 @@
 }
 
 <div class="match-set-results border info">
-    @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
+    @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
     {
-        <div class="confirm-buttons">
-            <button @onclick="ShowConfirmResultsModal" class="confirm-button">Confirm @Match.MyTeam result</button>
-        </div>
-    }  
-    @if (MyTeamHaveConfirmedResult())
-    {
-        <div class="confirm-buttons">
-            <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
-            <button @onclick="ShowDeleteConfirmationResultsModal" class="confirm-button">Delete confirmation</button>
-        </div>
+        @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
+        {
+            <div class="confirm-buttons">
+                <button @onclick="ShowConfirmResultsModal" class="confirm-button">Confirm @Match.MyTeam result</button>
+            </div>
+        }
+        @if (MyTeamHaveConfirmedResult())
+        {
+            <div class="confirm-buttons">
+                <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
+                <button @onclick="ShowDeleteConfirmationResultsModal" class="confirm-button">Delete confirmation</button>
+            </div>
+        }
     }
+    
     @if (Match?.Sets?.Count > 0)
     {
         <table>
