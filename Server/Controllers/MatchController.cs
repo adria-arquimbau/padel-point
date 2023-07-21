@@ -75,6 +75,7 @@ public class MatchController : ControllerBase
         }
 
         match.StartDateTime = request.StartDate.ToUniversalTime();
+        match.Duration = request.Duration;
         match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
 

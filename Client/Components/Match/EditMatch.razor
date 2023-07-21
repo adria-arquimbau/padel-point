@@ -13,12 +13,18 @@
             <div class="modal-body">
                 <form id="editForm" onsubmit="confirm">
                     <div class="form-group">
-                        <label for="startDateTime">Start Date and Time</label>
-                        <input type="datetime-local" @bind="_editMatchRequest.StartDate" id="startDateTime" class="form-control" placeholder="Start Date and Time">
+                        <label>Select the date and starting time</label>
+                        <DateEdit TValue="DateTime" @bind-Date="@_editMatchRequest.StartDate" InputMode="DateInputMode.DateTime"/>    
                     </div>
                     <div class="form-group">
-                        <label for="endDateTime">End Date and Time</label>
-                        @* <input type="datetime-local" @bind="_editMatchRequest.EndDateTime" id="endDateTime" class="form-control" placeholder="End Date and Time"> *@
+                        <label>Duration</label>
+                        <Select @bind-SelectedValue="@durationSelect" TValue="int">
+                            <SelectItem Value="1">1 hour</SelectItem>
+                            <SelectItem Value="2">1,5 hours</SelectItem>
+                            <SelectItem Value="3">2 hours</SelectItem>
+                            <SelectItem Value="4">2,5 hours</SelectItem>
+                            <SelectItem Value="5">3 hours</SelectItem>
+                        </Select>
                     </div>
                     <div class="form-group">
                         <label for="location">Location</label>
@@ -43,6 +49,8 @@
     [Parameter] public bool Visible { get; set; }
     
     CreateMatchRequest _editMatchRequest = new();
+    
+    private int durationSelect = 1;
 
     [Parameter]
     public MatchResponse? Match { get; set; }
@@ -58,11 +66,34 @@
             _editMatchRequest.Location = Match.Location;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
         }
+        var durationInHours = durationSelect switch
+        {
+            1 => 1,
+            2 => 1.5,
+            3 => 2,
+            4 => 2.5,
+            5 => 3,
+            _ => 1
+        };
+        
+        durationSelect = (int)durationInHours;
     }
 
     private async Task Confirm()
     {
         Visible = false;
+        
+        var durationInHours = durationSelect switch
+        {
+            1 => 1,
+            2 => 1.5,
+            3 => 2,
+            4 => 2.5,
+            5 => 3,
+            _ => 1
+        };
+        
+        _editMatchRequest.Duration = durationInHours;
         await ConfirmationChanged.InvokeAsync(_editMatchRequest);
     }
 
