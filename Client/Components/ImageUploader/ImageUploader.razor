@@ -6,6 +6,7 @@
 
 @inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IToastService ToastService
 
 @attribute [Authorize(Roles = "User")] 
 
@@ -19,6 +20,7 @@
             </div>
         }
         <div class="input-file-container">
+            Player image
             <InputFile OnChange="@OnInputFileChange" class="form-control">Select a picture, Max size 2MB</InputFile>
             <span class="text-danger">@_errorMessage</span>
         </div>
@@ -95,15 +97,26 @@
     }
     
     private async Task DeleteImage()    
-    {
+    {   
         _requestingDeleteImage = true;
+        HttpResponseMessage? response;
         if (Type == ImageType.User)
         {
-            await Http.DeleteAsync("User/image");
+            response = await Http.DeleteAsync("User/image");
         }
-        if (Type == ImageType.Event)
+        else
         {
-            await Http.DeleteAsync($"Event/{EventId}/image");
+            response = await Http.DeleteAsync($"Event/{EventId}/image");
+        }
+
+        if (response.IsSuccessStatusCode)
+        {
+            ToastService.ShowInfo("Image deleted");
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(error);
         }
         
         await RefreshInformation.InvokeAsync();
