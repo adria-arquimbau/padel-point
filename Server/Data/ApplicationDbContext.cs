@@ -15,10 +15,11 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Match> Match { get; set; }
     public DbSet<Set> Set { get; set; }
     public DbSet<MatchPlayer> MatchPlayer { get; set; }
+    public DbSet<EloHistory> EloHistories { get; set; }
 
     public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
-    }
+    }   
         
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,5 +29,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new MatchConfiguration());
         modelBuilder.ApplyConfiguration(new MatchPlayerConfiguration());
         modelBuilder.ApplyConfiguration(new SetConfiguration());
+        modelBuilder.ApplyConfiguration(new EloHistoryConfiguration());
     }
 }

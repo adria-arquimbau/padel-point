@@ -1,0 +1,46 @@
+﻿@using EventsManager.Shared.Responses
+
+@inject HttpClient Http
+@inject IToastService ToastService
+
+<h3>PlayerEloProgress</h3>
+
+@if (_eloHistory == null)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+else
+{
+    
+}
+
+@code {
+    private List<EloHistoryResponse>? _eloHistory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+
+    private async Task Get()
+    {
+        try
+        {
+            var response = await Http.GetAsync("elohistory");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+    }
+}
