@@ -72,7 +72,14 @@ else
                     Price
                 </div>
                 <div class="info-footer-box-content grey-typo">
-                    -
+                    @if(_matchPrice == 0)
+                    {
+                        <p>-</p>
+                    }
+                    else
+                    {
+                        <p>@_matchPrice €</p>
+                    }
                 </div>
             </div>
         </div>
@@ -118,12 +125,14 @@ else
 
     private MatchResponse? _match;
     private bool _editModalVisible;
-    private bool _deleteModalVisible;   
+    private bool _deleteModalVisible;
+    private double _matchPrice;
     private string _hourWord = "hour";   
     
     protected override async Task OnInitializedAsync()
     {
         await GetMatch();
+        _matchPrice = _match.PricePerHour * _match.Duration;
         if (_match.Duration != 1)
         {
             _hourWord = "hours";

@@ -8,6 +8,7 @@ public class Match
     public ICollection<Set> Sets { get; set; } = new List<Set>();
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
+    public double PricePerHour { get; set; }
     public DateTime StartDateTime { get; set; }
     public double Duration { get; set; }
     public Guid CreatorId { get; set; } 

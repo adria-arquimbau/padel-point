@@ -205,6 +205,7 @@ public class MatchController : ControllerBase
                 Duration = x.Duration,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
+                PricePerHour = x.PricePerHour,
                 MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
                 PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
