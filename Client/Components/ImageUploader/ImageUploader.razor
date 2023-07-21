@@ -5,14 +5,14 @@
 @using System.Drawing
 
 @inject HttpClient Http
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @attribute [Authorize(Roles = "User")] 
 
 <div class="user-image-container text-center">
     @if (ImageUrl == null)
     {
-        if (RequestingUploadImage)
+        if (_requestingUploadImage)
         {
             <div class="d-flex justify-content-center">
                 <FluentProgressRing></FluentProgressRing>
@@ -20,19 +20,19 @@
         }
         <div class="input-file-container">
             <InputFile OnChange="@OnInputFileChange" class="form-control">Select a picture, Max size 2MB</InputFile>
-            <span class="text-danger">@ErrorMessage</span>
+            <span class="text-danger">@_errorMessage</span>
         </div>
     }
     @if (ImageUrl != null)
     {
        
-            @if (!RequestingDeleteImage)
+            @if (!_requestingDeleteImage)
             {
-                <FluentButton Appearance="Appearance.Accent" @onclick="DeleteImage" class="btn btn-danger mt-2">Delete image</FluentButton>
+                <FluentButton Appearance="Appearance.Accent" @onclick="DeleteImage">Delete image</FluentButton>
             }
             else
             {
-                <FluentButton Disabled="true" Appearance="Appearance.Accent" @onclick="DeleteImage" class="btn btn-danger mt-2">Deleting...</FluentButton>
+                <FluentButton Disabled="true" Appearance="Appearance.Accent" @onclick="DeleteImage">Deleting...</FluentButton>
             }
        
     }
@@ -48,28 +48,28 @@
     [Parameter]
     public Guid? EventId { get; set; }
     
-    private int imageUpdateCount = 0;
+    private int _imageUpdateCount = 0;
     
     [Parameter]
     public EventCallback RefreshInformation { get; set; }
     
-    private string? ErrorMessage = null;
+    private string? _errorMessage = null;
     
-    string[] imageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/jpg" };
+    string[] _imageTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/jpg" };
     
-    private bool RequestingDeleteImage; 
-    private bool RequestingUploadImage;         
+    private bool _requestingDeleteImage; 
+    private bool _requestingUploadImage;         
     
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
-        RequestingUploadImage = true;
-        ErrorMessage = null;
+        _requestingUploadImage = true;
+        _errorMessage = null;
         using var content = new MultipartFormDataContent();
 
-        if (!imageTypes.Contains(e.File.ContentType))
+        if (!_imageTypes.Contains(e.File.ContentType))
         {
-            ErrorMessage = "Only JPEG, JPG, PNG and GIF images are allowed.";
-            RequestingUploadImage = false;
+            _errorMessage = "Only JPEG, JPG, PNG and GIF images are allowed.";
+            _requestingUploadImage = false;
             return;
         }
         
@@ -90,13 +90,13 @@
         }
         
         await RefreshInformation.InvokeAsync();
-        imageUpdateCount++;
-        RequestingUploadImage = false;
+        _imageUpdateCount++;
+        _requestingUploadImage = false;
     }
     
     private async Task DeleteImage()    
     {
-        RequestingDeleteImage = true;
+        _requestingDeleteImage = true;
         if (Type == ImageType.User)
         {
             await Http.DeleteAsync("User/image");
@@ -107,8 +107,8 @@
         }
         
         await RefreshInformation.InvokeAsync();
-        imageUpdateCount++;
-        RequestingDeleteImage = false;
+        _imageUpdateCount++;
+        _requestingDeleteImage = false;
     }   
     
     public enum ImageType
@@ -118,4 +118,9 @@
     }
 }
 
+<style>
 
+.user-image-container{
+    margin-bottom: 10px;
+}
+</style>

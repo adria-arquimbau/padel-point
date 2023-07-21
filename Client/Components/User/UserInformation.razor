@@ -15,13 +15,14 @@
         <div class="col-md-8">
             <div class="card shadow-lg p-3 mb-5 bg-white rounded">
                 <div class="card-body">
-                    <ImageUploader Type="ImageUploader.ImageType.User" ImageUrl="@User?.ImageUrl" RefreshInformation="GetUserInformation" />
                     <div class="d-flex justify-content-center">
                         @if (User?.ImageUrl != null)
                         {
                             <img class="user-image-picture rounded-circle mb-4" src="@($"{User.ImageUrl}?v={_imageUpdateCount}")" alt="User image"/>
                         }
                     </div>
+                    <ImageUploader Type="ImageUploader.ImageType.User" ImageUrl="@User?.ImageUrl" RefreshInformation="GetUserInformation" />
+                    <FluentDivider></FluentDivider>
                     <h4 class="card-title text-center mb-4">Basic information</h4>
                     <form>
                         <div class="mb-3">
@@ -34,9 +35,6 @@
                             </div>
                         
                     </form>
-                    <div class="d-flex justify-content-center mt-4">
-                        @RenderButtons
-                    </div>
                 </div>
             </div>
         </div>
@@ -51,59 +49,44 @@
     
     private int _imageUpdateCount = 0;
 
-    private void SwitchToEditMode()
-    {
-        ReadOnly = false;
-    }
-
-    private async Task CancelEdit()
-    {
-        await GetUserInformation();
-        ReadOnly = true;
-    }
-    
     private async Task GetUserInformation()
     {
         User = await Http.GetFromJsonAsync<UserDto>("User");
         _imageUpdateCount++;
     }
+}
 
-    private async Task SaveAccountInformation()
-    {
-        User!.RequestingUpdate = true;
-        var userToString = JsonSerializer.Serialize(User);
-        var response = await Http.PutAsync("User", new StringContent(userToString, Encoding.UTF8, "application/json"));
-        if (!response.IsSuccessStatusCode)
-        {
-            ToastService.ShowError("Something went wrong while updating your information");
-        }
-        User.RequestingUpdate = false;
-        ReadOnly = true;
+<style>
+    .card-title{
+        margin-top: 10px;
     }
 
-    private RenderFragment RenderButtons => builder =>
-    {
-        if (ReadOnly)
-        {
-            builder.OpenElement(0, "button");
-            builder.AddAttribute(1, "class", "btn btn-primary");
-            builder.AddAttribute(2, "onclick", EventCallback.Factory.Create(this, SwitchToEditMode));
-            builder.AddContent(3, "Edit");
-            builder.CloseElement();
+     .user-image-picture {
+            width: 150px; /* Adjust the width as needed */
+            height: 150px; /* Adjust the height as needed */
+            border-radius: 50%;
+            object-fit: cover; /* This ensures the image is scaled properly */
+            margin: 0 auto 20px; /* Add margin at the bottom */
+            display: block; /* This centers the image horizontally */
         }
-        else
-        {
-            builder.OpenElement(0, "button");
-            builder.AddAttribute(1, "class", "btn btn-primary");
-            builder.AddAttribute(2, "onclick", EventCallback.Factory.Create(this, SaveAccountInformation));
-            builder.AddContent(3, "Save");
-            builder.CloseElement();
-
-            builder.OpenElement(4, "button");
-            builder.AddAttribute(5, "class", "btn btn-secondary");
-            builder.AddAttribute(6, "onclick", EventCallback.Factory.Create(this, CancelEdit));
-            builder.AddContent(7, "Cancel");
-            builder.CloseElement();
-        }
-    };
-}
+   
+    .form-label {
+        font-size: 18px;
+        color: #333;
+        font-weight: 400;
+        margin-top: 10px;
+    }
+    
+    .form-control {
+        font-size: 16px;
+        padding: 10px;
+        border: none;
+        border-bottom: 1px solid #ccc;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .mb-3 {
+        margin-bottom: 30px;
+    }
+</style>
