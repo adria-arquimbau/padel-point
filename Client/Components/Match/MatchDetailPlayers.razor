@@ -56,7 +56,10 @@
                     }
                 }
             </div>
-            <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamOne</p>
+            @if (Match.PlayersTeamOne.Any())
+            {
+                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamOne</p>
+            }
             @if (Match.ScoreConfirmedTeamOne)
             {
                 <p style="font-size: 12px; color: green">Confirmed result</p>
@@ -103,7 +106,10 @@
                     }
                 }
             </div>
-            <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
+            @if (Match.PlayersTeamTwo.Any())
+            {
+                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
+            }
             @if (Match.ScoreConfirmedTeamTwo)
             {
                 <p style="font-size: 12px; color: green">Confirmed result</p>
@@ -234,7 +240,9 @@
     }
     
     .default-avatar {
-        background-color: grey;
+        background-color: white;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
+        border: none;
     }
     
     .add-button, .remove-button {
