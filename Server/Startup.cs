@@ -60,6 +60,7 @@ public class Startup {
             {
                 options.ClientId = googleAuthSection["Settings:ClientId"];
                 options.ClientSecret = googleAuthSection["Settings:ClientSecret"];
+                options.Scope.Add("email");
             })
             .AddIdentityServerJwt();
 
