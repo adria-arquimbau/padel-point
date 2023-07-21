@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
 using Microsoft.AspNetCore.Authorization;
@@ -33,5 +34,38 @@ public class PlayerController : ControllerBase
             .ToListAsync(cancellationToken: cancellationToken);
 
         return Ok(players);
+    }
+    
+    [HttpGet]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> Get(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var player = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .Select(x => new PlayerDto
+            {
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl,
+                DevelopmentAnnouncementReadIt = x.DevelopmentAnnouncementReadIt
+            })
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        return Ok(player);
+    }
+    
+    [HttpPost("development-announcement-read-it")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> DevelopmentAnnouncementReadIt(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var player = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        player.DevelopmentAnnouncementReadIt = true;
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return Ok();
     }
 }

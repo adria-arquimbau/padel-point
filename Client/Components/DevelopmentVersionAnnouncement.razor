@@ -1,0 +1,69 @@
+﻿@using Color = Blazorise.Color
+@using EventsManager.Shared.Dtos
+@inject HttpClient Http
+@inject IToastService ToastService
+
+@if (_player is {DevelopmentAnnouncementReadIt: false })
+{
+    @if (_visible)
+    {
+        <Divider />
+    }
+    <Alert  Color="Color.Info"  @bind-Visible="@_visible">
+        <Heading Size="HeadingSize.Is4" TextColor="TextColor.Success">
+            Padel Point Alpha version!
+        </Heading>
+        <Paragraph>
+            <p>
+                Dear User,<br>
+                Welcome to the Alpha version of Padel Point, an ongoing project developed single-handedly with utmost dedication. This version encapsulates the core functionalities of the application, while remaining in active development and refinement.<br><br>
+                As this is an Alpha version, you may encounter occasional inconsistencies or incomplete features. Your understanding and patience during this phase are highly appreciated.<br><br>
+                Your feedback plays an integral role in the enhancement of this application. Please share your experiences and ideas through the 'Suggestions' section in the application, assisting in the product's refinement.<br><br>
+                Thank you for being part of this journey.<br>
+                Best regards,
+            </p>
+        </Paragraph>
+        <Button @onclick="CloseAlert" Color="Color.Info">Understood</Button>
+    </Alert>
+}
+
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+
+@code {
+    private bool _visible = true;
+    private PlayerDto? _player;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUser();
+    }
+    
+    private async Task CloseAlert()
+    {
+        _visible = false;
+        await Http.PostAsync($"player/development-announcement-read-it", null);
+    }
+    
+    private async Task GetUser()    
+    {
+        _loading = true;
+
+        var response = await Http.GetAsync($"player");
+
+        if (response.IsSuccessStatusCode)
+        {
+            _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            ToastService.ShowError(error);
+        }
+       
+        _loading = false;
+    }
+}

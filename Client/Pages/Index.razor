@@ -3,6 +3,7 @@
 @using EventsManager.Client.Components.User
 @using EventsManager.Client.Components.Match
 @using EventsManager.Client.Components.Players
+@using EventsManager.Client.Components
 
 <PageTitle>Welcome</PageTitle>
 
@@ -17,11 +18,17 @@
 
 <AuthorizeView>
     <Authorized>
-        <FluentDivider></FluentDivider>
+        <DevelopmentVersionAnnouncement></DevelopmentVersionAnnouncement>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView>
+    <Authorized>
+        <Divider />
         <PlayerEloProgress></PlayerEloProgress>
     </Authorized>
 </AuthorizeView>
 
-<FluentDivider></FluentDivider>
+<Divider />
 
 <AllMatches></AllMatches>

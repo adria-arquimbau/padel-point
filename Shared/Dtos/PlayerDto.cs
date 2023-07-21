@@ -7,4 +7,5 @@ public class PlayerDto
     public Uri? ImageUrl { get; set; }
     public decimal Elo { get; set; }
     public bool CanIDeleteIt { get; set; }
+    public bool DevelopmentAnnouncementReadIt { get; set; }
 }
