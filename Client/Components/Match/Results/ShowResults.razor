@@ -4,10 +4,12 @@
 @using EventsManager.Client.Components.Modals
 @using System.Net
 @using EventsManager.Shared
+@using Color = Blazorise.Color
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @inject IToastService ToastService
+@inject IMessageService MessageService
 
 @if (_loading)
 {
@@ -20,14 +22,14 @@
         @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
         {
             <div class="confirm-buttons">
-                <button @onclick="ShowConfirmResultsModal" class="confirm-button">Confirm @Match.MyTeam result</button>
+                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Success" @onclick="ConfirmResult" Outline >Confirm result</Button>
             </div>
         }
         @if (MyTeamHaveConfirmedResult())
         {
             <div class="confirm-buttons">
                 <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
-                <button @onclick="ShowDeleteConfirmationResultsModal" class="confirm-button">Delete confirmation</button>
+                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteConfirmResult" Outline >Delete confirmation</Button>
             </div>
         }
     }
@@ -77,7 +79,6 @@
 
 <AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 <ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
-<ConfirmationModal ConfirmationChanged="DeleteConfirmResult" Visible="_deleteConfirmResultVisible" Title="Delete confirmed result" Message="Are you sure you want to delete the confirmed the result?"></ConfirmationModal>
 <ConfirmationModal ConfirmationChanged="DeleteScoreResult" Visible="_deleteScoreModalVisible" Title="Delete score" Message="Are you sure you want to delete the score?"></ConfirmationModal>
 
 @code {
@@ -112,11 +113,6 @@
         _confirmResultVisible = true;
     }
     
-    private void ShowDeleteConfirmationResultsModal()
-    {
-        _deleteConfirmResultVisible = true;
-    }
-    
     private void ShowDeleteScoreModal()
     {
         _deleteScoreModalVisible = true;
@@ -132,11 +128,11 @@
         _addResultsVisible = true;
     }
     
-    private async Task ConfirmResult(bool confirm)
+    private async Task ConfirmResult()
     {
         _loading = true;
 
-        if (confirm)
+        if (await MessageService.Confirm( "Are you sure you want to confirm the result?", "Confirm result"))
         {
             var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{true}", null);
             if (response.IsSuccessStatusCode)
@@ -156,11 +152,11 @@
         _loading = false;
     }
     
-    private async Task DeleteConfirmResult(bool confirm)
+    private async Task DeleteConfirmResult()
     {
         _loading = true;    
 
-        if (confirm)
+        if (await MessageService.Confirm( "Are you sure you want to delete your team result confirmation?", "Delete team result confirmation"))
         {
             var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{false}", null);
             if (response.IsSuccessStatusCode)
@@ -272,7 +268,8 @@
     .confirm-buttons{
         font-size: 12px;
         display: flex;
-        align-content: space-between;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .confirm-button{
