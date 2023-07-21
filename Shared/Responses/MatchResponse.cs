@@ -6,7 +6,6 @@ public class MatchResponse
 {
     public Guid Id { get; set; }
     public DateTime StartDateTime { get; set; }
-    public DateTime EndDateTime { get; set; }
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
@@ -23,5 +22,6 @@ public class MatchResponse
     public List<SetDto>? Sets { get; set; }
     public Team? MyTeam { get; set; }
     public bool Finished { get; set; }
+    public double Duration { get; set; }
 }
                             

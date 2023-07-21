@@ -14,11 +14,11 @@
                 <form id="editForm" onsubmit="confirm">
                     <div class="form-group">
                         <label for="startDateTime">Start Date and Time</label>
-                        <input type="datetime-local" @bind="_editMatchRequest.StartDateTime" id="startDateTime" class="form-control" placeholder="Start Date and Time">
+                        <input type="datetime-local" @bind="_editMatchRequest.StartDate" id="startDateTime" class="form-control" placeholder="Start Date and Time">
                     </div>
                     <div class="form-group">
                         <label for="endDateTime">End Date and Time</label>
-                        <input type="datetime-local" @bind="_editMatchRequest.EndDateTime" id="endDateTime" class="form-control" placeholder="End Date and Time">
+                        @* <input type="datetime-local" @bind="_editMatchRequest.EndDateTime" id="endDateTime" class="form-control" placeholder="End Date and Time"> *@
                     </div>
                     <div class="form-group">
                         <label for="location">Location</label>
@@ -54,8 +54,7 @@
     {
         if (Match != null)
         {   
-            _editMatchRequest.StartDateTime = Match.StartDateTime;
-            _editMatchRequest.EndDateTime = Match.EndDateTime;
+            _editMatchRequest.StartDate = Match.StartDateTime;
             _editMatchRequest.Location = Match.Location;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
         }

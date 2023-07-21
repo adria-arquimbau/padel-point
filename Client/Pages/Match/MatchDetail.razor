@@ -27,7 +27,7 @@ else
             PADEL
         </div>
         <div style="font-size: 12px">
-            @_match.StartDateTime.ToLocalTime().ToLongDateString() / @_match.StartDateTime.ToLocalTime().ToShortTimeString() - @_match.EndDateTime.ToLocalTime().ToShortTimeString()
+            @_match.StartDateTime.ToLocalTime().ToLongDateString() / @_match.StartDateTime.ToLocalTime().ToShortTimeString()
         </div>
         <div class="separation"></div>
         <div class="info-footer">
@@ -45,6 +45,14 @@ else
                 </div>
                 <div class="info-footer-box-content grey-typo">
                     All
+                </div>
+            </div>
+            <div class="info-footer-box">
+                <div class="info-footer-box-content">
+                    Duration     
+                </div>
+                <div class="info-footer-box-content grey-typo">
+                    @_match.Duration @hourWord   
                 </div>
             </div>
             <div class="info-footer-box">
@@ -103,15 +111,20 @@ else
 @code {
     [Parameter]
     public Guid? MatchId { get; set; }
-    private bool _loading = false;
+    private bool _loading;
 
     private MatchResponse? _match;
     private bool _editModalVisible;
     private bool _deleteModalVisible;   
+    private string hourWord = "hour";   
     
     protected override async Task OnInitializedAsync()
     {
         await GetMatch();
+        if (_match.Duration != 1)
+        {
+            hourWord = "hours";
+        }
     }
 
     private async Task GetMatch()

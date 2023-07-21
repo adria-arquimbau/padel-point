@@ -9,8 +9,8 @@ public class Match
     public string Location { get; set; }
     public bool IsPrivate { get; set; }
     public DateTime StartDateTime { get; set; }
-    public DateTime EndDateTime { get; set; }
-    public Guid CreatorId { get; set; }
+    public double Duration { get; set; }
+    public Guid CreatorId { get; set; } 
     public Player Creator { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
     public bool ScoreConfirmedTeamTwo { get; set; }

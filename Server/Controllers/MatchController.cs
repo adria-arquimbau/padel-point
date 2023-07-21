@@ -38,8 +38,8 @@ public class MatchController : ControllerBase
         {
             Creator = playerCreator,
             CreationDate = DateTime.UtcNow,
-            StartDateTime = request.StartDateTime.ToUniversalTime(),
-            EndDateTime = request.StartDateTime.ToUniversalTime(),
+            StartDateTime = request.StartDate.ToUniversalTime(),
+            Duration = request.Duration,
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -74,8 +74,7 @@ public class MatchController : ControllerBase
             return Conflict("Only creator can edit the match");
         }
 
-        match.StartDateTime = request.StartDateTime.ToUniversalTime();
-        match.EndDateTime = request.EndDateTime.ToUniversalTime();
+        match.StartDateTime = request.StartDate.ToUniversalTime();
         match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
 
@@ -202,7 +201,7 @@ public class MatchController : ControllerBase
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
-                EndDateTime = x.EndDateTime,
+                Duration = x.Duration,
                 Location = x.Location,
                 IsPrivate = x.IsPrivate,
                 MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
@@ -263,7 +262,7 @@ public class MatchController : ControllerBase
         {
             Id = x.Id,
             StartDateTime = x.StartDateTime,
-            EndDateTime = x.EndDateTime,
+            Duration = x.Duration,
             Location = x.Location,
             Finished = x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo,
             PlayersCount = x.MatchPlayers.Count,
