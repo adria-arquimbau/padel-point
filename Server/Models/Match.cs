@@ -6,7 +6,6 @@ public class Match
     public DateTime CreationDate { get; set; }
     public ICollection<MatchPlayer> MatchPlayers { get; set; } = new List<MatchPlayer>();
     public ICollection<Set> Sets { get; set; } = new List<Set>();
-    public string Location { get; set; }
     public bool IsPrivate { get; set; }
     public double PricePerHour { get; set; }
     public DateTime StartDateTime { get; set; }

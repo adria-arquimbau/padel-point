@@ -49,7 +49,6 @@ public class MatchController : ControllerBase
                     Team = Team.Team1
                 }
             },
-            Location = request.Location,
             IsPrivate = request.IsPrivate
         };
 
@@ -77,7 +76,6 @@ public class MatchController : ControllerBase
 
         match.StartDateTime = request.StartDate.ToUniversalTime();
         match.Duration = request.Duration;
-        match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -204,7 +202,6 @@ public class MatchController : ControllerBase
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
-                Location = x.Location,
                 IsPrivate = x.IsPrivate,
                 PricePerHour = x.PricePerHour,
                 MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
@@ -266,7 +263,6 @@ public class MatchController : ControllerBase
             Id = x.Id,
             StartDateTime = x.StartDateTime,
             Duration = x.Duration,
-            Location = x.Location,
             Finished = x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo,
             PlayersCount = x.MatchPlayers.Count,
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),

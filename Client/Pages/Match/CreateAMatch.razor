@@ -24,23 +24,21 @@
         </Select>
     </div>
     <div class="form-group">
-        <label for="location">Location:</label>
-        <input type="text" id="location" @bind="@_location" name="location" class="form-control">
+        <label>Price per hour:</label>
+        <NumericEdit TValue="double" @bind-Value="@_pricePerHour" />    
     </div>
     <div class="form-group">
-        <label for="location">Price per hour:</label>
-        <NumericEdit TValue="double" @bind-Value="@_pricePerHour" />    
+        <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
     </div>
     <button type="submit" class="btn btn-primary">Create Match</button>
 </form>
-
 
 @code {
 
     private DateTime _start = DateTime.Now;
     private int _durationSelect = 1;
-    private string _location = "";
     private double _pricePerHour;
+    private bool _isPrivate;
 
     private async Task HandleValidSubmit()
     {
@@ -58,7 +56,7 @@
         {
             StartDate = _start,
             Duration = durationInHours,
-            Location = _location,
+            IsPrivate = _isPrivate,
             PricePerHour = _pricePerHour
         };
         var response = await Http.PostAsJsonAsync("match", request);

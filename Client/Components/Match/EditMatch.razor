@@ -26,10 +26,6 @@
                             <SelectItem Value="5">3 hours</SelectItem>
                         </Select>
                     </div>
-                    <div class="form-group">
-                        <label for="location">Location</label>
-                        <input type="text" id="location" @bind="_editMatchRequest.Location" class="form-control" placeholder="Location">
-                    </div>
                     <div class="form-group form-check">
                         <input type="checkbox" id="isPrivate" class="form-check-input">
                         <label class="form-check-label" @bind="_editMatchRequest.IsPrivate" for="isPrivate">Is Private?</label>
@@ -63,7 +59,6 @@
         if (Match != null)
         {   
             _editMatchRequest.StartDate = Match.StartDateTime;
-            _editMatchRequest.Location = Match.Location;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
         }
         var duration = Match?.Duration switch

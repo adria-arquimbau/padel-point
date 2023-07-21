@@ -6,7 +6,6 @@ public class MatchResponse
 {
     public Guid Id { get; set; }
     public DateTime StartDateTime { get; set; }
-    public string Location { get; set; }
     public bool IsPrivate { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
     public bool ScoreConfirmedTeamTwo { get; set; }
