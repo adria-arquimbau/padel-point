@@ -11,15 +11,25 @@
                 <button type="button" class="btn-close" @onclick="Cancel"></button>
             </div>
             <div class="modal-body">
-                <EditForm Model="_editMatchRequest" OnValidSubmit="Confirm">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                
-                    <InputDate id="startDateTime" @bind-Value="_editMatchRequest.StartDateTime" class="form-control" placeholder="Start Date and Time"/>
-                    <InputDate id="endDateTime" @bind-Value="_editMatchRequest.EndDateTime" class="form-control" placeholder="End Date and Time"/>
-                    <InputText id="location" @bind-Value="_editMatchRequest.Location" class="form-control" placeholder="Location"/>
-                    <InputCheckbox id="isPrivate" @bind-Value="_editMatchRequest.IsPrivate"/> Is Private?
-                </EditForm>
+                <form id="editForm" onsubmit="confirm">
+                    <div class="form-group">
+                        <label for="startDateTime">Start Date and Time</label>
+                        <input type="datetime-local" @bind="_editMatchRequest.StartDateTime" id="startDateTime" class="form-control" placeholder="Start Date and Time">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDateTime">End Date and Time</label>
+                        <input type="datetime-local" @bind="_editMatchRequest.EndDateTime" id="endDateTime" class="form-control" placeholder="End Date and Time">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" @bind="_editMatchRequest.Location" class="form-control" placeholder="Location">
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" id="isPrivate" class="form-check-input">
+                        <label class="form-check-label" @bind="_editMatchRequest.IsPrivate" for="isPrivate">Is Private?</label>
+                    </div>
+                </form>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>

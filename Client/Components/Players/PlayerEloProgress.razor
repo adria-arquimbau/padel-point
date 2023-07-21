@@ -1,9 +1,8 @@
 ﻿@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
 
 @inject HttpClient Http
 @inject IToastService ToastService
-
-<h3>PlayerEloProgress</h3>
 
 @if (_eloHistory == null)
 {
@@ -11,7 +10,10 @@
 }
 else
 {
-    
+    <div class="elo-chart">
+        <LineChart @ref="lineChart" TItem="double" />
+        <Button class="show-elo-button" Size="Size.Small" Color="Color.Primary" Clicked="@(async () => await HandleRedraw())">Show your elo history</Button>
+    </div>
 }
 
 @code {
@@ -20,6 +22,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         await Get();
+
     }
 
     private async Task Get()
@@ -31,6 +34,9 @@ else
             if (response.IsSuccessStatusCode)
             {
                 _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
+                
+                // Add StateHasChanged after data fetch
+                
             }
             else
             {
@@ -43,4 +49,51 @@ else
             ToastService.ShowError("Something went wrong, please try again later.");
         }
     }
+
+    LineChart<double> lineChart = new LineChart<double>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender && _eloHistory != null)
+        {
+            await HandleRedraw();
+        }
+    }
+
+    private async Task HandleRedraw()
+    {
+        if (_eloHistory != null)
+        {
+            await lineChart.Clear();
+            await lineChart.AddLabelsDatasetsAndUpdate(_eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), GetLineChartDataset());
+        }
+    }
+
+    private LineChartDataset<double> GetLineChartDataset()
+    {
+        return new LineChartDataset<double>
+        {
+            Label = "Your elo history",
+            Data = _eloHistory?.Select(e => (double)e.Elo).ToList(),
+            BackgroundColor = backgroundColors,
+            BorderColor = borderColors,
+            Fill = true,
+            PointRadius = 3,
+            CubicInterpolationMode = "monotone",
+        };
+    }
+
+    // You can choose a specific color for your data
+    List<string> backgroundColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
+    List<string> borderColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 1f ) };
 }
+
+<style>
+    .elo-chart{
+        margin: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>

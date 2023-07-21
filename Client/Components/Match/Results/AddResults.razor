@@ -14,31 +14,29 @@
             <div class="modal-body">
                 @if (Sets != null)
                 {
-                    <EditForm Model="Match" OnValidSubmit="Confirm">
-                        <DataAnnotationsValidator/>
-                        <ValidationSummary/>
-
+                    <form id="matchForm" onsubmit="confirm">
                         <div class="score-grid">
                             <div class="score-labels">
                                 <div>Team 1</div>
                                 <div>Team 2</div>
                             </div>
-
-                            @foreach (var score in Sets)
-                            {
-                                <div class="score-set">
-                                    <small class="set-number">Set @score.SetNumber</small>
-                                    <InputNumber @bind-Value="score.Team1Score" class="form-control" placeholder="Score Team 1"/>
-                                    <InputNumber @bind-Value="score.Team2Score" class="form-control" placeholder="Score Team 2"/>
-                                </div>
-                            }
+                            <div id="score-sets">
+                                 @foreach (var score in Sets)
+                                {
+                                    <div class="score-set">
+                                        <small class="set-number">Set @score.SetNumber</small>
+                                         <input type="number" @bind="score.Team1Score" class="form-control" placeholder="Score Team 1">
+                                         <input type="number" @bind="score.Team2Score" class="form-control" placeholder="Score Team 2">
+                                    </div>
+                                }
+                            </div>
                         </div>
 
                         <div class="set-buttons">
                             <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
                             <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
                         </div>
-                    </EditForm>
+                    </form>
                 }
             </div>
             <div class="modal-footer">

@@ -1,4 +1,7 @@
 using Blazored.Toast;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using EventsManager.Client;
 using EventsManager.Client.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -20,4 +23,9 @@ builder.Services.AddBlazoredToast();
 builder.Services.AddApiAuthorization()
     .AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 builder.Services.AddFluentUIComponents();
+builder.Services.AddBlazorise( options =>
+    {
+        options.Immediate = true;
+    }).AddBootstrapProviders()
+    .AddFontAwesomeIcons();
 await builder.Build().RunAsync();

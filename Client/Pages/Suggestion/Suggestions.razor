@@ -11,17 +11,14 @@
 
 @if (!_suggestionSubmitted)
 {
-    <EditForm Model="_userSuggestion" OnValidSubmit="HandleValidSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
+    <form id="userSuggestionForm" @onsubmit="HandleValidSubmit">
         <div class="form-group">
             <label for="suggestion">Your Suggestion:</label>
-            <InputTextArea id="suggestion" class="form-control" @bind-Value="_userSuggestion.Content" />
+            <textarea id="suggestion" @bind="_userSuggestion.Content" class="form-control"></textarea>
         </div>
-
         <button type="submit" class="btn btn-primary">Submit</button>
-    </EditForm>
+    </form>
+
 }
 else
 {

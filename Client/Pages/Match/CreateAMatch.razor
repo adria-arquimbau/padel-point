@@ -8,27 +8,22 @@
 
 <h3>Create Match</h3>
 
-<EditForm Model="@_newMatch" OnValidSubmit="HandleValidSubmit" class="my-form">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    
+<form id="newMatchForm" class="my-form" @onsubmit="HandleValidSubmit">
     <div class="form-group">
         <label>Start Date:</label>
-        <InputDate class="form-control" @bind-Value="_newMatch.StartDateTime" format="dd MMM yyyy" />
+        <input type="date" id="startDateTime" @bind="_newMatch.StartDateTime" class="form-control" placeholder="Start Date">
     </div>
-
     <div class="form-group">
         <label>End Date:</label>
-        <InputDate class="form-control" @bind-Value="_newMatch.EndDateTime" format="dd MMM yyyy" />
+        <input type="date" id="endDateTime" @bind="_newMatch.EndDateTime" class="form-control" placeholder="End Date">
     </div>
-
     <div class="form-group">
         <label for="location">Location:</label>
-        <InputText @bind-Value="_newMatch.Location" id="location" name="location" class="form-control" />
+        <input type="text" id="location" @bind="_newMatch.Location" name="location" class="form-control">
     </div>
-
     <button type="submit" class="btn btn-primary">Create Match</button>
-</EditForm>
+</form>
+
 
 @code {
     private CreateMatchRequest _newMatch = new()
