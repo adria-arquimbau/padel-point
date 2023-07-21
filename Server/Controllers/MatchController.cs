@@ -40,6 +40,7 @@ public class MatchController : ControllerBase
             CreationDate = DateTime.UtcNow,
             StartDateTime = request.StartDate.ToUniversalTime(),
             Duration = request.Duration,
+            PricePerHour = request.PricePerHour,
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
