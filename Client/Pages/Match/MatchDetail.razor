@@ -41,7 +41,7 @@ else
                 </Buttons>
             }
         </div>
-        <div class="separation"></div>
+        <Divider />
         <div class="info-footer">
             <div class="info-footer-box">
                 <div class="info-footer-box-content">
@@ -103,9 +103,9 @@ else
         <ShowResults Match="_match" RefreshMatch="GetMatch"></ShowResults>
     }
     
-    <div class="border match-detail-location">
-        @_match.Location                        
-    </div>
+    @* <div class="border match-detail-location"> *@
+    @*     @_match.Location                         *@
+    @* </div> *@
 
     <EditMatch Match="_match" Visible="_editModalVisible" ConfirmationChanged="EditMatch"></EditMatch>
     <ConfirmationModal ConfirmationChanged="RemoveMatch" Visible="_deleteModalVisible" Title="Delete Match" Message="Are you sure you want to delete this match?"></ConfirmationModal>
