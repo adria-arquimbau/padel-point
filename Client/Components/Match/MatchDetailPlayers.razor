@@ -163,6 +163,10 @@
             }
             
         }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
         finally
         {
             _loading = false;
@@ -191,6 +195,10 @@
                     ToastService.ShowError(error);
                 }
             
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
             }
             finally
             {

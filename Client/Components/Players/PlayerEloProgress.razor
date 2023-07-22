@@ -11,7 +11,7 @@
 else
 {
     <div class="elo-chart">
-        <LineChart @ref="lineChart" TItem="double" />
+        <LineChart @ref="@_lineChart" TItem="double" />
         <Button class="show-elo-button" Size="Size.Small" Color="Color.Primary" Clicked="@(async () => await HandleRedraw())">Show your elo history</Button>
     </div>
 }
@@ -36,7 +36,6 @@ else
                 _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
                 
                 // Add StateHasChanged after data fetch
-                
             }
             else
             {
@@ -50,7 +49,7 @@ else
         }
     }
 
-    LineChart<double> lineChart = new LineChart<double>();
+    LineChart<double> _lineChart = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -65,8 +64,8 @@ else
     {
         if (_eloHistory != null)
         {
-            await lineChart.Clear();
-            await lineChart.AddLabelsDatasetsAndUpdate(_eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), GetLineChartDataset());
+            await _lineChart.Clear();
+            await _lineChart.AddLabelsDatasetsAndUpdate(_eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), GetLineChartDataset());
         }
     }
 
@@ -76,8 +75,8 @@ else
         {
             Label = "Your elo history",
             Data = _eloHistory?.Select(e => (double)e.Elo).ToList(),
-            BackgroundColor = backgroundColors,
-            BorderColor = borderColors,
+            BackgroundColor = _backgroundColors,
+            BorderColor = _borderColors,
             Fill = true,
             PointRadius = 3,
             CubicInterpolationMode = "monotone",
@@ -85,8 +84,8 @@ else
     }
 
     // You can choose a specific color for your data
-    List<string> backgroundColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
-    List<string> borderColors = new List<string> { ChartColor.FromRgba( 255, 99, 132, 1f ) };
+    List<string> _backgroundColors = new() { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
+    List<string> _borderColors = new() { ChartColor.FromRgba( 255, 99, 132, 1f ) };
 }
 
 <style>

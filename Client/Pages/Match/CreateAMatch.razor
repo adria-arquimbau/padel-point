@@ -6,6 +6,11 @@
 @inject NavigationManager NavManager
 @inject IToastService ToastService
 
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+
 <h3>Create Match</h3>
 
 <form id="newMatchForm" class="my-form" @onsubmit="HandleValidSubmit">
@@ -39,9 +44,11 @@
     private int _durationSelect = 1;
     private double _pricePerHour;
     private bool _isPrivate;
+    private bool _loading;
 
     private async Task HandleValidSubmit()
     {
+        _loading = true;
         var durationInHours = _durationSelect switch
         {
             1 => 1,
@@ -59,17 +66,29 @@
             IsPrivate = _isPrivate,
             PricePerHour = _pricePerHour
         };
-        var response = await Http.PostAsJsonAsync("match", request);
-        
-        if(response.IsSuccessStatusCode)
+
+        try
         {
-            var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
-            NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
-            ToastService.ShowSuccess("Match created successfully.");
+            var response = await Http.PostAsJsonAsync("match", request);
+        
+            if(response.IsSuccessStatusCode)
+            {
+                var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
+                NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
+                ToastService.ShowSuccess("Match created successfully.");
+            }
+            else
+            {
+                ToastService.ShowError("Something went wrong. Please try again later.");
+            }
         }
-        else
+        catch (Exception)
         {
             ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        finally
+        {
+            _loading = false;
         }
     }
 }

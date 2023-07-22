@@ -140,27 +140,35 @@ else
         _loading = true;
         if (MatchId.HasValue)
         {
-            HttpResponseMessage? response;
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity?.IsAuthenticated == false)
+            try
             {
-                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-                response = await http.GetAsync($"match/{MatchId.Value}");
-            }
-            else
-            {
-                response = await Http.GetAsync($"match/{MatchId.Value}");
-            }
+                HttpResponseMessage? response;
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity?.IsAuthenticated == false)
+                {
+                    var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                    response = await http.GetAsync($"match/{MatchId.Value}");
+                }
+                else
+                {
+                    response = await Http.GetAsync($"match/{MatchId.Value}");
+                }
 
-            if (response.IsSuccessStatusCode)
-            {
-                _match = await response.Content.ReadFromJsonAsync<MatchResponse>();
+                if (response.IsSuccessStatusCode)
+                {
+                    _match = await response.Content.ReadFromJsonAsync<MatchResponse>();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
             }
-            else
+            catch (Exception)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
+                ToastService.ShowError("Something went wrong, please try again later.");
             }
+          
         }
         _loading = false;
     }
@@ -180,18 +188,26 @@ else
         _loading = true;
         if (removeIt)
         {
-            var response = await Http.DeleteAsync($"match/{MatchId.Value}");
+            try
+            {
+                var response = await Http.DeleteAsync($"match/{MatchId.Value}");
         
-            if(response.IsSuccessStatusCode)
-            {
-                ToastService.ShowInfo("Match has been removed successfully.");
-                NavigationManager.NavigateTo("/");
+                if(response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowInfo("Match has been removed successfully.");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
             }
-            else
+            catch (Exception)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
+                ToastService.ShowError("Something went wrong, please try again later.");
             }
+           
         }
         _loading = false;
         _deleteModalVisible = false;
@@ -201,18 +217,25 @@ else
     {
         _loading = true;
         if (editMatchRequest != null)
-        {   
-            var response = await Http.PutAsJsonAsync($"match/{MatchId.Value}", editMatchRequest);
+        {
+            try
+            {
+                var response = await Http.PutAsJsonAsync($"match/{MatchId.Value}", editMatchRequest);
 
-            if(response.IsSuccessStatusCode)    
-            {
-                ToastService.ShowInfo("Match has been updated successfully.");
-                await GetMatch();
+                if(response.IsSuccessStatusCode)    
+                {
+                    ToastService.ShowInfo("Match has been updated successfully.");
+                    await GetMatch();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
             }
-            else
+            catch (Exception)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
+                ToastService.ShowError("Something went wrong, please try again later.");
             }
         }
         

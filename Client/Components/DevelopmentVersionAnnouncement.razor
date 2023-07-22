@@ -45,25 +45,39 @@
     private async Task CloseAlert()
     {
         _visible = false;
-        await Http.PostAsync($"player/development-announcement-read-it", null);
+        try
+        {
+            await Http.PostAsync($"player/development-announcement-read-it", null);
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
     }
     
     private async Task GetUser()    
     {
         _loading = true;
 
-        var response = await Http.GetAsync($"player");
+        try
+        {
+            var response = await Http.GetAsync($"player");
 
-        if (response.IsSuccessStatusCode)
-        {
-            _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
+            if (response.IsSuccessStatusCode)
+            {
+                _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
         }
-        else
+        catch (Exception)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            ToastService.ShowError(error);
+            // ignored
         }
-       
+
         _loading = false;
     }
 }
