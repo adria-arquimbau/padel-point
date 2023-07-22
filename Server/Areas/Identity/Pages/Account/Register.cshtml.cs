@@ -69,7 +69,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [Required]
-            [StringLength(20, ErrorMessage = "User name with less than 20 characters please.", MinimumLength = 1)]
+            [StringLength(10, ErrorMessage = "User name with less than 10 characters please.", MinimumLength = 1)]
             [Display(Name = "UserName")]
             public string UserName { get; set; }
                 
