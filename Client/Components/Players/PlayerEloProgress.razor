@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-@if (_eloHistory == null)
+@if (_loading == null)
 {
     <LoadingSpinner></LoadingSpinner>
 }
@@ -12,21 +12,31 @@ else
 {
     <div class="elo-chart">
         <LineChart @ref="@_lineChart" TItem="double" />
-        <Button class="show-elo-button" Size="Size.Small" Color="Color.Primary" Clicked="@(async () => await HandleRedraw())">Show your elo history</Button>
     </div>
 }
 
 @code {
+    private bool _loading = false;
+    
     private List<EloHistoryResponse>? _eloHistory;
-
-    protected override async Task OnInitializedAsync()
+    
+    LineChart<double> _lineChart = new();
+    List<string> _backgroundColors = new() { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
+    List<string> _borderColors = new() { ChartColor.FromRgba( 255, 99, 132, 1f ) };
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await Get();
-
+        if (firstRender && _eloHistory != null)
+        {
+            await HandleRedraw();
+            StateHasChanged();
+        }
     }
 
     private async Task Get()
     {
+        _loading = true;
         try
         {
             var response = await Http.GetAsync("elohistory");
@@ -41,25 +51,16 @@ else
             {
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
+                _loading = false;
             }
         }
         catch (Exception)
         {
+            _loading = false;
             ToastService.ShowError("Something went wrong, please try again later.");
         }
     }
-
-    LineChart<double> _lineChart = new();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-
-        if (firstRender && _eloHistory != null)
-        {
-            await HandleRedraw();
-        }
-    }
-
+    
     private async Task HandleRedraw()
     {
         if (_eloHistory != null)
@@ -82,10 +83,6 @@ else
             CubicInterpolationMode = "monotone",
         };
     }
-
-    // You can choose a specific color for your data
-    List<string> _backgroundColors = new() { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
-    List<string> _borderColors = new() { ChartColor.FromRgba( 255, 99, 132, 1f ) };
 }
 
 <style>
