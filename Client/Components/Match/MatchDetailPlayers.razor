@@ -36,7 +36,10 @@
                                 }
                                 @if (player.CanIDeleteIt || Match.RequesterIsTheCreator)
                                 {
-                                    <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                    @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
+                                    {
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                    }
                                 }
                             </div>
                             <p>@player.NickName</p>
@@ -86,7 +89,10 @@
                                 }
                                 @if (player.CanIDeleteIt || Match.RequesterIsTheCreator)
                                 {
-                                    <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                    @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
+                                    {
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                    }
                                 }
                             </div>
                             <p>@player.NickName</p>
