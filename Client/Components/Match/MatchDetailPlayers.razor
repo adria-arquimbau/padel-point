@@ -1,5 +1,6 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Match.Results
+@using EventsManager.Shared
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
 
@@ -17,7 +18,7 @@
 <div class="border match-detail-players">
     <div class="teams">
         <div class="team @(Match.ScoreConfirmedTeamOne ? "team-confirmed" : "")">
-            Team 1
+            Team 1 
             <div class="players-grid">
                 @for (var i = 0; i < 2; i++)
                 {
@@ -43,7 +44,7 @@
                                 }
                             </div>
                             <p>@player.NickName</p>
-                            <p>@player.Elo</p>
+                            <p>@player.Elo <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">@(player.GainedElo > 0 ? "+" : "")@player.GainedElo</span></p>
                         </div>
                     }
                     else
@@ -96,7 +97,7 @@
                                 }
                             </div>
                             <p>@player.NickName</p>
-                            <p>@player.Elo</p>
+                            <p>@player.Elo <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">@(player.GainedElo > 0 ? "+" : "")@player.GainedElo</span></p>
                         </div>
                     }
                     else
@@ -124,8 +125,6 @@
         </div>
     </div>
 </div>
-
-
 
 @code {
     [Parameter]
@@ -215,6 +214,23 @@
         justify-content: space-between;
     }
     
+    .winner-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: limegreen;
+        border: 2px solid limegreen;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
     .team {
         display: flex;
         flex-direction: column;
@@ -232,8 +248,18 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;  /* This will center Elo and Gained Elo vertically */
         width: 60px;
+        text-align: center;  /* This will center Elo and Gained Elo horizontally */
         font-size: 12px;
+    }
+    
+    .elo-change-positive {
+        color: limegreen;
+    }
+    
+    .elo-change-negative {
+        color: red;
     }
     
     .player-avatar, .default-avatar {

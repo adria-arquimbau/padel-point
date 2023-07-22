@@ -8,4 +8,5 @@ public class PlayerDto
     public decimal Elo { get; set; }
     public bool CanIDeleteIt { get; set; }
     public bool DevelopmentAnnouncementReadIt { get; set; }
+    public int GainedElo { get; set; }
 }
