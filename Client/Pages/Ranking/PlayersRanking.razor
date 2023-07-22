@@ -1,0 +1,80 @@
+﻿@page "/players-ranking"
+
+@using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Responses
+
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+
+<h3>Players Ranking</h3>
+
+
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
+@if(_players != null)
+{
+    @foreach (var player in _players)
+    {
+        <div class="border player-card" style="position: relative;">
+            <div style="width: 40%; float: left; margin-bottom: 20px;">
+                @if (player.ImageUrl != null)
+                {
+                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
+                }
+                else
+                {
+                    <img src="/default-avatar.png" alt="Default avatar" class="player-avatar-img"/>
+                }
+            </div>
+            <div style="width: 60%; float: right;">
+                <p style="font-size: 14px"><b>Nickname:</b> @player.NickName</p>
+                <p style="font-size: 14px"><b>Elo:</b> @player.Elo</p>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    }
+}
+
+@code {
+    private List<PlayerRankingResponse>? _players;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        try
+        {
+            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+            _players = await http.GetFromJsonAsync<List<PlayerRankingResponse>>("player/ranking");
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}
+
+<style>
+    .border {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 10px;
+        margin: 10px;
+        background-color: white;
+    }
+        
+    .player-card {
+        margin-bottom: 15px;
+    }
+
+    .player-avatar-img {
+        width: 100%;
+        height: auto;
+    }
+</style>

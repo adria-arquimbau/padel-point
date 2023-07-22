@@ -58,17 +58,24 @@ else
 
     private async Task GetAllMatches()
     {
-        var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-        var response = await http.GetAsync("match");
+        try
+        {
+            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+            var response = await http.GetAsync("match");
 
-        if (response.IsSuccessStatusCode)
-        {
-            _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+            if (response.IsSuccessStatusCode)
+            {
+                _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
         }
-        else
+        catch (Exception)
         {
-            var error = await response.Content.ReadAsStringAsync();
-            ToastService.ShowError(error);
+            ToastService.ShowError("Something went wrong. Please try again later.");
         }
     }
 }

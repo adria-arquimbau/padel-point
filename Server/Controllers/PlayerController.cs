@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +53,24 @@ public class PlayerController : ControllerBase
             .SingleAsync(cancellationToken: cancellationToken);
 
         return Ok(player);
+    }
+    
+    [HttpGet("ranking")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
+    {
+        var players = await _dbContext.Player
+            .Select(x => new PlayerRankingResponse
+            {
+                Id = x.Id,
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl,
+                Elo = x.Elo
+            })
+            .OrderBy(x => x.Elo)
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        return Ok(players);
     }
     
     [HttpPost("development-announcement-read-it")]
