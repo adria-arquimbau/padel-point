@@ -81,7 +81,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; }
             [Required]
-            [MaxLength(14)]
+            [MaxLength(10)]
             public string UserName { get; set; }
         }
         
