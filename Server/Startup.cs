@@ -74,7 +74,7 @@ public class Startup {
         });
         
         var blobStorageSection = configuration.GetSection("BlobStorage");
-        services.Configure<BlobStorageSettings>(blobStorageSection);    
+        services.Configure<BlobStorageSettings>(blobStorageSection);
     }
     
     public void Configure(WebApplication app, IWebHostEnvironment env, IServiceProvider services) {

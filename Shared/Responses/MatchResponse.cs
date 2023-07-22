@@ -23,5 +23,6 @@ public class MatchResponse
     public bool Finished { get; set; }  
     public double Duration { get; set; }
     public double PricePerHour { get; set; }
+    public Team? TeamWinner { get; set; }
 }
                             

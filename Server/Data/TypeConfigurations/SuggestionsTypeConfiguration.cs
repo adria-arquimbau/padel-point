@@ -101,7 +101,7 @@ public class EloHistoryConfiguration : IEntityTypeConfiguration<EloHistory>
             .WithMany(p => p.EloHistories)
             .HasForeignKey(eh => eh.PlayerId);
         builder.HasOne(eh => eh.Match)
-            .WithMany(m => m.EloHistories) // Configure relationship with Match
+            .WithMany(m => m.EloHistories)
             .HasForeignKey(eh => eh.MatchId);
     }
 }

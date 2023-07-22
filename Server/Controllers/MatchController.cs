@@ -150,8 +150,7 @@ public class MatchController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
         var player = await _dbContext.Player
-            //.Where(x => x.UserId == userId)
-            .Where(x => x.Id == Guid.Parse("efce1755-7620-46e7-515d-08db8aa4c34e"))
+            .Where(x => x.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
         var match = await _dbContext.Match
@@ -209,6 +208,7 @@ public class MatchController : ControllerBase
                 PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
+                TeamWinner = null,
                 Sets = x.Sets.Select(s => new SetDto
                 {
                     SetNumber = s.SetNumber,
@@ -247,7 +247,22 @@ public class MatchController : ControllerBase
         match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
             ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo)) : 0;
         
+        match.TeamWinner = CalculateMatchWinner(match.Sets);
+        
         return Ok(match);
+    }
+    
+    public Team? CalculateMatchWinner(List<SetDto>? sets)
+    {
+        if (sets == null || !sets.Any())
+        {
+            return null;
+        }
+
+        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
+        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
+
+        return team1Wins != team2Wins ? (team1Wins > team2Wins ? Team.Team1 : Team.Team2) : (Team?)null;
     }
     
     [HttpGet]

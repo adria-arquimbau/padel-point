@@ -46,14 +46,16 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var set in Match.Sets)
-            {
-                <tr>
-                    <td>@set.SetNumber</td>
-                    <td>@set.Team1Score</td>
-                    <td>@set.Team2Score</td>
-                </tr>
-            }
+                @foreach (var set in Match.Sets)
+                {
+                    var team1ScoreClass = set.Team1Score > set.Team2Score ? "green" : "red";
+                    var team2ScoreClass = set.Team2Score > set.Team1Score ? "green" : "red";
+                    <tr>
+                        <td>@set.SetNumber</td>
+                        <td class="@team1ScoreClass">@set.Team1Score</td>
+                        <td class="@team2ScoreClass">@set.Team2Score</td>
+                    </tr>
+                }
             </tbody>
         </table>
     }
@@ -281,6 +283,14 @@
         border-radius: 10px;   
         display: flex;  
         background-color: white;
+    }
+    
+    .green {
+        color: green;
+    }
+    
+    .red {
+        color: red;
     }
     
     .confirm-buttons{
