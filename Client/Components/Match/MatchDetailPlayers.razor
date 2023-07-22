@@ -44,7 +44,15 @@
                                 }
                             </div>
                             <p>@player.NickName</p>
-                            <p>@player.Elo <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">@(player.GainedElo > 0 ? "+" : "")@player.GainedElo</span></p>
+                            <div class="elo">@player.Elo</div>
+                            <div class="gained-elo">
+                                @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
+                                {
+                                    <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
+                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
+                                    </span>
+                                }
+                            </div>
                         </div>
                     }
                     else
@@ -62,7 +70,7 @@
             </div>
             @if (Match.PlayersTeamOne.Any())
             {
-                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamOne</p>
+                <p style="font-size: 12px; margin-top: 5px">Average Elo: @Match.AverageEloTeamOne</p>
             }
             @if (Match.ScoreConfirmedTeamOne)
             {
@@ -97,7 +105,15 @@
                                 }
                             </div>
                             <p>@player.NickName</p>
-                            <p>@player.Elo <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">@(player.GainedElo > 0 ? "+" : "")@player.GainedElo</span></p>
+                            <div class="elo">@player.Elo</div>
+                            <div class="gained-elo">
+                                @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
+                                {
+                                    <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
+                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
+                                    </span>
+                                }
+                            </div>
                         </div>
                     }
                     else
@@ -115,7 +131,7 @@
             </div>
             @if (Match.PlayersTeamTwo.Any())
             {
-                <p style="font-size: 12px">Average Skill: @Match.AverageEloTeamTwo</p>
+                <p style="font-size: 12px; margin-top: 5px">Average Elo: @Match.AverageEloTeamTwo</p>
             }
             @if (Match.ScoreConfirmedTeamTwo)
             {
@@ -214,23 +230,6 @@
         justify-content: space-between;
     }
     
-    .winner-stamp {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 100px;
-        height: 20px;
-        background-color: transparent;
-        color: limegreen;
-        border: 2px solid limegreen;
-        display: flex;
-        align-items: center; /* center text vertically */
-        justify-content: center; /* center text horizontally */
-        overflow: hidden;
-        font-weight: bold;
-        font-size: 14px;
-    }
-    
     .team {
         display: flex;
         flex-direction: column;
@@ -254,6 +253,12 @@
         font-size: 12px;
     }
     
+    .elo,
+    .gained-elo {
+        width: 100%;
+        text-align: center;
+    }
+
     .elo-change-positive {
         color: limegreen;
     }
