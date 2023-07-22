@@ -26,7 +26,7 @@ public class EloHistoryController : ControllerBase
 
         var eloHistory = await _dbContext.EloHistories
             .Where(x => x.Player.UserId == userId)
-            .OrderByDescending(x => x.ChangeDate)
+            .OrderBy(x => x.ChangeDate)
             .Select(x => new EloHistoryResponse
             {
                 Elo = x.CurrentElo,
