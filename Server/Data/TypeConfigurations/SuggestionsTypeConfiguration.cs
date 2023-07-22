@@ -25,7 +25,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
         builder.HasOne(p => p.User)
             .WithOne(u => u.Player)
             .HasForeignKey<Player>(x => x.UserId);
-        builder.HasMany(p => p.EloHistories) // Added this line to define the relationship with EloHistory
+        builder.HasMany(p => p.EloHistories)
             .WithOne(eh => eh.Player)
             .HasForeignKey(eh => eh.PlayerId)
             .OnDelete(DeleteBehavior.Restrict);

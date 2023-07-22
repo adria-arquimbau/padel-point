@@ -6,4 +6,6 @@ public class PlayerRankingResponse
     public required string NickName { get; set; }    
     public Uri? ImageUrl { get; set; }
     public int Elo { get; set; }
-}
+    public int LastEloGained { get; set; }
+    public int MatchesPlayed { get; set; }
+}   
