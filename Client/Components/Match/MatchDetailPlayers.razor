@@ -78,7 +78,7 @@
             }
         </div>
 
-        <div class="team @((Match.ScoreConfirmedTeamTwo) ? "team-confirmed" : "")">
+        <div class="team @(Match.ScoreConfirmedTeamTwo ? "team-confirmed" : "")">
             Team 2
             <div class="players-grid">
                 @for (var i = 0; i < 2; i++)
@@ -247,9 +247,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;  /* This will center Elo and Gained Elo vertically */
+        justify-content: center;
         width: 60px;
-        text-align: center;  /* This will center Elo and Gained Elo horizontally */
+        text-align: center;
         font-size: 12px;
     }
     
