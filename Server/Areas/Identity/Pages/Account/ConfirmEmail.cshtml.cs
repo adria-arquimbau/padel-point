@@ -58,6 +58,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 newPlayer.EloHistories.Add(new EloHistory
                 {
                     CurrentElo = 1500,
+                    PreviousElo = 1500,
                     ChangeDate = DateTime.Now
                 });
                 _context.Player.Add(newPlayer);
