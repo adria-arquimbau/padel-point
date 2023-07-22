@@ -1,4 +1,5 @@
 ﻿@using Color = Blazorise.Color
+@using IconSize = Blazorise.IconSize
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href=""><img src="logo-nav-menu.png" alt="" style="width: 35px"/> Padel Point </a>
@@ -12,14 +13,19 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <Icon Class="icon" Name="IconName.Home" /> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="players-ranking" Match="NavLinkMatch.All">
+               <Icon Class="icon" Name="IconName.Users" /> Ranking
             </NavLink>
         </div>
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="create-match" Match="NavLinkMatch.All">
-                        <span class="bi bi-calendar2-date" aria-hidden="true"></span>  Create a Match
+                        <Icon Class="icon" Name="IconName.PlusCircle" /> Create a Match
                     </NavLink>
                 </div>
             </Authorized>
@@ -28,7 +34,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="account" Match="NavLinkMatch.All">
-                        <span class="oi oi-person" aria-hidden="true"></span> Account
+                        <Icon Class="icon" Name="IconName.User" /> Account
                     </NavLink>
                 </div>
             </Authorized>
@@ -37,7 +43,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="users-manager" Match="NavLinkMatch.All">
-                        <span class="oi oi-people" aria-hidden="true"></span> Users manager
+                        <Icon Class="icon" Name="IconName.Compass" /> Users manager
                     </NavLink>
                 </div>
             </Authorized>
@@ -46,7 +52,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="suggestions" Match="NavLinkMatch.All">
-                        <span class="oi oi-comment-square" aria-hidden="true"></span> Suggestions
+                        <Icon Class="icon" Name="IconName.Mail" /> Suggestions
                     </NavLink>
                 </div>
             </Authorized>
@@ -55,14 +61,14 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="suggestions-manager" Match="NavLinkMatch.All">
-                        <span class="oi oi-comment-square" aria-hidden="true"></span> Suggestions manager
+                        <Icon Class="icon" Name="IconName.Mail" /> Suggestions manager
                     </NavLink>
                 </div>
             </Authorized>
         </AuthorizeView>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="documentation" Match="NavLinkMatch.All">
-                <span class="bi bi-book" aria-hidden="true"> </span> Documentation
+                <Icon Class="icon" Name="IconName.Book" /> Documentation
             </NavLink>
         </div>
     </nav>
@@ -79,3 +85,10 @@
         _collapseNavMenu = !_collapseNavMenu;
     }
 }
+
+<style>
+    .icon {
+        margin-right: 5px;
+    }
+
+</style>
