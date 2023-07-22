@@ -221,9 +221,12 @@ public class MatchController : ControllerBase
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.Elo,
+                    Elo = p.Player.EloHistories
+                        .Where(e => e.MatchId == matchId)
+                        .Select(e => (int?)e.PreviousElo)
+                        .SingleOrDefault() ?? p.Player.Elo,
                     CanIDeleteIt = userId != null && p.Player.UserId == userId,
-                    GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange)
+                    GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
                 }).ToList(),
                 PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
                     .Select(p => new PlayerDto
@@ -231,9 +234,12 @@ public class MatchController : ControllerBase
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.Elo,
+                    Elo = p.Player.EloHistories
+                        .Where(e => e.MatchId == matchId)
+                        .Select(e => (int?)e.PreviousElo)
+                        .SingleOrDefault() ?? p.Player.Elo,
                     CanIDeleteIt = userId != null && p.Player.UserId == userId,
-                    GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange)
+                    GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
                 }).ToList()
             })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
