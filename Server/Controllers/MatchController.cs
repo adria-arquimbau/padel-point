@@ -150,7 +150,8 @@ public class MatchController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
         var player = await _dbContext.Player
-            .Where(x => x.UserId == userId)
+            //.Where(x => x.UserId == userId)
+            .Where(x => x.Id == Guid.Parse("efce1755-7620-46e7-515d-08db8aa4c34e"))
             .SingleAsync(cancellationToken: cancellationToken);
         
         var match = await _dbContext.Match

@@ -52,9 +52,14 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 var newPlayer = new Player
                 {
                     User = user,
-                    NickName = user.UserName,
-                    Elo = 0
+                    NickName = user.UserName
                 };
+                
+                newPlayer.EloHistories.Add(new EloHistory
+                {
+                    CurrentElo = 1500,
+                    ChangeDate = DateTime.Now
+                });
                 _context.Player.Add(newPlayer);
                 await _context.SaveChangesAsync();
             }
