@@ -291,6 +291,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("You can only remove yourself.");
         }
+
+        if (match.ScoreConfirmedTeamOne || match.ScoreConfirmedTeamTwo)
+        {
+            return Conflict("You can't remove players from a match with confirmed score.");
+        }
         
         var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
 
