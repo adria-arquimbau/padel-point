@@ -15,7 +15,7 @@
 
 @if (_loading)
 {
-    <LoadingSpinner></LoadingSpinner>
+    <MatchDetailSkeleton></MatchDetailSkeleton>
 }
 @if (_match != null)
 {
@@ -113,6 +113,7 @@
 @code {
     [Parameter]
     public Guid? MatchId { get; set; }
+    
     private bool _loading;
 
     private MatchResponse? _match;
