@@ -6,6 +6,8 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
 
+<div class="title">Current ranking</div>
+
 @if (_loading)
 {
     <LoadingSpinner></LoadingSpinner>
@@ -44,3 +46,11 @@ else
         }
     }
 }
+
+<style>
+    .title{
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+</style>
