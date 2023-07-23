@@ -1,11 +1,15 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Text.Json;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Queries.Users.GetMyUser;
 using EventsManager.Server.Models;
 using EventsManager.Server.Settings;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace EventsManager.Server;
 
@@ -67,6 +71,8 @@ public class Startup {
         services.AddControllersWithViews();
         services.AddRazorPages();
         
+        services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("padelpointdb", tags: new []{ FullTag, LiteTag });
+        
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetMyUserQueryHandler).Assembly));
         services.AddMediatR(config =>
         {
@@ -91,6 +97,18 @@ public class Startup {
             app.UseHsts();
         }
         
+        app.UseHealthChecks("/hc", new HealthCheckOptions
+        {
+            ResponseWriter = WriteResponseAsync,
+            Predicate = reg => reg.Tags.Contains(FullTag)
+        });
+
+        app.UseHealthChecks("/hc-lite", new HealthCheckOptions
+        {
+            ResponseWriter = WriteResponseAsync,
+            Predicate = reg => reg.Tags.Contains(LiteTag)
+        });
+        
         app.UseDeveloperExceptionPage();
         
         app.UseHttpsRedirection();
@@ -107,6 +125,56 @@ public class Startup {
         app.MapControllers();
         app.MapFallbackToFile("index.html");
         
+        app.UseHealthChecks("/hc", new HealthCheckOptions
+        {
+            ResponseWriter = WriteResponseAsync,
+            Predicate = reg => reg.Tags.Contains(FullTag)
+        });
+
+        app.UseHealthChecks("/hc-lite", new HealthCheckOptions
+        {
+            ResponseWriter = WriteResponseAsync,
+            Predicate = reg => reg.Tags.Contains(LiteTag)
+        });
+        
         app.Run();
+    }
+    
+    private const string FullTag = "full";
+    private const string LiteTag = "lite";
+
+    private static Task WriteResponseAsync(HttpContext httpContext, HealthReport report)
+    {
+        httpContext.Response.ContentType = "application/json";
+        var text = Serialize(report);
+        return httpContext.Response.WriteAsync(text);
+    }
+
+    private static string Serialize(HealthReport report)
+    {
+        var options = new JsonWriterOptions()
+        {
+            Indented = true
+        };
+        using var utf8Json = new MemoryStream();
+        using (var writer = new Utf8JsonWriter((Stream) utf8Json, options))
+        {
+            writer.WriteStartObject();
+            writer.WriteString("status", report.Status.ToString());
+            writer.WriteStartObject("results");
+            report.Entries.ToList<KeyValuePair<string, HealthReportEntry>>().ForEach((Action<KeyValuePair<string, HealthReportEntry>>) (pair =>
+            {
+                writer.WriteStartObject(pair.Key);
+                writer.WriteString(pair.Key + "_status", pair.Value.Status.ToString());
+                writer.WriteString("description", pair.Value.Description);
+                writer.WriteStartObject("data");
+                pair.Value.Data.ToList<KeyValuePair<string, object>>().ForEach((Action<KeyValuePair<string, object>>) (dataItem => writer.WriteString(dataItem.Key, dataItem.Value.ToString())));
+                writer.WriteEndObject();
+                writer.WriteEndObject();
+            }));
+            writer.WriteEndObject();
+            writer.WriteEndObject();
+        }
+        return Encoding.UTF8.GetString(utf8Json.ToArray());
     }
 }
