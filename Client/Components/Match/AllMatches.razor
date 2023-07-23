@@ -22,6 +22,10 @@ else
                  {
                      <div class="searching-stamp">Open slots</div>
                  }
+                 @if (match.PlayersCount == 4 && !match.Finished)
+                  {
+                      <div class="pending-stamp">Pending</div>
+                  }
                 <div style="font-size: 12px; text-align: center;">
                     @match.StartDateTime.ToLocalTime().ToLongDateString() /
                     @match.StartDateTime.ToLocalTime().ToShortTimeString() -
@@ -126,5 +130,21 @@ else
         font-weight: bold;
         font-size: 14px;
     }
-
+    
+    .pending-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: #ffaf00;
+        border: 2px solid #ffaf00;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
 </style>
