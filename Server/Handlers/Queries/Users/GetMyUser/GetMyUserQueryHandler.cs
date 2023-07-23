@@ -32,7 +32,8 @@ public class GetMyUserQueryHandler : IRequestHandler<GetMyUserQueryRequest, User
             Id = user.Id,
             UserName = user.UserName!,
             Email = user.Email!,
-            ImageUrl = user.Player.ImageUrl
+            ImageUrl = user.Player.ImageUrl,
+            Country = user.Player.Country
         };
     }
 }

@@ -21,7 +21,11 @@ public class UpdateMyUserCommandHandler : IRequestHandler<UpdateMyUserCommandReq
             throw new NotSameUserForUpdateException();
         }
 
-        var userEntity = await _dbContext.Users.SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
+        var userEntity = await _dbContext.Users
+            .Include(x => x.Player)
+            .SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
+        
+        userEntity.Player.Country = request.UserDto.Country;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
     }

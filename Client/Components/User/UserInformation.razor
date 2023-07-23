@@ -3,12 +3,17 @@
 @using EventsManager.Shared.Dtos
 @using EventsManager.Client.Components.ImageUploader
 @using Microsoft.AspNetCore.Authorization
+@using Color = Blazorise.Color
 
 @inject HttpClient Http
 @inject IToastService ToastService
 
 @attribute [Authorize(Roles = "User")]
 
+@if (_loading)
+{
+    <LoadingSpinner></LoadingSpinner>
+}
 
 <div class="container mt-5">
     <div class="row justify-content-center">
@@ -24,16 +29,26 @@
                     <ImageUploader Type="ImageUploader.ImageType.User" ImageUrl="@User?.ImageUrl" RefreshInformation="GetUserInformation" />
                     <FluentDivider></FluentDivider>
                     <h4 class="card-title text-center mb-4">Basic information</h4>
+                    
                     <form>
                         <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="@User?.Email" readonly />
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">User name</label>
-                                <input type="text" class="form-control" value="@User?.UserName" readonly />
-                            </div>
-                        
+                            <label class="form-label">Country</label><CountryFlag Country="@_userCountry"></CountryFlag>
+                            <Select @bind-SelectedValue="@_userCountry" TValue="Country">
+                                @foreach (var country in _countries)
+                                {
+                                    <SelectItem Value="@country">@country.GetDescription()</SelectItem>
+                                }
+                            </Select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="@User?.Email" readonly />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">User name</label>
+                            <input type="text" class="form-control" value="@User?.UserName" readonly />
+                        </div>
+                        <Button Clicked="UpdateUserInformation" Color="Color.Primary" Size="Size.Small">Update</Button>
                     </form>
                 </div>
             </div>
@@ -45,14 +60,60 @@
     [Parameter]
     public UserDto? User { get; set; }
 
+    private Country _userCountry;
     private bool ReadOnly { get; set; } = true;
-    
     private int _imageUpdateCount = 0;
+    private bool _loading;
+    private List<Country> _countries = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(User?.Country))
+        {
+            if (Enum.TryParse(typeof(Country), User.Country, out var parsedCountry))
+            {
+                _userCountry = (Country)parsedCountry;
+            }
+        }
+        _countries = GetCountries();
+    }
+    
+    private async Task UpdateUserInformation()
+    {
+        _loading = true;
+        try
+        {
+            User.Country = _userCountry.ToString();
+            var response = await Http.PutAsJsonAsync("user", User);
+        
+            if(response.IsSuccessStatusCode)
+            {
+                ToastService.ShowSuccess("User information updated successfully.");
+            }
+            else
+            {
+                ToastService.ShowError("Something went wrong. Please try again later.");
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
 
     private async Task GetUserInformation()
     {
         User = await Http.GetFromJsonAsync<UserDto>("User");
         _imageUpdateCount++;
+    }
+    
+    private List<Country> GetCountries()
+    {
+        return Enum.GetValues(typeof(Country)).Cast<Country>().ToList();
     }
 }
 

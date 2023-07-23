@@ -11,4 +11,5 @@ public class Player
     public ApplicationUser User { get; set; }   
     public ICollection<Match> CreatedMatches { get; set; } = new List<Match>();
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
-}
+    public string? Country { get; set; }
+}   

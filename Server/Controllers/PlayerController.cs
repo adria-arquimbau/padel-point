@@ -96,6 +96,7 @@ public class PlayerController : ControllerBase
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
+                Country = x.Country,
                 LastEloGained = x.EloHistories
                     .OrderByDescending(eh => eh.ChangeDate)
                     .Single()

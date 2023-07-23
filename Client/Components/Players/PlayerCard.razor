@@ -12,7 +12,7 @@
                 @Player?.NickName
             </div>
             <div class="player-info-flag">
-                <CountryFlag Country="Country.AT" Size="FlagSize.Small"></CountryFlag>
+                <CountryFlag Country="@_userCountry"></CountryFlag>
             </div>
         </div>
         <div class="player-info-content">
@@ -37,7 +37,20 @@
 @code {
     [Parameter]
     public PlayerDetailResponse? Player { get; set; }
+    
+    private Country _userCountry;
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Player?.Country))
+        {
+            if (Enum.TryParse(typeof(Country), Player.Country, out var parsedCountry))
+            {
+                _userCountry = (Country)parsedCountry;
+            }
+        }
+    }
+    
     private string GetPlayerAvatarSource()
     {
         return Player?.ImageUrl?.ToString() ?? "/default-avatar.png";
