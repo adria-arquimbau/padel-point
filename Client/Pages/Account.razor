@@ -18,13 +18,15 @@
     <UserInformation User="@User"></UserInformation>
     <FluentDivider></FluentDivider>
 }
-@if(User == null)
+@if(_loading)
 {
-    <FluentProgressRing></FluentProgressRing>
+    <UserInformationSkeleton></UserInformationSkeleton>
 }
 
 @code {
     private UserDto? User { get; set; }
+
+    private bool _loading;
     
     protected override async Task OnInitializedAsync()
     {
@@ -39,11 +41,16 @@
     {
         try
         {
+            _loading = true;
             User = await Http.GetFromJsonAsync<UserDto>("User");
         }
         catch (Exception)
         {
             ToastService.ShowError("Something went wrong while getting user information.");
+        }
+        finally
+        {
+            _loading = false;
         }
     }
 }
