@@ -51,6 +51,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 await _userManager.AddToRoleAsync(user, RoleConstants.User);
                 var newPlayer = new Player
                 {
+                    Id = Guid.Parse(user.Id),
                     User = user,
                     NickName = user.UserName
                 };
