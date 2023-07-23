@@ -55,13 +55,36 @@ public class PlayerController : ControllerBase
         return Ok(player);
     }
     
+    [HttpGet("{playerId:guid}/detail")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPlayerDetail([FromRoute] Guid playerId, CancellationToken cancellationToken)
+    {
+        var response = await _dbContext.Player
+            .Where(x => x.Id == playerId)
+            .Select(x => new PlayerDetailResponse
+            {
+                Id = x.Id,
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl,
+                Elo = x.Elo,
+                MatchesPlayed = x.EloHistories.Count - 1,
+                LastEloGained = x.EloHistories
+                    .OrderByDescending(eh => eh.ChangeDate)
+                    .Single()
+                    .EloChange,
+            })
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        return Ok(response);
+    }
+    
     [HttpGet("ranking")]
     [AllowAnonymous]
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
         var players = await _dbContext.Player
             .Where(x => x.EloHistories.Count > 1)
-            .Select(x => new PlayerRankingResponse
+            .Select(x => new PlayerDetailResponse
             {
                 Id = x.Id,
                 NickName = x.NickName,

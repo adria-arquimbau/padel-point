@@ -1,40 +1,37 @@
-﻿@page "/players-ranking"
+﻿@page "/player-detail/{PlayerId:guid}"
 
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Players
 
+@inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
-
-<div class="title">Current ranking</div>
 
 @if (_loading)
 {
     <LoadingSpinner></LoadingSpinner>
 }
-else if(_players != null)
+@if (_playerDetail != null)
 {
-    @foreach (var player in _players)
-    {
-        <PlayerCard Player="player"></PlayerCard>
-    }
-}
-else
-{
-    <p>There are no players to show.</p>
+    <PlayerCard Player="_playerDetail"></PlayerCard>
+    <Divider></Divider>
+    
 }
 
 @code {
-    private List<PlayerDetailResponse>? _players;
-    private bool _loading;
-
+    [Parameter]
+    public Guid PlayerId { get; set; }
+    
+    private PlayerDetailResponse? _playerDetail;
+    private bool _loading;  
+    
     protected override async Task OnInitializedAsync()
     {
         _loading = true;
         try
         {
             var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-            _players = await http.GetFromJsonAsync<List<PlayerDetailResponse>>("player/ranking");
+            _playerDetail = await http.GetFromJsonAsync<PlayerDetailResponse>($"player/{PlayerId}/detail");
         }
         catch (Exception)
         {
@@ -46,11 +43,3 @@ else
         }
     }
 }
-
-<style>
-    .title{
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-</style>

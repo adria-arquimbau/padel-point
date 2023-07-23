@@ -1,13 +1,15 @@
 ﻿@using EventsManager.Shared.Responses
 
-<div class="border player-card">
+@inject NavigationManager NavigationManager
+
+<div class="border player-card" @onclick="NavigateToPlayerDetail">
     <div class="player-avatar">
             <img src="@GetPlayerAvatarSource()" alt="Player avatar" class="player-avatar-img"/>
     </div>
     <div class="player-info">
         <div class="player-info-header">
             <div class="player-info-name">
-                @Player.NickName
+                @Player?.NickName
             </div>
             <div class="player-info-flag">
                 <CountryFlag Country="Country.AT" Size="FlagSize.Small"></CountryFlag>
@@ -16,7 +18,7 @@
         <div class="player-info-content">
             <div class="info-box">
                 <div class="info-label">Matches</div>
-                <div>@Player.MatchesPlayed</div>
+                <div>@Player?.MatchesPlayed</div>
             </div>
             <div class="info-box">
                 <div class="info-label">Trend</div>
@@ -26,7 +28,7 @@
             </div>
             <div class="info-box">
                 <div class="info-label">Elo</div>
-                <div>@Player.Elo</div>
+                <div>@Player?.Elo</div>
             </div>
         </div>
     </div>
@@ -34,7 +36,7 @@
 
 @code {
     [Parameter]
-    public PlayerRankingResponse Player { get; set; }
+    public PlayerDetailResponse? Player { get; set; }
 
     private string GetPlayerAvatarSource()
     {
@@ -49,6 +51,11 @@
     private string FormatTrend()
     {
         return $"{(Player?.LastEloGained > 0 ? "+" : "")}{Player?.LastEloGained}";
+    }
+    
+    private void NavigateToPlayerDetail()
+    {
+        NavigationManager.NavigateTo($"/player-detail/{Player?.Id}");
     }
 }
 
