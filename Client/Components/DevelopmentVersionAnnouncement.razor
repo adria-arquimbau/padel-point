@@ -27,15 +27,9 @@
     </Alert>
 }
 
-@if (_loading)
-{
-    <LoadingSpinner></LoadingSpinner>
-}
-
 @code {
     private bool _visible = true;
     private PlayerDto? _player;
-    private bool _loading;
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,8 +51,6 @@
     
     private async Task GetUser()    
     {
-        _loading = true;
-
         try
         {
             var response = await Http.GetAsync($"player");
@@ -77,7 +69,5 @@
         {
             // ignored
         }
-
-        _loading = false;
     }
 }

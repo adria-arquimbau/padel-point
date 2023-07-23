@@ -6,7 +6,9 @@
 
 @if (_loading)
 {
-    <LoadingSpinner></LoadingSpinner>
+    <div class="elo-chart">
+        <LineChart TItem="double" />
+    </div>
 }
 else
 {
@@ -94,11 +96,7 @@ else
                 {
                     _eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), 
                     OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
-                }, new []
-                {
-                    GetLineChartMyPlayerDataset(),
-                    GetLineChartOtherPlayerDataset()
-                });
+                }, GetLineChartMyPlayerDataset(), GetLineChartOtherPlayerDataset());
         }
     }
 
