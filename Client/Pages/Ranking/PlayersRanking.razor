@@ -10,11 +10,14 @@
 
 @if (_loading)
 {
-    <LoadingSpinner></LoadingSpinner>
+    for (var i = 0; i < 5; i++)
+    {
+        <PlayerCardSkeleton></PlayerCardSkeleton>
+    }
 }
 else if(_players != null)
 {
-    @foreach (var player in _players)
+    @foreach (var player in _players)   
     {
         <PlayerCard Player="player"></PlayerCard>
     }
