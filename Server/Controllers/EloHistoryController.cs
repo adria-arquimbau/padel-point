@@ -25,7 +25,7 @@ public class EloHistoryController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var eloHistory = await _dbContext.EloHistories
-            .Where(x => x.Player.Id == Guid.Parse(userId))
+            .Where(x => x.Player.UserId == userId)
             .OrderBy(x => x.ChangeDate)
             .Select(x => new EloHistoryResponse
             {

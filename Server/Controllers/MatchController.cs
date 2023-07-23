@@ -32,9 +32,7 @@ public class MatchController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateMatchRequest request, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var playerCreator = await _dbContext.Player
-            .Where(x => x.Id == Guid.Parse(userId))
-            .SingleAsync(cancellationToken: cancellationToken);
+        var playerCreator = await _dbContext.Player.Where(x => x.UserId == userId).SingleAsync(cancellationToken: cancellationToken);
         
         var newMatch = new Match
         {
@@ -71,7 +69,7 @@ public class MatchController : ControllerBase
             .Include(x => x.Creator)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.Creator.Id != Guid.Parse(userId))
+        if (match.Creator.UserId != userId)
         {
             return Conflict("Only creator can edit the match");
         }
@@ -96,7 +94,7 @@ public class MatchController : ControllerBase
             .Include(x => x.Creator)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.Creator.Id != Guid.Parse(userId))
+        if (match.Creator.UserId != userId)
         {
             return Conflict("Only creator can delete the match.");
         }
@@ -114,7 +112,7 @@ public class MatchController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var player = await _dbContext.Player
-            .Where(x => x.Id == Guid.Parse(userId))
+            .Where(x => x.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
         var match = await _dbContext.Match
@@ -152,7 +150,7 @@ public class MatchController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
         var player = await _dbContext.Player
-            .Where(x => x.Id == Guid.Parse(userId))
+            .Where(x => x.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
         var match = await _dbContext.Match
@@ -200,13 +198,13 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
-                IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.Id == Guid.Parse(userId)),
-                RequesterIsTheCreator = userId != null && x.Creator.Id == Guid.Parse(userId),
+                IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
+                RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
                 IsPrivate = x.IsPrivate,
                 PricePerHour = x.PricePerHour,
-                MyTeam = x.MatchPlayers.Where(p => p.Player.Id == Guid.Parse(userId)).Select(p => p.Team).SingleOrDefault(),
+                MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
                 PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
@@ -227,7 +225,7 @@ public class MatchController : ControllerBase
                         .Where(e => e.MatchId == matchId)
                         .Select(e => (int?)e.PreviousElo)
                         .SingleOrDefault() ?? p.Player.Elo,
-                    CanIDeleteIt = userId != null && p.Player.Id == Guid.Parse(userId),
+                    CanIDeleteIt = userId != null && p.Player.UserId == userId,
                     GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
                 }).ToList(),
                 PlayersTeamTwo = x.MatchPlayers.Where(p => p.Team == Team.Team2)
@@ -240,7 +238,7 @@ public class MatchController : ControllerBase
                         .Where(e => e.MatchId == matchId)
                         .Select(e => (int?)e.PreviousElo)
                         .SingleOrDefault() ?? p.Player.Elo,
-                    CanIDeleteIt = userId != null && p.Player.Id == Guid.Parse(userId),
+                    CanIDeleteIt = userId != null && p.Player.UserId == userId,
                     GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
                 }).ToList()
             })
@@ -313,7 +311,7 @@ public class MatchController : ControllerBase
             .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        if (Guid.Parse(userId) != player.Id && Guid.Parse(userId) != match.Creator.Id)
+        if (userId != player.UserId && userId != match.Creator.UserId)
         {
             return Conflict("You can only remove yourself.");
         }
@@ -345,7 +343,7 @@ public class MatchController : ControllerBase
             .Include(x => x.MatchPlayers)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.Creator.Id != Guid.Parse(userId))
+        if (match.Creator.UserId != userId)
         {
             return Conflict("Only creator can set the score");
         }
@@ -360,7 +358,7 @@ public class MatchController : ControllerBase
             return Conflict("Score is already confirmed");
         }
 
-        var score = request.Sets.Select(x => new Set
+        var score = request.Sets?.Select(x => new Set
         {
             SetNumber = x.SetNumber,
             Team1Score = x.Team1Score,
@@ -389,7 +387,7 @@ public class MatchController : ControllerBase
             .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.Creator.Id != Guid.Parse(userId))
+        if (match.Creator.UserId != userId)
         {
             return Conflict("Only creator can remove the score");
         }

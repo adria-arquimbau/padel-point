@@ -43,7 +43,7 @@ public class PlayerController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var player = await _dbContext.Player
-            .Where(x => x.Id == Guid.Parse(userId))
+            .Where(x => x.UserId == userId)
             .Select(x => new PlayerDto
             {
                 NickName = x.NickName,
@@ -86,7 +86,7 @@ public class PlayerController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var player = await _dbContext.Player
-            .Where(x => x.Id == Guid.Parse(userId))
+            .Where(x => x.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         player.DevelopmentAnnouncementReadIt = true;
         
