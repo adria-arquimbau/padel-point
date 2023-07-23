@@ -10,13 +10,25 @@
 }
 else
 {
-    <div class="elo-chart">
-        <LineChart @ref="@_lineChart" TItem="double" />
-    </div>
+    if (OtherPlayerEloHistory == null)
+    {
+        <div class="elo-chart">
+            <LineChart @ref="@_lineChart" TItem="double" />
+        </div>
+    }
+    if (OtherPlayerEloHistory != null)
+    {
+        <div class="elo-chart">
+            <LineChart @ref="@_lineChart" TItem="double" />
+        </div>
+    }
 }
 
 @code {
     private bool _loading = false;
+    
+    [Parameter]
+    public List<EloHistoryResponse>? OtherPlayerEloHistory { get; set; }
     
     private List<EloHistoryResponse>? _eloHistory;
     

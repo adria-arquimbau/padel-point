@@ -68,11 +68,16 @@ public class PlayerController : ControllerBase
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
                 MatchesPlayed = x.EloHistories.Count - 1,
+                EloHistory = x.EloHistories.Select(eh => new EloHistoryResponse
+                {
+                    Elo = eh.CurrentElo,
+                    ChangeDate = eh.ChangeDate
+                }).ToList(),
                 LastEloGained = x.EloHistories
                     .OrderByDescending(eh => eh.ChangeDate)
                     .Single()
                     .EloChange,
-            })
+            })  
             .SingleAsync(cancellationToken: cancellationToken);
 
         return Ok(response);

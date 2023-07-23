@@ -8,4 +8,5 @@ public class PlayerDetailResponse
     public int MatchesPlayed { get; set; }
     public int LastEloGained { get; set; }
     public Guid Id { get; set; }
-}
+    public List<EloHistoryResponse> EloHistory { get; set; } = new List<EloHistoryResponse>();
+}   
