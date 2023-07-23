@@ -17,11 +17,7 @@
 {
     <LoadingSpinner></LoadingSpinner>
 }
-@if (_match == null)
-{
-    <LoadingSpinner></LoadingSpinner>
-}
-else
+@if (_match != null)
 {
     <div class="border info">
         <div class="header">
@@ -128,20 +124,23 @@ else
     protected override async Task OnInitializedAsync()
     {
         await GetMatch();
-        _matchPrice = _match.PricePerHour * _match.Duration;
-        if (_match.Duration != 1)
+        if (_match != null)
         {
-            _hourWord = "hours";
+            _matchPrice = _match.PricePerHour * _match.Duration;
+            if (_match.Duration != 1)
+            {
+                _hourWord = "hours";
+            }
         }
     }
 
     private async Task GetMatch()
     {
-        _loading = true;
         if (MatchId.HasValue)
         {
             try
             {
+                _loading = true;
                 HttpResponseMessage? response;
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity?.IsAuthenticated == false)
@@ -168,9 +167,11 @@ else
             {
                 ToastService.ShowError("Something went wrong, please try again later.");
             }
-          
+            finally
+            {
+                _loading = false;
+            }
         }
-        _loading = false;
     }
     
     private void ShowEditModal()
