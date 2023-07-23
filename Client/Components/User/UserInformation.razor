@@ -113,7 +113,9 @@
     
     private List<Country> GetCountries()
     {
-        return Enum.GetValues(typeof(Country)).Cast<Country>().ToList();
+        var countries = Enum.GetValues(typeof(Country)).Cast<Country>().ToList();
+        countries.Add(Country.ES_CA);
+        return countries;
     }
 }
 
