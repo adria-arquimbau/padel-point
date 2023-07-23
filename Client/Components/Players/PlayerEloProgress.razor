@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-@if (_loading == null)
+@if (_loading)
 {
     <LoadingSpinner></LoadingSpinner>
 }
@@ -19,7 +19,7 @@ else
     if (OtherPlayerEloHistory != null)
     {
         <div class="elo-chart">
-            <LineChart @ref="@_lineChart" TItem="double" />
+            <LineChart @ref="_lineChart" TItem="double" />
         </div>
     }
 }
@@ -33,8 +33,10 @@ else
     private List<EloHistoryResponse>? _eloHistory;
     
     LineChart<double> _lineChart = new();
-    List<string> _backgroundColors = new() { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
-    List<string> _borderColors = new() { ChartColor.FromRgba( 255, 99, 132, 1f ) };
+    List<string> _myPlayerBackgroundColors = new() { ChartColor.FromRgba( 255, 99, 132, 0.2f ) };
+    List<string> _myPlayerBorderColors = new() { ChartColor.FromRgba( 255, 99, 132, 1f ) };
+    List<string> _otherPlayerBackgroundColors = new() { ChartColor.FromRgba(99, 255, 132, 0.2f) };
+    List<string> _otherPlayerBorderColors = new() { ChartColor.FromRgba(99, 255, 132, 1f) };
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -56,40 +58,72 @@ else
             if (response.IsSuccessStatusCode)
             {
                 _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
-                
-                // Add StateHasChanged after data fetch
+
+    // Add StateHasChanged after data fetch
             }
             else
             {
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
-                _loading = false;
             }
         }
         catch (Exception)
         {
-            _loading = false;
             ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
         }
     }
     
     private async Task HandleRedraw()
     {
-        if (_eloHistory != null)
+        if (_eloHistory != null && OtherPlayerEloHistory == null)
         {
             await _lineChart.Clear();
-            await _lineChart.AddLabelsDatasetsAndUpdate(_eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), GetLineChartDataset());
+            await _lineChart.AddLabelsDatasetsAndUpdate(_eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
+                ,GetLineChartMyPlayerDataset());
+        }
+
+        if (_eloHistory != null && OtherPlayerEloHistory != null)
+        {
+            await _lineChart.Clear();
+            await _lineChart.AddLabelsDatasetsAndUpdate(
+                new []
+                {
+                    _eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), 
+                    OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
+                }, new []
+                {
+                    GetLineChartMyPlayerDataset(),
+                    GetLineChartOtherPlayerDataset()
+                });
         }
     }
 
-    private LineChartDataset<double> GetLineChartDataset()
+    private LineChartDataset<double> GetLineChartMyPlayerDataset()
     {
         return new LineChartDataset<double>
         {
             Label = "Your elo history",
             Data = _eloHistory?.Select(e => (double)e.Elo).ToList(),
-            BackgroundColor = _backgroundColors,
-            BorderColor = _borderColors,
+            BackgroundColor = _myPlayerBackgroundColors,
+            BorderColor = _myPlayerBorderColors,
+            Fill = true,
+            PointRadius = 3,
+            CubicInterpolationMode = "monotone",
+        };
+    }
+    
+    private LineChartDataset<double> GetLineChartOtherPlayerDataset()
+    {
+        return new LineChartDataset<double>
+        {
+            Label = "His elo history",
+            Data = OtherPlayerEloHistory?.Select(e => (double)e.Elo).ToList(),
+            BackgroundColor = _otherPlayerBackgroundColors,
+            BorderColor = _otherPlayerBorderColors,
             Fill = true,
             PointRadius = 3,
             CubicInterpolationMode = "monotone",
