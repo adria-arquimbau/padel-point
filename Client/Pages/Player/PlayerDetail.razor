@@ -2,6 +2,7 @@
 
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Players
+@using EventsManager.Client.Components.Match
 
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
@@ -14,6 +15,7 @@
 {
     <PlayerCard Player="_playerDetail"></PlayerCard>
     <PlayerEloProgress OtherPlayerEloHistory="_playerDetail.EloHistory"></PlayerEloProgress>
+    <LastMatches PlayerId="PlayerId"></LastMatches>
 }
 
 @code {

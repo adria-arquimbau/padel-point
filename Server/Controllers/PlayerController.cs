@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Enums;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -134,9 +135,6 @@ public class PlayerController : ControllerBase
 
         return Ok(rankedPlayers);
     }
-
-
-
     
     [HttpPost("development-announcement-read-it")]
     [Authorize(Roles = "User")]
@@ -151,5 +149,27 @@ public class PlayerController : ControllerBase
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Ok();
+    }
+    
+    [HttpGet("{playerId:guid}/last-matches")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LastMatches([FromRoute] Guid playerId, CancellationToken cancellationToken)
+    {
+        var matches = await _dbContext.MatchPlayer
+            .Where(x => x.PlayerId == playerId && (x.Match.ScoreConfirmedTeamTwo && x.Match.ScoreConfirmedTeamOne))
+            .Select(x => x.Match)
+            .OrderBy(x => x.CreationDate)
+            .Take(5)
+            .Select(x => new LastMatchesResponse
+            {
+                Id = x.Id,
+                StartDateTime = x.StartDateTime,
+                Duration = x.Duration,
+                EloChange = x.EloHistories.Single(eh => eh.PlayerId == playerId).EloChange,
+                AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        return Ok(matches);
     }
 }
