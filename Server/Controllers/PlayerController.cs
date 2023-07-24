@@ -90,7 +90,6 @@ public class PlayerController : ControllerBase
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
         var players = await _dbContext.Player
-            .Where(x => x.EloHistories.Count > 1)
             .Select(x => new PlayerDetailResponse
             {
                 Id = x.Id,
@@ -104,7 +103,8 @@ public class PlayerController : ControllerBase
                     .EloChange,
                 MatchesPlayed = x.EloHistories.Count - 1,
             })
-            .OrderByDescending(x => x.Elo)
+            .OrderByDescending(x => x.MatchesPlayed > 0)
+            .ThenByDescending(x => x.Elo)
             .ToListAsync(cancellationToken: cancellationToken);
         
         return Ok(players);
