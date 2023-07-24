@@ -8,6 +8,8 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 @inject IMessageService MessageService
+@inject NavigationManager NavigationManager
+
 
 
 @if (_loading)
@@ -43,7 +45,7 @@
                                     }
                                 }
                             </div>
-                            <p>@player.NickName</p>
+                            <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
                             <div class="gained-elo">
                                 @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
@@ -90,7 +92,7 @@
                             <div class="player-avatar">
                                 @if (player.ImageUrl != null)
                                 {
-                                    <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
+                                    <img  src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
                                 }
                                 else
                                 {
@@ -104,7 +106,7 @@
                                     }
                                 }
                             </div>
-                            <p>@player.NickName</p>
+                            <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
                             <div class="gained-elo">
                                 @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
@@ -221,6 +223,11 @@
                 StateHasChanged();
             }
         }
+    }
+    
+    private async Task NavigateToPlayerProfile(Guid playerId)
+    {
+        NavigationManager.NavigateTo($"/player-detail/{playerId}");
     }
 }
 
