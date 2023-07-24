@@ -81,7 +81,7 @@ public class PlayerController : ControllerBase
             .SingleAsync(cancellationToken: cancellationToken);
         
         var allPlayers = await _dbContext.Player
-            .Where(p => p.EloHistories.Count > 1)
+            .Where(p => p.EloHistories.Any())
             .ToListAsync(cancellationToken: cancellationToken);
         
         if (response.MatchesPlayed > 0)
