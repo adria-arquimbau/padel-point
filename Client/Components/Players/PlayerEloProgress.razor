@@ -42,7 +42,7 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await Get();
-        if (firstRender && _eloHistory != null)
+        if (firstRender)
         {
             await HandleRedraw();
             StateHasChanged();
@@ -63,8 +63,6 @@ else
                 if (response.IsSuccessStatusCode)
                 {
                     _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
-
-    // Add StateHasChanged after data fetch
                 }
                 else
                 {
@@ -101,6 +99,12 @@ else
                     _eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), 
                     OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
                 }, GetLineChartMyPlayerDataset(), GetLineChartOtherPlayerDataset());
+        }
+        if (_eloHistory == null && OtherPlayerEloHistory != null)
+        {
+            await _lineChart.Clear();
+            await _lineChart.AddLabelsDatasetsAndUpdate(OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
+                ,GetLineChartOtherPlayerDataset());
         }
     }
 
