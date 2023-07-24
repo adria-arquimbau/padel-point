@@ -44,6 +44,12 @@
                                         <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
                                     }
                                 }
+                                @if (player.Country != null)
+                                {
+                                    <div class="player-country">
+                                       <CountryFlag InputType="InputType.ISOA2" ISOA2="@player.Country" Size="FlagSize.Small" IsRounded="true" HasShadow="true"></CountryFlag>
+                                    </div>
+                                }
                             </div>
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
@@ -105,6 +111,12 @@
                                         <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
                                     }
                                 }
+                               @if (player.Country != null)
+                               {
+                                   <div class="player-country">
+                                       <CountryFlag InputType="InputType.ISOA2" ISOA2="@player.Country" Size="FlagSize.Small" IsRounded="true" HasShadow="true"></CountryFlag>
+                                   </div>
+                               }
                             </div>
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
@@ -294,6 +306,13 @@
         background-color: white;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
         border: none;
+    }
+    
+    .player-country {
+        position: absolute;
+        bottom: -18px; /* Adjust this according to your needs */
+        left: -2px; /* Adjust this according to your needs */
+        /* Add other styles for the country flag if necessary */
     }
     
     .add-button, .remove-button {

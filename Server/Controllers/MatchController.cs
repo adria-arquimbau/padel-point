@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Blazor.Flags;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo;
 using EventsManager.Server.Models;
@@ -220,6 +221,7 @@ public class MatchController : ControllerBase
                 {
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
+                    Country = p.Player.Country,
                     ImageUrl = p.Player.ImageUrl,
                     Elo = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
@@ -233,6 +235,7 @@ public class MatchController : ControllerBase
                 {
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
+                    Country = p.Player.Country,
                     ImageUrl = p.Player.ImageUrl,
                     Elo = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
