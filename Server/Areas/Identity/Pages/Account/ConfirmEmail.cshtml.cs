@@ -27,7 +27,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
         ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        /// </summary>DeviceCodes
         [TempData]
         public string StatusMessage { get; set; }
         public async Task<IActionResult> OnGetAsync(string userId, string code)
@@ -49,21 +49,6 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             {
                 StatusMessage = "Thank you for confirming your email.";
                 await _userManager.AddToRoleAsync(user, RoleConstants.User);
-                var newPlayer = new Player
-                {
-                    Id = Guid.Parse(user.Id),
-                    User = user,
-                    NickName = user.UserName
-                };
-                
-                newPlayer.EloHistories.Add(new EloHistory
-                {
-                    CurrentElo = 1500,
-                    PreviousElo = 1500,
-                    ChangeDate = DateTime.Now
-                });
-                _context.Player.Add(newPlayer);
-                await _context.SaveChangesAsync();
             }
             else
                 StatusMessage = "Error confirming your email.";

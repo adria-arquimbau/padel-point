@@ -5,6 +5,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
+using EventsManager.Server.Data;
 using Microsoft.AspNetCore.Authentication;
 using EventsManager.Server.Models;
 using Microsoft.AspNetCore.Identity;
@@ -23,13 +24,15 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -37,6 +40,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -136,12 +140,22 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                     
                     await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                     await _userManager.AddToRoleAsync(user, "USER");
+                    
+                    var newPlayer = new Player
+                    {
+                        Id = Guid.Parse(user.Id),
+                        User = user,
+                        NickName = Input.UserName,
+                        Elo = 1500
+                    };
+                    _context.Player.Add(newPlayer);
+                    
+                    await _context.SaveChangesAsync();
+                    
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
-
-                    
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }

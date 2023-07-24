@@ -69,15 +69,14 @@ public class PlayerController : ControllerBase
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
                 Country = x.Country,
-                MatchesPlayed = x.EloHistories.Count - 1,
+                MatchesPlayed = x.EloHistories.Count,
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
                     {
                         Elo = eh.CurrentElo,
                         ChangeDate = eh.ChangeDate
                     }).OrderBy(eh => eh.ChangeDate).ToList(),
-                LastEloGained = x.EloHistories
-                    .OrderByDescending(eh => eh.ChangeDate).First().EloChange,
+                LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
             })  
             .SingleAsync(cancellationToken: cancellationToken);
         
@@ -111,14 +110,14 @@ public class PlayerController : ControllerBase
                     ImageUrl = x.ImageUrl,
                     Elo = x.Elo,
                     Country = x.Country,
-                    LastEloGained = x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
-                    MatchesPlayed = x.EloHistories.Count - 1,
+                    LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
+                    MatchesPlayed = x.EloHistories.Count,
                 },
                 OrderKey1 = x.EloHistories.Count > 1 ? 1 : 0,
                 OrderKey2 = x.Elo
             })
-            .OrderByDescending(x => x.OrderKey1) // Players with at least 1 match come first
-            .ThenByDescending(x => x.OrderKey2) // Then sort by Elo within each group
+            .OrderByDescending(x => x.OrderKey1) 
+            .ThenByDescending(x => x.OrderKey2)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var rankedPlayers = players
