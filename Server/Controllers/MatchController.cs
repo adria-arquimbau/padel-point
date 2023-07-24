@@ -75,6 +75,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("Only creator can edit the match");
         }
+        
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            return Conflict("You can't edit a match with confirmed score.");
+        }
 
         match.StartDateTime = request.StartDate.ToUniversalTime();
         match.Duration = request.Duration;
@@ -99,6 +104,11 @@ public class MatchController : ControllerBase
         if (match.Creator.UserId != userId)
         {
             return Conflict("Only creator can delete the match.");
+        }
+        
+        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        {
+            return Conflict("You can't delete a match with confirmed score.");
         }
 
         _dbContext.Match.Remove(match);
@@ -203,6 +213,7 @@ public class MatchController : ControllerBase
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 StartDateTime = x.StartDateTime,
+                Finished = x.ScoreConfirmedTeamTwo && x.ScoreConfirmedTeamOne,
                 Duration = x.Duration,
                 IsPrivate = x.IsPrivate,
                 PricePerHour = x.PricePerHour,
@@ -291,7 +302,7 @@ public class MatchController : ControllerBase
             Id = x.Id,
             StartDateTime = x.StartDateTime,
             Duration = x.Duration,
-            Finished = x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo,
+            Finished = x is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true },
             PlayersCount = x.MatchPlayers.Count,
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
             AverageElo = x.MatchPlayers.Any() ? (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo)) : 0

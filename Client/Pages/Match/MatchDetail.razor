@@ -29,12 +29,15 @@
             </div>
         </div>
         <div class="action-buttons top-right">
-            @if (_match.RequesterIsTheCreator)
+            @if (_match.RequesterIsTheCreator )
             {
-                <Buttons Size="Size.Small">
-                    <Button @onclick="ShowEditModal" Color="Color.Primary" Outline >Edit</Button>
-                    <Button @onclick="ShowRemoveModal" Color="Color.Danger" Outline >Delete</Button>
-                </Buttons>
+                @if (!_match.Finished)
+                {
+                    <Buttons Size="Size.Small">
+                        <Button @onclick="ShowEditModal" Color="Color.Primary" Outline >Edit</Button>
+                        <Button @onclick="ShowRemoveModal" Color="Color.Danger" Outline >Delete</Button>
+                    </Buttons>
+                }
             }
         </div>
         <Divider />
