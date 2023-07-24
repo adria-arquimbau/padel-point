@@ -90,25 +90,47 @@ public class PlayerController : ControllerBase
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
         var players = await _dbContext.Player
-            .Select(x => new PlayerDetailResponse
+            .Select(x => new 
             {
-                Id = x.Id,
-                NickName = x.NickName,
-                ImageUrl = x.ImageUrl,
-                Elo = x.Elo,
-                Country = x.Country,
-                LastEloGained = x.EloHistories
-                    .OrderByDescending(eh => eh.ChangeDate)
-                    .Single()
-                    .EloChange,
-                MatchesPlayed = x.EloHistories.Count - 1,
+                PlayerDetail = new PlayerDetailResponse
+                {
+                    Id = x.Id,
+                    NickName = x.NickName,
+                    ImageUrl = x.ImageUrl,
+                    Elo = x.Elo,
+                    Country = x.Country,
+                    LastEloGained = x.EloHistories
+                        .OrderByDescending(eh => eh.ChangeDate)
+                        .Single()
+                        .EloChange,
+                    MatchesPlayed = x.EloHistories.Count - 1,
+                },
+                OrderKey1 = x.EloHistories.Count > 1 ? 1 : 0,
+                OrderKey2 = x.Elo
             })
-            .OrderByDescending(x => x.MatchesPlayed > 0)
-            .ThenByDescending(x => x.Elo)
+            .OrderByDescending(x => x.OrderKey1) // Players with at least 1 match come first
+            .ThenByDescending(x => x.OrderKey2) // Then sort by Elo within each group
             .ToListAsync(cancellationToken: cancellationToken);
-        
-        return Ok(players);
+
+        var rankedPlayers = players
+            .Select((x, i) => new PlayerDetailResponse
+            {
+                Id = x.PlayerDetail.Id,
+                NickName = x.PlayerDetail.NickName,
+                ImageUrl = x.PlayerDetail.ImageUrl,
+                Elo = x.PlayerDetail.Elo,
+                Country = x.PlayerDetail.Country,
+                LastEloGained = x.PlayerDetail.LastEloGained,
+                MatchesPlayed = x.PlayerDetail.MatchesPlayed,
+                Rank = i + 1  // The rank is 1-based, so we add 1
+            })
+            .ToList();
+
+        return Ok(rankedPlayers);
     }
+
+
+
     
     [HttpPost("development-announcement-read-it")]
     [Authorize(Roles = "User")]
