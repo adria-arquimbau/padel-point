@@ -3,7 +3,7 @@
 
 @inject HttpClient Http
 @inject IToastService ToastService
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_loading)
 {
@@ -29,6 +29,7 @@ else
 
 @code {
     private bool _loading = false;
+    private bool isAuth = false;
     
     [Parameter]
     public List<EloHistoryResponse>? OtherPlayerEloHistory { get; set; }
@@ -53,10 +54,10 @@ else
 
     private async Task Get()
     {
-        
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
+            isAuth = true;
             try
             {
                 _loading = true;
@@ -96,13 +97,13 @@ else
         {
             await _lineChart.Clear();
             await _lineChart.AddLabelsDatasetsAndUpdate(OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
-                ,GetLineChartOtherPlayerDataset());
+                ,await GetLineChartOtherPlayerDataset());
         }
         if (_eloHistory == null && OtherPlayerEloHistory != null)
         {
             await _lineChart.Clear();
             await _lineChart.AddLabelsDatasetsAndUpdate(OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
-                ,GetLineChartOtherPlayerDataset());
+                ,await GetLineChartOtherPlayerDataset());
         }
     }
 
@@ -120,11 +121,17 @@ else
         };
     }
     
-    private LineChartDataset<double> GetLineChartOtherPlayerDataset()
+    private async Task<LineChartDataset<double>> GetLineChartOtherPlayerDataset()
     {
+        var label = "His elo history";
+
+        if (isAuth)
+        {
+            label = "Your elo history";
+        }
         return new LineChartDataset<double>
         {
-            Label = "His elo history",
+            Label = label,
             Data = OtherPlayerEloHistory?.Select(e => (double)e.Elo).ToList(),
             BackgroundColor = _otherPlayerBackgroundColors,
             BorderColor = _otherPlayerBorderColors,
