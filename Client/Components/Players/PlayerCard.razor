@@ -12,7 +12,7 @@
                 @Player?.NickName
             </div>
             <div class="player-info-flag">
-                <CountryFlag Country="@_userCountry"></CountryFlag>
+                <CountryFlag IsRounded="true" Country="@_userCountry"></CountryFlag>
             </div>
         </div>
         <div class="player-info-content">
@@ -82,7 +82,7 @@
     .player-card {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-around;
         margin-bottom: 15px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
