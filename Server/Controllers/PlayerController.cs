@@ -101,6 +101,7 @@ public class PlayerController : ControllerBase
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
         var players = await _dbContext.Player
+            .Where(x => x.EloHistories.Count >= 1)
             .Select(x => new 
             {
                 PlayerDetail = new PlayerDetailResponse
