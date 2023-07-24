@@ -67,6 +67,7 @@ public class PlayerController : ControllerBase
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
+                Country = x.Country,
                 MatchesPlayed = x.EloHistories.Count - 1,
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
