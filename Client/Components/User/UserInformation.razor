@@ -32,7 +32,7 @@
                     
                     <form>
                         <div class="mb-3">
-                            <label class="form-label">Country</label><CountryFlag IsRounded="true" Country="@_userCountry"></CountryFlag>
+                            <label class="form-label">Country</label><CountryFlag HasShadow="true" IsRounded="true" Country="@_userCountry"></CountryFlag>
                             <Select @bind-SelectedValue="@_userCountry" TValue="Country">
                                 @foreach (var country in _countries)
                                 {
