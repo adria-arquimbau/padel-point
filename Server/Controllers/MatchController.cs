@@ -293,7 +293,8 @@ public class MatchController : ControllerBase
     {
         var matches = await _dbContext.Match
             .Include(x => x.MatchPlayers)
-            .ThenInclude(x => x.Player)
+                .ThenInclude(matchPlayer => matchPlayer.Player)
+            .Include(x => x.EloHistories)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var response = matches.Select(x => new MatchResponse
@@ -305,7 +306,9 @@ public class MatchController : ControllerBase
             Duration = x.Duration,
             PlayersCount = x.MatchPlayers.Count,
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
-            AverageElo = x.MatchPlayers.Any() ? (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo)) : 0
+            AverageElo = x.MatchPlayers.Any() ? 
+                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
+                : 0
         }).OrderByDescending(x => x.StartDateTime).ToList();
         
         return Ok(response);
