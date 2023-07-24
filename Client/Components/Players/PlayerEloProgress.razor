@@ -93,12 +93,8 @@ else
         if (_eloHistory != null && OtherPlayerEloHistory != null)
         {
             await _lineChart.Clear();
-            await _lineChart.AddLabelsDatasetsAndUpdate(
-                new []
-                {
-                    _eloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList(), 
-                    OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
-                }, GetLineChartMyPlayerDataset(), GetLineChartOtherPlayerDataset());
+            await _lineChart.AddLabelsDatasetsAndUpdate(OtherPlayerEloHistory.Select(e => e.ChangeDate.ToShortDateString()).ToList()
+                ,GetLineChartOtherPlayerDataset());
         }
         if (_eloHistory == null && OtherPlayerEloHistory != null)
         {
