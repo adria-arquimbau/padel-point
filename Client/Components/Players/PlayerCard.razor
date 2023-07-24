@@ -8,9 +8,18 @@
     </div>
     <div class="player-info">
         <div class="player-info-header">
-            <div class="player-info-rank">
-                #@Player?.Rank
-            </div>
+             @if (Player?.Rank != 0)
+              {
+                <div class="player-info-rank">
+                    #@Player?.Rank  
+                </div>
+              }
+             @if (Player?.Rank == 0)
+              {
+                 <div class="player-info-rank">
+                     #X 
+                 </div>
+              }
             <div class="player-info-name">
                 @Player?.NickName
             </div>

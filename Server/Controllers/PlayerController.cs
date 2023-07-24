@@ -131,7 +131,7 @@ public class PlayerController : ControllerBase
                 Country = x.PlayerDetail.Country,
                 LastEloGained = x.PlayerDetail.LastEloGained,
                 MatchesPlayed = x.PlayerDetail.MatchesPlayed,
-                Rank = i + 1 
+                Rank = x.PlayerDetail.MatchesPlayed == 0 ? 0 : i + 1
             })
             .ToList();
 
