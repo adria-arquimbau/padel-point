@@ -59,6 +59,7 @@ public class PlayerController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetPlayerDetail([FromRoute] Guid playerId, CancellationToken cancellationToken)
     {
+        // Fetch the player details
         var response = await _dbContext.Player
             .Where(x => x.Id == playerId)
             .Select(x => new PlayerDetailResponse
@@ -71,16 +72,27 @@ public class PlayerController : ControllerBase
                 MatchesPlayed = x.EloHistories.Count - 1,
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
-                {
-                    Elo = eh.CurrentElo,
-                    ChangeDate = eh.ChangeDate
-                }).OrderBy(eh => eh.ChangeDate).ToList(),
+                    {
+                        Elo = eh.CurrentElo,
+                        ChangeDate = eh.ChangeDate
+                    }).OrderBy(eh => eh.ChangeDate).ToList(),
                 LastEloGained = x.EloHistories
-                    .OrderByDescending(eh => eh.ChangeDate)
-                    .Single()
-                    .EloChange,
+                    .OrderByDescending(eh => eh.ChangeDate).First().EloChange,
             })  
             .SingleAsync(cancellationToken: cancellationToken);
+        
+        var allPlayers = await _dbContext.Player
+            .Where(p => p.EloHistories.Count > 1)
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        if (response.MatchesPlayed > 0)
+        {
+            response.Rank = allPlayers.Count(p => p.Elo > response.Elo) + 1;
+        }
+        else
+        {
+            response.Rank = 0;
+        }
 
         return Ok(response);
     }
@@ -99,10 +111,7 @@ public class PlayerController : ControllerBase
                     ImageUrl = x.ImageUrl,
                     Elo = x.Elo,
                     Country = x.Country,
-                    LastEloGained = x.EloHistories
-                        .OrderByDescending(eh => eh.ChangeDate)
-                        .Single()
-                        .EloChange,
+                    LastEloGained = x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
                     MatchesPlayed = x.EloHistories.Count - 1,
                 },
                 OrderKey1 = x.EloHistories.Count > 1 ? 1 : 0,
@@ -122,7 +131,7 @@ public class PlayerController : ControllerBase
                 Country = x.PlayerDetail.Country,
                 LastEloGained = x.PlayerDetail.LastEloGained,
                 MatchesPlayed = x.PlayerDetail.MatchesPlayed,
-                Rank = i + 1  // The rank is 1-based, so we add 1
+                Rank = i + 1 
             })
             .ToList();
 
