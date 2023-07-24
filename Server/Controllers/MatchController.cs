@@ -1,9 +1,7 @@
 using System.Security.Claims;
-using Blazor.Flags;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo;
 using EventsManager.Server.Models;
-using EventsManager.Shared;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
@@ -169,6 +167,7 @@ public class MatchController : ControllerBase
             .Where(x => x.Id == matchId)
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
+            .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
@@ -177,7 +176,7 @@ public class MatchController : ControllerBase
         }
         
         var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
-       
+        
         var myTeam = matchPlayer.Team;
 
         if (myTeam == Team.Team1)
@@ -188,6 +187,8 @@ public class MatchController : ControllerBase
         {
             match.ScoreConfirmedTeamTwo = confirmation;
         }
+
+        match.Winner = CalculateMatchWinner(match.Sets.ToList());
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         
@@ -197,6 +198,14 @@ public class MatchController : ControllerBase
         }
         
         return Ok();
+    }
+    
+    public Team? CalculateMatchWinner(List<Set> sets)
+    {
+        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
+        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
+
+        return team1Wins != team2Wins ? (team1Wins > team2Wins ? Team.Team1 : Team.Team2) : null;
     }
 
     [HttpGet("{matchId:guid}")]
@@ -220,7 +229,7 @@ public class MatchController : ControllerBase
                 PlayersCount = x.MatchPlayers.Count,
                 ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
                 ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
-                TeamWinner = null,
+                TeamWinner = x.Winner,
                 Sets = x.Sets.Select(s => new SetDto
                 {
                     SetNumber = s.SetNumber,
@@ -269,22 +278,7 @@ public class MatchController : ControllerBase
         match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
             ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo)) : 0;
         
-        match.TeamWinner = CalculateMatchWinner(match.Sets);
-        
         return Ok(match);
-    }
-    
-    public Team? CalculateMatchWinner(List<SetDto>? sets)
-    {
-        if (sets == null || !sets.Any())
-        {
-            return null;
-        }
-
-        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
-        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
-
-        return team1Wins != team2Wins ? (team1Wins > team2Wins ? Team.Team1 : Team.Team2) : (Team?)null;
     }
     
     [HttpGet]

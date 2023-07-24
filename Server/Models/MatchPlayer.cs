@@ -1,4 +1,3 @@
-using EventsManager.Shared;
 using EventsManager.Shared.Enums;
 
 namespace EventsManager.Server.Models;

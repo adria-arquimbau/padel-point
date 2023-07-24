@@ -51,6 +51,8 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .WithOne(eh => eh.Match)
             .HasForeignKey(eh => eh.MatchId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.Property(mp => mp.Winner)
+            .HasConversion<string>();
     }
 }
 

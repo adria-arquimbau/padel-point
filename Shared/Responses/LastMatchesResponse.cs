@@ -7,4 +7,5 @@ public class LastMatchesResponse
     public double Duration { get; set; }
     public int AverageElo { get; set; }
     public int EloChange { get; set; }
-}
+    public bool PlayerWon { get; set; }
+}   

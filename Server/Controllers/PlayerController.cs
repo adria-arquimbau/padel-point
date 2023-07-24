@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
-using EventsManager.Shared.Enums;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -165,6 +164,7 @@ public class PlayerController : ControllerBase
                 Id = x.Id,
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
+                PlayerWon = x.MatchPlayers.Single(mp => mp.PlayerId == playerId).Team == x.Winner,
                 EloChange = x.EloHistories.Single(eh => eh.PlayerId == playerId).EloChange,
                 AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
             })

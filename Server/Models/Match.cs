@@ -1,3 +1,5 @@
+using EventsManager.Shared.Enums;
+
 namespace EventsManager.Server.Models;
 
 public class Match
@@ -13,6 +15,7 @@ public class Match
     public Guid CreatorId { get; set; } 
     public Player Creator { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
-    public bool ScoreConfirmedTeamTwo { get; set; }
+    public bool ScoreConfirmedTeamTwo { get; set; } 
+    public Team? Winner { get; set; }
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
 }

@@ -1,5 +1,4 @@
-﻿using EventsManager.Server.Areas.Identity.Pages.Account;
-using EventsManager.Shared.Enums;
+﻿using EventsManager.Shared.Enums;
 
 namespace EventsManager.Server.Models;
 
