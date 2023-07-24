@@ -1,11 +1,12 @@
 ﻿@using EventsManager.Shared.Dtos
 
 @inject HttpClient Http
-@inject AuthenticationStateProvider authenticationStateProvider
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 @if (UserImageUrl != null)
 {
-    <img class="user-image" src="@UserImageUrl" alt=""/>
+    <img class="user-image" src="@UserImageUrl" alt="" @onclick="GoToUserProfile"/>
 }
 
 @code {
@@ -13,10 +14,11 @@
     public Uri? UserImageUrl { get; set; } 
     
     public bool RequestingImage;
+    private Guid _playerId; 
     
     protected override async Task OnInitializedAsync()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
         {
             await GetUserInformation();
@@ -27,7 +29,17 @@
     {
         RequestingImage = true;
         var user = await Http.GetFromJsonAsync<UserDto>("User");
-        UserImageUrl = user?.ImageUrl;
+        if (user != null)
+        {
+            UserImageUrl = user.ImageUrl;
+            _playerId = user.PlayerId;
+        }
+       
         RequestingImage = false;
+    }
+    
+    private void GoToUserProfile()
+    {
+        NavigationManager.NavigateTo($"player-detail/{_playerId}");
     }
 }
