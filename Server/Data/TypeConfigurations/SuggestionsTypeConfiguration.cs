@@ -103,6 +103,9 @@ public class EloHistoryConfiguration : IEntityTypeConfiguration<EloHistory>
         builder.HasOne(eh => eh.Match)
             .WithMany(m => m.EloHistories)
             .HasForeignKey(eh => eh.MatchId);
+        builder.Property(mp => mp.ChangeReason)
+            .HasConversion<string>()
+            .IsRequired();
     }
 }
 

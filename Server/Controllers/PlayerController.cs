@@ -59,7 +59,6 @@ public class PlayerController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetPlayerDetail([FromRoute] Guid playerId, CancellationToken cancellationToken)
     {
-        // Fetch the player details
         var response = await _dbContext.Player
             .Where(x => x.Id == playerId)
             .Select(x => new PlayerDetailResponse
@@ -81,7 +80,7 @@ public class PlayerController : ControllerBase
             .SingleAsync(cancellationToken: cancellationToken);
         
         var allPlayers = await _dbContext.Player
-            .Where(p => p.EloHistories.Any())
+            .Where(p => p.EloHistories.Count >= 2)
             .ToListAsync(cancellationToken: cancellationToken);
         
         if (response.MatchesPlayed > 0)
@@ -101,7 +100,7 @@ public class PlayerController : ControllerBase
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
         var players = await _dbContext.Player
-            .Where(x => x.EloHistories.Count >= 1)
+            .Where(x => x.EloHistories.Count >= 2)
             .Select(x => new 
             {
                 PlayerDetail = new PlayerDetailResponse
@@ -112,7 +111,7 @@ public class PlayerController : ControllerBase
                     Elo = x.Elo,
                     Country = x.Country,
                     LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
-                    MatchesPlayed = x.EloHistories.Count,
+                    MatchesPlayed = x.EloHistories.Count - 1,
                 },
                 OrderKey1 = x.Elo
             })

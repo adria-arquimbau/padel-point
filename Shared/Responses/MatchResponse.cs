@@ -1,4 +1,5 @@
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Enums;
 
 namespace EventsManager.Shared.Responses;
 

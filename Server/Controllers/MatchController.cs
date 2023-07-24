@@ -5,6 +5,7 @@ using EventsManager.Server.Handlers.Commands.Elo;
 using EventsManager.Server.Models;
 using EventsManager.Shared;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using MediatR;

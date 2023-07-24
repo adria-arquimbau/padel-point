@@ -1,4 +1,4 @@
-namespace EventsManager.Shared;
+namespace EventsManager.Shared.Enums;
 
 public enum Team
 {

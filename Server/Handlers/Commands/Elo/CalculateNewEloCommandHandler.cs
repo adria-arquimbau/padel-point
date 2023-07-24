@@ -1,6 +1,7 @@
 ﻿using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared;
+using EventsManager.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +60,8 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
                 EloChange = newElo - player.Elo,
                 ChangeDate = DateTime.UtcNow,
                 MatchId = match.Id,
-                PlayerId = player.Id
+                PlayerId = player.Id,
+                ChangeReason = ChangeEloHistoryReason.MatchPlayed
             });
 
             // Update the player's Elo rating
@@ -81,7 +83,8 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
                 EloChange = newElo - player.Elo,
                 ChangeDate = DateTime.UtcNow,
                 MatchId = match.Id,
-                PlayerId = player.Id
+                PlayerId = player.Id,
+                ChangeReason = ChangeEloHistoryReason.MatchPlayed
             });
 
             player.Elo = newElo;

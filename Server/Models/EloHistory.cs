@@ -1,4 +1,7 @@
-﻿namespace EventsManager.Server.Models;
+﻿using EventsManager.Server.Areas.Identity.Pages.Account;
+using EventsManager.Shared.Enums;
+
+namespace EventsManager.Server.Models;
 
 public class EloHistory
 {
@@ -11,4 +14,5 @@ public class EloHistory
     public Match? Match { get; set; }
     public Guid PlayerId { get; set; }  
     public Player Player { get; set; }
+    public ChangeEloHistoryReason ChangeReason { get; set; }
 }

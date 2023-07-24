@@ -6,6 +6,7 @@ using System.Text;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared;
+using EventsManager.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

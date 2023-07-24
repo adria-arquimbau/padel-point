@@ -12,4 +12,5 @@ public class Player
     public ICollection<Match> CreatedMatches { get; set; } = new List<Match>();
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
     public string? Country { get; set; }
+    public DateTime CreationDate { get; set; }
 }   
