@@ -21,7 +21,7 @@ public class MatchResponse
     public List<string> PlayersNames { get; set; }
     public List<SetDto>? Sets { get; set; }
     public Team? MyTeam { get; set; }
-    public bool Finished { get; set; }  
+    public bool Finished => ScoreConfirmedTeamTwo && ScoreConfirmedTeamOne;
     public double Duration { get; set; }
     public double PricePerHour { get; set; }
     public Team? TeamWinner { get; set; }

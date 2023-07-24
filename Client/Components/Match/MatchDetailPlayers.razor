@@ -54,7 +54,7 @@
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
                             <div class="gained-elo">
-                                @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
+                                @if(Match.Finished)
                                 {
                                     <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
                                         @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
@@ -123,7 +123,7 @@
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.Elo</div>
                             <div class="gained-elo">
-                                @if(Match.ScoreConfirmedTeamOne && Match.ScoreConfirmedTeamTwo)
+                                @if(Match.Finished)
                                 {
                                     <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
                                         @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
