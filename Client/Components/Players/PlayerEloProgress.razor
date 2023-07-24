@@ -3,6 +3,7 @@
 
 @inject HttpClient Http
 @inject IToastService ToastService
+@inject AuthenticationStateProvider authenticationStateProvider
 
 @if (_loading)
 {
@@ -50,30 +51,35 @@ else
 
     private async Task Get()
     {
-        _loading = true;
-        try
+        
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
         {
-            var response = await Http.GetAsync("elohistory");
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
+                _loading = true;
+                var response = await Http.GetAsync("elohistory");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _eloHistory = await response.Content.ReadFromJsonAsync<List<EloHistoryResponse>>();
 
     // Add StateHasChanged after data fetch
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
             }
-            else
+            catch (Exception)
             {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
+                ToastService.ShowError("Something went wrong, please try again later.");
             }
-        }
-        catch (Exception)
-        {
-            ToastService.ShowError("Something went wrong, please try again later.");
-        }
-        finally
-        {
-            _loading = false;
+            finally
+            {
+                _loading = false;
+            }
         }
     }
     
