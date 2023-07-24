@@ -114,11 +114,9 @@ public class PlayerController : ControllerBase
                     LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
                     MatchesPlayed = x.EloHistories.Count,
                 },
-                OrderKey1 = x.EloHistories.Count > 1 ? 1 : 0,
-                OrderKey2 = x.Elo
+                OrderKey1 = x.Elo
             })
-            .OrderByDescending(x => x.OrderKey1) 
-            .ThenByDescending(x => x.OrderKey2)
+            .OrderByDescending(x => x.OrderKey1)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var rankedPlayers = players
