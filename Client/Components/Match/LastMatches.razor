@@ -13,7 +13,7 @@
 {
     @foreach (var match in _matches)
     {
-        <div class="match-card">
+        <div class="match-card" @onclick="() => NavigateToMatch(match.Id)">
             <div class="match-stamp">
                 @if (match.PlayerWon)
                 {
@@ -27,7 +27,7 @@
             <div class="match-date">
                 @match.StartDateTime.ToLocalTime().ToLongDateString() @match.StartDateTime.ToLocalTime().ToShortTimeString() Duration: @match.Duration h
             </div>
-            <Divider></Divider>
+            <Divider Style="margin: 0px 0px 5px 0px"></Divider>
             <div class="match-info">
                 <div class="match-info-item">
                     <div class="info-title">
@@ -95,7 +95,7 @@
 
     .match-stamp {
         position: absolute;
-        top: 85px;
+        top: 70px;
         right: 8px;
     }
 
@@ -123,7 +123,7 @@
 
     .match-info {
         display: flex;
-        justify-content: space-around;
+        justify-content: space-evenly;
         width: 100%;
     }
 
