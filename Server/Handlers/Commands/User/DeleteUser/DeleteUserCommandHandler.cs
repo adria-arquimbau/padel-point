@@ -19,9 +19,13 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommandRequest
             .Include(x => x.Player)
             .ThenInclude(x => x.EloHistories)
             .SingleAsync(x => x.Id == request.UserId, cancellationToken: cancellationToken);
+
+        if (user?.Player != null)
+        {
+            _dbContext.EloHistories.RemoveRange(user.Player.EloHistories);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
         
-        _dbContext.EloHistories.RemoveRange(user.Player.EloHistories);
-        await _dbContext.SaveChangesAsync(cancellationToken);
         await _dbContext.Users
             .Where(x => x.Id == request.UserId)
             .ExecuteDeleteAsync(cancellationToken: cancellationToken);

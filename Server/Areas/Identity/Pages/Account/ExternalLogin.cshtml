@@ -27,7 +27,7 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary" onclick="hideButton()">Register</button>
         </form>
     </div>
 </div>
@@ -35,3 +35,9 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<script>
+function hideButton() {
+    document.getElementById('registerSubmit').style.display = 'none';
+}
+</script>
