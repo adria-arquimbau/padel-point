@@ -157,7 +157,7 @@ public class PlayerController : ControllerBase
         var matches = await _dbContext.MatchPlayer
             .Where(x => x.PlayerId == playerId && (x.Match.ScoreConfirmedTeamTwo && x.Match.ScoreConfirmedTeamOne))
             .Select(x => x.Match)
-            .OrderBy(x => x.CreationDate)
+            .OrderByDescending(x => x.CreationDate)
             .Take(5)
             .Select(x => new LastMatchesResponse
             {
