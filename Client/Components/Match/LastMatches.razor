@@ -4,32 +4,52 @@
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
 
+<Divider></Divider>
 @if (_isLoading)
 {
-    
+    <AllMatchesSkeleton></AllMatchesSkeleton>
 }
 @if (_matches != null)
 {
-    <Divider />
     @foreach (var match in _matches)
     {
-        <div class="border match-card" @onclick="() => NavigateToMatch(match.Id)">
-            <div style="font-size: 12px; text-align: center;">
-                @match.StartDateTime.ToLocalTime().ToLongDateString() / @match.StartDateTime.ToLocalTime().ToShortTimeString() - Duration: @match.Duration h
+        <div class="match-card" @onclick="() => NavigateToMatch(match.Id)">
+            <div class="match-stamp">
+                @if (match.PlayerWon)
+                {
+                    <div class="won-stamp">Won</div>
+                }
+                else
+                {
+                    <div class="lost-stamp">Lost</div>
+                }
             </div>
-            <FluentDivider></FluentDivider>
-            <p style="font-size: 14px">
-                <b>Average Elo:</b> @match.AverageElo
-            </p>
-            <p style="font-size: 14px">
-                <b>Elo changed:</b> @match.EloChange
-            </p>
-            <p style="font-size: 14px">
-                <b>Win?</b> @match.PlayerWon
-            </p>
+            <div class="match-date">
+                @match.StartDateTime.ToLocalTime().ToLongDateString() @match.StartDateTime.ToLocalTime().ToShortTimeString() Duration: @match.Duration h
+            </div>
+            <Divider Style="margin: 0px 0px 5px 0px"></Divider>
+            <div class="match-info">
+                <div class="match-info-item">
+                    <div class="info-title">
+                        Average Elo
+                    </div>
+                    <div class="info-value">
+                        @match.AverageElo
+                    </div>
+                </div>
+                <div class="match-info-item">
+                    <div class="info-title">
+                        Elo changed
+                    </div>
+                    <div class="info-value" style="color: @(match.EloChange >= 0 ? "limegreen" : "red")">
+                        @(match.EloChange >= 0 ? "+" : "")@match.EloChange
+                    </div>
+                </div>
+            </div>
         </div>
     }
 }
+
 
 @code {
     [Parameter]
@@ -63,18 +83,61 @@
 }
 
 <style>
-    .border {
+    .match-card {
         border: 1px solid #ccc;
         border-radius: 8px;
         background-color: white;
+        padding: 0px 10px 10px 10px;
+        margin-bottom: 10px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        position: relative;
     }
-        
-    .match-card {
+
+    .match-stamp {
+        position: absolute;
+        top: 70px;
+        right: 8px;
+    }
+
+    .won-stamp, .lost-stamp {
+        padding: 5px;
+        font-size: 12px;
+        text-align: center;
+        border-radius: 3px;
+        color: white;
+    }
+
+    .won-stamp {
+        background-color: limegreen;
+    }
+
+    .lost-stamp {
+        background-color: red;
+    }
+
+    .match-date {
+        font-size: 12px; 
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .match-info {
+        display: flex;
+        justify-content: space-evenly;
+        width: 100%;
+    }
+
+    .match-info-item {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-around;
-        margin-bottom: 15px;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .info-title {
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 14px;
     }
 </style>
