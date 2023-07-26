@@ -18,78 +18,72 @@
 
 @if (Match != null)
 {
-    
-        <div class="match-set-results border info">
-            <AuthorizeView>
-                <Authorized>
-                    @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
-                    {
-                        @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
-                        {
-                            <div class="confirm-buttons">
-                                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Success" @onclick="ConfirmResult" Outline>Confirm result</Button>
-                            </div>
-                            <Divider/>
-                        }
-                        @if (MyTeamHaveConfirmedResult())
-                        {
-                            <div class="confirm-buttons">
-                                <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
-                                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteConfirmResult" Outline>Delete confirmation</Button>
-                            </div>
-                            <Divider/>
-                        }
-                    }
-                </Authorized>
-            </AuthorizeView>
-        
-            @if (Match?.Sets?.Count > 0)
-            {
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Set</th>
-                        <th>Team 1</th>
-                        <th>Team 2</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var set in Match.Sets)
-                    {
-                        var team1ScoreClass = set.Team1Score > set.Team2Score ? "green" : "red";
-                        var team2ScoreClass = set.Team2Score > set.Team1Score ? "green" : "red";
-                        <tr>
-                            <td>@set.SetNumber</td>
-                            <td class="@team1ScoreClass">@set.Team1Score</td>
-                            <td class="@team2ScoreClass">@set.Team2Score</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-            @if (Match.RequesterIsTheCreator)
-            {
+    <div class="match-set-results border info">
+        <AuthorizeView>
+            <Authorized>
                 @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
                 {
-                    @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
+                    @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
                     {
-                        <div class="button-container">
-                            <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
+                        <div class="confirm-buttons">
+                            <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Success" @onclick="ConfirmResult" Outline>Confirm result</Button>
                         </div>
+                        <Divider/>
                     }
-                    @if (Match.Sets.Count > 0)
+                    @if (MyTeamHaveConfirmedResult())
                     {
-                        <div class="button-container">
-                            <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" @onclick="ShowEditResultsModal" Outline>Edit score</Button>
-                            <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteScoreResult" Outline>Delete score</Button>
+                        <div class="confirm-buttons">
+                            <p class="confirm-button" style="font-size: 12px">You have confirmed result.</p>
+                            <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteConfirmResult" Outline>Delete confirmation</Button>
                         </div>
+                        <Divider/>
                     }
                 }
+            </Authorized>
+        </AuthorizeView>
+        
+        @if (Match?.Sets?.Count > 0)
+        {
+            <table>
+                <thead>
+                <tr>
+                    <th>Set</th>
+                    <th>Team 1</th>
+                    <th>Team 2</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var set in Match.Sets)
+                {
+                    var team1ScoreClass = set.Team1Score > set.Team2Score ? "green" : "red";
+                    var team2ScoreClass = set.Team2Score > set.Team1Score ? "green" : "red";
+                    <tr>
+                        <td>@set.SetNumber</td>
+                        <td class="@team1ScoreClass">@set.Team1Score</td>
+                        <td class="@team2ScoreClass">@set.Team2Score</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+        @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
+        {
+            @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
+            {
+                <div class="button-container">
+                    <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
+                </div>
             }
-        </div>
-    
+            @if (Match.Sets.Count > 0)
+            {
+                <div class="button-container">
+                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" @onclick="ShowEditResultsModal" Outline>Edit score</Button>
+                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteScoreResult" Outline>Delete score</Button>
+                </div>
+            }
+        }
+    </div>
 }
-
 
 <AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 <ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
