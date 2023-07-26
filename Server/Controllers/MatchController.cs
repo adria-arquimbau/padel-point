@@ -221,6 +221,7 @@ public class MatchController : ControllerBase
                 Id = x.Id,
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
+                RequesterIsAPlayer = x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
                 IsPrivate = x.IsPrivate,

@@ -25,5 +25,6 @@ public class MatchResponse
     public double Duration { get; set; }
     public double PricePerHour { get; set; }
     public Team? TeamWinner { get; set; }
+    public bool RequesterIsAPlayer { get; set; }
 }
                             
