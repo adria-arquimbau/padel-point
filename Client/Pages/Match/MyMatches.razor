@@ -1,0 +1,92 @@
+@page "/my-matches"
+
+@using EventsManager.Shared.Responses
+
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+
+<h3>My Matches</h3>
+
+@if (_loading)
+{
+    <AllMatchesSkeleton></AllMatchesSkeleton>
+}
+@if (_myMatches != null)
+{
+    @foreach (var match in _myMatches)
+    {
+        <div class="match-card" @onclick="() => NavigateToMatch(match.Id)">
+            <div class="match-date">
+                @match.StartDateTime.ToLocalTime().ToLongDateString() @match.StartDateTime.ToLocalTime().ToShortTimeString() Duration: @match.Duration h
+            </div>
+            <Divider Style="margin: 0px 0px 5px 0px"></Divider>
+            <div class="match-info">
+                <div class="match-info-item">
+                    <div class="info-title">
+                        Average Elo
+                    </div>
+                    <div class="info-value">
+                        @match.AverageElo
+                    </div>
+                </div>
+                <div class="match-info-item">
+                    <div class="info-title">
+                        Your status
+                    </div>
+                    <div class="info-value">
+                        @if (match.RequesterIsTheCreator)
+                        {
+                            @Creator
+                        }
+                        else
+                        {
+                            @Player
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private bool _loading;
+
+    private List<MyMatchesResponse>? _myMatches;
+
+        const string Creator = "Creator";
+        const string Player = "Player";
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _loading = true;
+            var response = await Http.GetAsync($"match/my");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _myMatches = await response.Content.ReadFromJsonAsync<List<MyMatchesResponse>>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    
+    private void NavigateToMatch(Guid id)
+    {
+        NavigationManager.NavigateTo($"/match/{id}/detail");
+    }
+}
