@@ -23,7 +23,7 @@
             <Authorized>
                 @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
                 {
-                    @if (Match.Sets.Count > 1 && !MyTeamHaveConfirmedResult())
+                    @if (Match.Sets is {Count: > 1 } && !MyTeamHaveConfirmedResult())
                     {
                         <div class="confirm-buttons">
                             <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Success" @onclick="ConfirmResult" Outline>Confirm result</Button>
@@ -67,15 +67,15 @@
             </table>
         }
         
-        @if (!Match.Finished && Match.RequesterIsAPlayer)
+        @if (Match is {Finished: false,RequesterIsAPlayer: true })
         {
-            @if (Match.Sets.Count == 0 && Match.PlayersCount == 4)
+            @if (Match.Sets is {Count: 0 } && Match.PlayersCount == 4)
             {
                 <div class="button-container">
                     <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
                 </div>
             }
-            @if (Match.Sets.Count > 0)
+            @if (Match.Sets is {Count: > 0 })
             {
                 <div class="button-container">
                     <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" @onclick="ShowEditResultsModal" Outline>Edit score</Button>
@@ -86,7 +86,7 @@
     </div>
 }
 
-<AddResults Sets="Match.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
+<AddResults Sets="Match?.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 <ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
 
 @code {
@@ -104,11 +104,11 @@
 
     private bool MyTeamHaveConfirmedResult()
     {
-        if (Match.MyTeam == Team.Team1 && Match.ScoreConfirmedTeamOne)
+        if (Match?.MyTeam == Team.Team1 && Match.ScoreConfirmedTeamOne)
         {
             return true;
         }
-        if (Match.MyTeam == Team.Team2 && Match.ScoreConfirmedTeamTwo)
+        if (Match?.MyTeam == Team.Team2 && Match.ScoreConfirmedTeamTwo)
         {
             return true;
         }
@@ -139,7 +139,7 @@
         {
             try
             {
-                var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{true}", null);
+                var response = await Http.PostAsync($"match/{Match?.Id}/confirm-result/{true}", null);
                 if (response.IsSuccessStatusCode)
                 {
                     ToastService.ShowInfo("Confirmed result.");
@@ -170,7 +170,7 @@
         {
             try
             {
-                var response = await Http.PostAsync($"match/{Match.Id}/confirm-result/{false}", null);
+                var response = await Http.PostAsync($"match/{Match?.Id}/confirm-result/{false}", null);
                 if (response.IsSuccessStatusCode)
                 {
                     ToastService.ShowInfo("Deleted confirmed result.");
@@ -200,7 +200,7 @@
         {
             try
             {
-                var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
+                var response = await Http.DeleteAsync($"match/{Match?.Id}/remove-score");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -230,7 +230,7 @@
         {
             try
             {
-                var response = await Http.PostAsJsonAsync($"match/{Match.Id}/set-score", addResultRequest);
+                var response = await Http.PostAsJsonAsync($"match/{Match?.Id}/set-score", addResultRequest);
                 if (response.IsSuccessStatusCode)
                 {
                     ToastService.ShowInfo("Results added.");
@@ -259,7 +259,7 @@
 
         try
         {
-            var response = await Http.DeleteAsync($"match/{Match.Id}/remove-score");
+            var response = await Http.DeleteAsync($"match/{Match?.Id}/remove-score");
 
             if (response.IsSuccessStatusCode)
             {

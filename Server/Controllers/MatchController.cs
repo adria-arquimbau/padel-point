@@ -371,7 +371,7 @@ public class MatchController : ControllerBase
             return Conflict("Score is already confirmed");
         }
 
-        var score = request.Sets?.Select(x => new Set
+        var score = request.Sets.Select(x => new Set
         {
             SetNumber = x.SetNumber,
             Team1Score = x.Team1Score,
@@ -417,5 +417,27 @@ public class MatchController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
         
         return Ok();
+    }
+    
+    [HttpGet("my")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GetMyMatches(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var matches = await _dbContext.Match
+            .Where(x => x.Creator.UserId == userId || x.MatchPlayers.Any(mp => mp.Player.UserId == userId))
+            .Select(x => new MyMatchesResponse
+            {
+                Id = x.Id,
+                StartDateTime = x.StartDateTime,
+                Duration = x.Duration,
+                AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
+                IsPrivate = x.IsPrivate,
+                RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
+            })
+            .ToListAsync(cancellationToken);
+        
+        return Ok(matches);
     }
 }
