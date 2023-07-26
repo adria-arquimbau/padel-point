@@ -8,4 +8,6 @@ public class MyMatchesResponse
     public required int AverageElo { get; set; }
     public required bool IsPrivate { get; set; }
     public required bool RequesterIsTheCreator { get; set; }
-}       
+    public required int PlayersCount { get; set; }
+    public required bool Finished { get; set; }
+}           

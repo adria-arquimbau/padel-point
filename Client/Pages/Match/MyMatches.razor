@@ -17,10 +17,22 @@
     @foreach (var match in _myMatches)
     {
         <div class="match-card" @onclick="() => NavigateToMatch(match.Id)">
+             @if (match.Finished)
+             {
+                 <div class="finished-stamp">Finished</div>
+             }
+             @if (match.PlayersCount < 4)
+             {
+                 <div class="searching-stamp">Open slots</div>
+             }
+             @if (match.PlayersCount == 4 && !match.Finished)
+             {
+                 <div class="pending-stamp">Pending</div>
+             }
             <div class="match-date">
                 @match.StartDateTime.ToLocalTime().ToLongDateString() @match.StartDateTime.ToLocalTime().ToShortTimeString() Duration: @match.Duration h
             </div>
-            <Divider Style="margin: 0px 0px 5px 0px"></Divider>
+            <Divider Style="margin: 0 0 5px 0"></Divider>
             <div class="match-info">
                 <div class="match-info-item">
                     <div class="info-title">
@@ -55,8 +67,8 @@
 
     private List<MyMatchesResponse>? _myMatches;
 
-        const string Creator = "Creator";
-        const string Player = "Player";
+    const string Creator = "Creator";
+    const string Player = "Player";
     
     protected override async Task OnInitializedAsync()
     {
@@ -90,3 +102,92 @@
         NavigationManager.NavigateTo($"/match/{id}/detail");
     }
 }
+
+<style>
+    .match-card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: white;
+        padding: 0 10px 10px 10px;
+        margin-bottom: 10px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    .match-date {
+        font-size: 12px; 
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .match-info {
+        display: flex;
+        justify-content: space-evenly;
+        width: 100%;
+    }
+
+    .match-info-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .info-title {
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 14px;
+    }
+    
+    .finished-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: limegreen;
+        border: 2px solid limegreen;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .searching-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: darkblue;
+        border: 2px solid darkblue;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    .pending-stamp {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        width: 100px;
+        height: 20px;
+        background-color: transparent;
+        color: #ffaf00;
+        border: 2px solid #ffaf00;
+        display: flex;
+        align-items: center; /* center text vertically */
+        justify-content: center; /* center text horizontally */
+        overflow: hidden;
+        font-weight: bold;
+        font-size: 14px;
+    }
+</style>

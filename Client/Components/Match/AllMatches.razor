@@ -28,9 +28,9 @@
                      <div class="searching-stamp">Open slots</div>
                  }
                  @if (match.PlayersCount == 4 && !match.Finished)
-                  {
-                      <div class="pending-stamp">Pending</div>
-                  }
+                 {
+                     <div class="pending-stamp">Pending</div>
+                 }
                 <div style="font-size: 12px; text-align: center;">
                     @match.StartDateTime.ToLocalTime().ToLongDateString() /
                     @match.StartDateTime.ToLocalTime().ToShortTimeString() -
@@ -158,8 +158,5 @@
         overflow: hidden;
         font-weight: bold;
         font-size: 14px;
-    }
-       
-  
-    
+    }    
 </style>

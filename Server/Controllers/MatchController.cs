@@ -435,6 +435,8 @@ public class MatchController : ControllerBase
                 AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
                 IsPrivate = x.IsPrivate,
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
+                PlayersCount = x.MatchPlayers.Count,
+                Finished = x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo
             })
             .ToListAsync(cancellationToken);
         
