@@ -224,6 +224,7 @@ public class MatchController : ControllerBase
                 RequesterIsAPlayer = x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
+                CreatorNickName = x.Creator.NickName,
                 IsPrivate = x.IsPrivate,
                 PricePerHour = x.PricePerHour,
                 MyTeam = x.MatchPlayers.Where(p => p.Player.UserId == userId).Select(p => p.Team).SingleOrDefault(),
