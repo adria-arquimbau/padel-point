@@ -157,7 +157,6 @@ public class PlayerController : ControllerBase
         var matches = await _dbContext.MatchPlayer
             .Where(x => x.PlayerId == playerId && (x.Match.ScoreConfirmedTeamTwo && x.Match.ScoreConfirmedTeamOne))
             .Select(x => x.Match)
-            .OrderByDescending(x => x.CreationDate)
             .Take(5)
             .Select(x => new LastMatchesResponse
             {
@@ -168,6 +167,7 @@ public class PlayerController : ControllerBase
                 EloChange = x.EloHistories.Single(eh => eh.PlayerId == playerId).EloChange,
                 AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
             })
+            .OrderByDescending(x => x.StartDateTime)
             .ToListAsync(cancellationToken: cancellationToken);
         
         return Ok(matches);
