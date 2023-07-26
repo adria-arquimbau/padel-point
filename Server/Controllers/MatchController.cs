@@ -288,6 +288,7 @@ public class MatchController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var matches = await _dbContext.Match
+            .Where(x => x.IsPrivate == false || x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo)
             .Include(x => x.MatchPlayers)
                 .ThenInclude(matchPlayer => matchPlayer.Player)
             .Include(x => x.EloHistories)
@@ -423,12 +424,13 @@ public class MatchController : ControllerBase
                 Id = x.Id,
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
-                AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
+                AverageElo = x.EloHistories.Any() ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : 0,
                 IsPrivate = x.IsPrivate,
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 PlayersCount = x.MatchPlayers.Count,
                 Finished = x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo
             })
+            .OrderByDescending(x => x.StartDateTime)
             .ToListAsync(cancellationToken);
         
         return Ok(matches);
