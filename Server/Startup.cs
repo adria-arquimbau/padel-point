@@ -32,7 +32,7 @@ public class Startup {
 
         services.AddDefaultIdentity<ApplicationUser>(options =>
         {
-            options.SignIn.RequireConfirmedAccount = true;
+            options.SignIn.RequireConfirmedAccount = false;
             options.User.RequireUniqueEmail = true;
             options.SignIn.RequireConfirmedEmail = true;
             options.Password.RequireDigit = false;
