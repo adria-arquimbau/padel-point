@@ -22,7 +22,7 @@
             <Authorized>
                 @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
                 {
-                    @if (Match.Sets is {Count: > 1 } && !MyTeamHaveConfirmedResult())
+                    @if (Match.Sets is {Count: > 1 } && !MyTeamHaveConfirmedResult() && Match.RequesterIsAPlayer)
                     {
                         <div class="confirm-buttons">
                             <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Success" @onclick="ConfirmResult" Outline>Confirm result</Button>
