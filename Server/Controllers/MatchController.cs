@@ -356,11 +356,6 @@ public class MatchController : ControllerBase
             .Include(x => x.MatchPlayers)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.Creator.UserId != userId)
-        {
-            return Conflict("Only creator can set the score");
-        }
-
         if (match.MatchPlayers.Count != 4)
         {
             return Conflict("Match is not full");
@@ -399,11 +394,6 @@ public class MatchController : ControllerBase
             .Include(x => x.Creator)
             .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
-
-        if (match.Creator.UserId != userId)
-        {
-            return Conflict("Only creator can remove the score");
-        }
 
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
