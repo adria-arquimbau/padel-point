@@ -18,8 +18,7 @@
 
 @if (Match != null)
 {
-    @if (Match.RequesterIsTheCreator || Match.Sets.Any())
-    {
+    
         <div class="match-set-results border info">
             <AuthorizeView>
                 <Authorized>
@@ -88,7 +87,7 @@
                 }
             }
         </div>
-    }
+    
 }
 
 
