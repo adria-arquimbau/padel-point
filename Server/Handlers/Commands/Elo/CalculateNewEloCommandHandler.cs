@@ -89,8 +89,6 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
             player.Elo = newElo;
         }
 
-        // Save changes to the database
         await _context.SaveChangesAsync(cancellationToken);
-
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EventsManager.Server.Data.TypeConfigurations;
 
-public class SuggestionsTypeConfiguration : IEntityTypeConfiguration<Suggestion>
+public class SuggestionsConfiguration : IEntityTypeConfiguration<Suggestion>
 {
     public void Configure(EntityTypeBuilder<Suggestion> builder) 
     {
@@ -29,10 +29,25 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .WithOne(eh => eh.Player)
             .HasForeignKey(eh => eh.PlayerId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasMany(p => p.Notifications)
+            .WithOne(eh => eh.Player)
+            .OnDelete(DeleteBehavior.Cascade);
         builder.HasMany(p => p.CreatedMatches)
             .WithOne(m => m.Creator)
             .HasForeignKey(m => m.CreatorId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+}
+
+public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
+{
+    public void Configure(EntityTypeBuilder<Notification> builder)
+    {
+        builder.HasKey(m => m.Id);
+        builder.Property(m => m.CreationDate)
+            .IsRequired();
+        builder.HasOne<Player>(m => m.Player)
+            .WithMany(p => p.Notifications);
     }
 }
 
