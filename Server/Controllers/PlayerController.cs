@@ -68,7 +68,7 @@ public class PlayerController : ControllerBase
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
                 Country = x.Country,
-                MatchesPlayed = x.EloHistories.Count,
+                MatchesPlayed = x.EloHistories.Count - 1,
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
                     {
@@ -85,7 +85,7 @@ public class PlayerController : ControllerBase
         
         if (response.MatchesPlayed > 0)
         {
-            response.Rank = allPlayers.Count(p => p.Elo > response.Elo) + 1;
+            response.Rank = response.EloHistory.Count == 1 ? 0 : allPlayers.Count(p => p.Elo > response.Elo) + 1;
         }
         else
         {
