@@ -245,7 +245,7 @@ public class MatchController : ControllerBase
                     NickName = p.Player.NickName,
                     Country = p.Player.Country,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.EloHistories
+                    EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
                         .Select(e => (int?)e.PreviousElo)
                         .SingleOrDefault() ?? p.Player.Elo,
@@ -259,7 +259,7 @@ public class MatchController : ControllerBase
                     NickName = p.Player.NickName,
                     Country = p.Player.Country,
                     ImageUrl = p.Player.ImageUrl,
-                    Elo = p.Player.EloHistories
+                    EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
                         .Select(e => (int?)e.PreviousElo)
                         .SingleOrDefault() ?? p.Player.Elo,
@@ -275,10 +275,10 @@ public class MatchController : ControllerBase
         }
         
         match.AverageEloTeamOne = match.PlayersTeamOne.Any()
-            ? (int)Math.Round(match.PlayersTeamOne.Average(mp => mp.Elo)) : 0;
+            ? (int)Math.Round(match.PlayersTeamOne.Average(mp => mp.EloBeforeFinish)) : 0;
 
         match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
-            ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.Elo)) : 0;
+            ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.EloBeforeFinish)) : 0;
         
         return Ok(match);
     }

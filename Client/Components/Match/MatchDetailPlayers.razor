@@ -52,12 +52,12 @@
                                 }
                             </div>
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
-                            <div class="elo">@player.Elo</div>
+                            <div class="elo">@player.EloBeforeFinish</div>
                             <div class="gained-elo">
                                 @if(Match.Finished)
                                 {
-                                    <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
-                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
+                                    <span style="font-size: 10px" class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
+                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo (@(player.GainedElo + player.EloBeforeFinish))
                                     </span>
                                 }
                             </div>
@@ -121,12 +121,12 @@
                                }
                             </div>
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
-                            <div class="elo">@player.Elo</div>
+                            <div class="elo">@player.EloBeforeFinish</div>
                             <div class="gained-elo">
                                 @if(Match.Finished)
                                 {
-                                    <span class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
-                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo
+                                    <span style="font-size: 10px" class="@(player.GainedElo > 0 ? "elo-change-positive" : "elo-change-negative")">
+                                        @(player.GainedElo > 0 ? "+" : "")@player.GainedElo (@(player.GainedElo + player.EloBeforeFinish))
                                     </span>
                                 }
                             </div>
