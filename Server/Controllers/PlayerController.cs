@@ -5,8 +5,6 @@ using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 
 namespace EventsManager.Server.Controllers;
 

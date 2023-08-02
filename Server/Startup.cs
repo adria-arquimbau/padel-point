@@ -59,7 +59,7 @@ public class Startup {
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
         
-        var emailSection = configuration.GetSection("EmaiLService");
+        var emailSection = configuration.GetSection("EmailService");
         services.Configure<EmailOptions>(emailSection);
         services.AddScoped<IEmailService, EmailService>();
         

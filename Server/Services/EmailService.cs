@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Options;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+﻿using Azure;
+using Azure.Communication.Email;
+using Microsoft.Extensions.Options;
 
 namespace EventsManager.Server.Services;
 
@@ -13,23 +13,45 @@ public class EmailService : IEmailService
         _emailSettings = emailSettings.Value; 
     }   
             
-    public async Task<Response> Execute(string toEmail, string toUserName, string body, string subject)
+    public async Task<EmailSendResult?> Execute(string toEmail, string toUserName, string body, string subject)
     {
-        var client = new SendGridClient(_emailSettings.ApiKey); 
-        var from = new EmailAddress("adria.arquimbau@gmail.com", "Padel Point");
-        var receiver = new EmailAddress(toEmail, toUserName);
-        var message = MailHelper.CreateSingleEmail(from, receiver, subject, body, body);
-        var response = await client.SendEmailAsync(message);
-        return response;
+        var emailClient = new EmailClient(_emailSettings.ConnectionString);
+        const string sender = "DoNotReply@arquimbau.dev";
+
+        EmailSendResult? statusMonitor = null;
+        try
+        {
+            Console.WriteLine("Sending email...");
+            var emailSendOperation = await emailClient.SendAsync(
+                wait: WaitUntil.Completed,  
+                senderAddress: sender,  
+                recipientAddress: toEmail,
+                subject: subject,
+                htmlContent: body);
+            statusMonitor = emailSendOperation.Value;
+    
+            Console.WriteLine($"Email Sent. Status = {emailSendOperation.Value.Status}");
+
+            /// Get the OperationId so that it can be used for tracking the message for troubleshooting
+            var operationId = emailSendOperation.Id;
+            Console.WriteLine($"Email operation id = {operationId}");
+        }
+        catch (RequestFailedException ex)
+        {
+            /// OperationID is contained in the exception message and can be used for troubleshooting purposes
+            Console.WriteLine($"Email send operation failed with error code: {ex.ErrorCode}, message: {ex.Message}");
+        }
+        
+        return statusMonitor;
     }
 }
     
 public class EmailOptions
 {
-    public required string ApiKey { get; set; }
+    public required string ConnectionString { get; set; }
 }
 
 public interface IEmailService
 {
-    Task<Response> Execute(string toEmail, string toUserName, string body, string subject);
+    Task<EmailSendResult?> Execute(string toEmail, string toUserName, string body, string subject);
 }
