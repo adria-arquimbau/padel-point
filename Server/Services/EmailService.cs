@@ -13,7 +13,7 @@ public class EmailService : IEmailService
         _emailSettings = emailSettings.Value; 
     }   
             
-    public async Task<EmailSendResult?> Execute(string toEmail, string toUserName, string body, string subject)
+    public async Task<EmailSendResult?> Execute(string toEmail, string body, string subject)
     {
         var emailClient = new EmailClient(_emailSettings.ConnectionString);
         const string sender = "DoNotReply@arquimbau.dev";
@@ -53,5 +53,5 @@ public class EmailOptions
 
 public interface IEmailService
 {
-    Task<EmailSendResult?> Execute(string toEmail, string toUserName, string body, string subject);
+    Task<EmailSendResult?> Execute(string toEmail, string body, string subject);
 }
