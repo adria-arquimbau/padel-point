@@ -6,6 +6,7 @@ using EventsManager.Server.Handlers.Queries.Users.GetMyUser;
 using EventsManager.Server.Models;
 using EventsManager.Server.Settings;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,45 +29,57 @@ public class Startup {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
+        
         services.AddDatabaseDeveloperPageExceptionFilter();
 
-        services.AddDefaultIdentity<ApplicationUser>(options =>
-        {
-            options.SignIn.RequireConfirmedAccount = false;
-            options.User.RequireUniqueEmail = true;
-            options.SignIn.RequireConfirmedEmail = true;
-            options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 3;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredUniqueChars = 0;
-        })
-        .AddRoles<IdentityRole>()
-        .AddEntityFrameworkStores<ApplicationDbContext>();
-
-        var issuer = configuration.GetSection("IdentityServer")["IssuerUri"];
-        services.AddIdentityServer(options =>
-            { 
-                options.IssuerUri = issuer;
-            })
-            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => 
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, c =>
             {
-                opt.IdentityResources["openid"].UserClaims.Add("role");
-                opt.ApiResources.Single().UserClaims.Add("role");
+                c.Authority = $"https://{ configuration.GetSection("Auth0")["Domain"]}";
+                c.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidAudience =  configuration.GetSection("Auth0")["Audience"],
+                    ValidIssuer = $"https://{ configuration.GetSection("Auth0")["Domain"]}"
+                };
             });
-
-        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
         
-        var googleAuthSection = configuration.GetSection("GoogleAuth");
-        services.AddAuthentication()
-            .AddGoogle(options =>
-            {
-                options.ClientId = googleAuthSection["Settings:ClientId"];
-                options.ClientSecret = googleAuthSection["Settings:ClientSecret"];
-                options.Scope.Add("email");
-            })
-            .AddIdentityServerJwt();
+        // services.AddDefaultIdentity<ApplicationUser>(options =>
+        // {
+        //     options.SignIn.RequireConfirmedAccount = false;
+        //     options.User.RequireUniqueEmail = true;
+        //     options.SignIn.RequireConfirmedEmail = true;
+        //     options.Password.RequireDigit = false;
+        //     options.Password.RequiredLength = 3;
+        //     options.Password.RequireLowercase = false;
+        //     options.Password.RequireUppercase = false;
+        //     options.Password.RequireNonAlphanumeric = false;
+        //     options.Password.RequiredUniqueChars = 0;
+        // })
+        // .AddRoles<IdentityRole>()
+        // .AddEntityFrameworkStores<ApplicationDbContext>();
+        //
+        // var issuer = configuration.GetSection("IdentityServer")["IssuerUri"];
+        // services.AddIdentityServer(options =>
+        //     { 
+        //         options.IssuerUri = issuer;
+        //     })
+        //     .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => 
+        //     {
+        //         opt.IdentityResources["openid"].UserClaims.Add("role");
+        //         opt.ApiResources.Single().UserClaims.Add("role");
+        //     });
+        //
+        // JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
+        //
+        // var googleAuthSection = configuration.GetSection("GoogleAuth");
+        // services.AddAuthentication()
+        //     .AddGoogle(options =>
+        //     {
+        //         options.ClientId = googleAuthSection["Settings:ClientId"];
+        //         options.ClientSecret = googleAuthSection["Settings:ClientSecret"];
+        //         options.Scope.Add("email");
+        //     })
+        //     .AddIdentityServerJwt();
 
         services.AddControllersWithViews();
         services.AddRazorPages();
@@ -118,7 +131,8 @@ public class Startup {
 
         app.UseRouting();
 
-        app.UseIdentityServer();
+        //app.UseIdentityServer();
+        app.UseAuthentication();
         app.UseAuthorization();
         
         app.MapRazorPages();
