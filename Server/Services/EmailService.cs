@@ -48,7 +48,7 @@ public class EmailService : IEmailService
     
 public class EmailOptions
 {
-    public required string ConnectionString { get; set; }
+    public string ConnectionString { get; set; }
 }
 
 public interface IEmailService
