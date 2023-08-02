@@ -1,21 +1,51 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Color = Blazorise.Color
 @inject NavigationManager Navigation
 
 <AuthorizeView>
     <Authorized>
-        <a href="authentication/profile">Hello, @context.User.Identity?.Name!</a>
-        <button class="nav-link btn btn-link" @onclick="BeginLogOut">Log out</button>
+        <div class="button-container">
+            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Primary" Clicked="NavigateToProfile">
+                Hello, @context.User.Identity?.Name!
+            </Button>
+            <Button Size="Size.Small" Color="Color.Primary" Clicked="BeginLogOut">Log out</Button>
+        </div>
     </Authorized>
     <NotAuthorized>
-        <a href="authentication/register">Register</a>
-        <a href="authentication/login">Log in</a>
+        <div class="button-container">
+            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Primary" Clicked="NavigateToRegister">Register</Button>
+            <Button Size="Size.Small" Color="Color.Primary" Clicked="NavigateToLogin">Log in</Button>
+        </div>
     </NotAuthorized>
 </AuthorizeView>
 
 @code{
+    private void NavigateToProfile()
+    {
+        Navigation.NavigateTo("authentication/profile");
+    }
+    
+    private void NavigateToRegister()
+    {
+        Navigation.NavigateTo("authentication/register");
+    }
+    
+    private void NavigateToLogin()
+    {
+        Navigation.NavigateTo("authentication/login");
+    }
+    
     private void BeginLogOut()
     {
         Navigation.NavigateToLogout("authentication/logout");
     }
 }
+
+<style>
+    .button-container {
+        margin: 5px;
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>

@@ -1,5 +1,6 @@
 ﻿@using Color = Blazorise.Color
 @using IconSize = Blazorise.IconSize
+
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href=""><img src="logo-nav-menu.png" alt="" style="width: 35px"/> Padel Point </a>
@@ -13,19 +14,19 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <Icon Class="icon" Name="IconName.Home" /> Home
+                <Icon Class="icon" Name="IconName.Home"/> Home
             </NavLink>
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="players-ranking" Match="NavLinkMatch.All">
-               <Icon Class="icon" Name="IconName.Users" /> Ranking
+                <Icon Class="icon" Name="IconName.Users"/> Ranking
             </NavLink>
         </div>
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="create-match" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.PlusCircle" /> Create a Match
+                        <Icon Class="icon" Name="IconName.PlusCircle"/> Create a Match
                     </NavLink>
                 </div>
             </Authorized>
@@ -34,7 +35,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="my-matches" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.Running" /> My Matches
+                        <Icon Class="icon" Name="IconName.Running"/> My Matches
                     </NavLink>
                 </div>
             </Authorized>
@@ -43,7 +44,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="account" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.User" /> Account
+                        <Icon Class="icon" Name="IconName.User"/> Account
                     </NavLink>
                 </div>
             </Authorized>
@@ -52,7 +53,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="users-manager" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.Compass" /> Users manager
+                        <Icon Class="icon" Name="IconName.Compass"/> Users manager
                     </NavLink>
                 </div>
             </Authorized>
@@ -61,7 +62,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="suggestions" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.Mail" /> Suggestions
+                        <Icon Class="icon" Name="IconName.Mail"/> Suggestions
                     </NavLink>
                 </div>
             </Authorized>
@@ -70,16 +71,17 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="suggestions-manager" Match="NavLinkMatch.All">
-                        <Icon Class="icon" Name="IconName.Mail" /> Suggestions manager
+                        <Icon Class="icon" Name="IconName.Mail"/> Suggestions manager
                     </NavLink>
                 </div>
             </Authorized>
         </AuthorizeView>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="documentation" Match="NavLinkMatch.All">
-                <Icon Class="icon" Name="IconName.Book" /> Documentation
+                <Icon Class="icon" Name="IconName.Book"/> Documentation
             </NavLink>
         </div>
+        <LoginDisplay></LoginDisplay>
     </nav>
 </div>
 

@@ -34,7 +34,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
         {
             if (userId == null || code == null)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Error");
             }
 
             var user = await _userManager.FindByIdAsync(userId);
@@ -45,13 +45,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            if (result.Succeeded)
-            {
-                StatusMessage = "Thank you for confirming your email.";
-                await _userManager.AddToRoleAsync(user, RoleConstants.User);
-            }
-            else
-                StatusMessage = "Error confirming your email.";
+            StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
             return Page();
         }
     }

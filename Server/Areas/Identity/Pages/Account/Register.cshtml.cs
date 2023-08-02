@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using EventsManager.Server.Data;
 using Microsoft.AspNetCore.Authentication;
 using EventsManager.Server.Models;
+using EventsManager.Server.Services;
 using EventsManager.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -25,6 +26,7 @@ public class RegisterModel : PageModel
     private readonly IUserEmailStore<ApplicationUser> _emailStore;
     private readonly ILogger<RegisterModel> _logger;
     private readonly IEmailSender _emailSender;
+    private readonly IEmailService _emailService;
     private readonly ApplicationDbContext _context;
 
     public RegisterModel(
@@ -33,6 +35,7 @@ public class RegisterModel : PageModel
         SignInManager<ApplicationUser> signInManager,
         ILogger<RegisterModel> logger,
         IEmailSender emailSender,
+        IEmailService emailService,
         ApplicationDbContext context)
     {
         _userManager = userManager;
@@ -41,6 +44,7 @@ public class RegisterModel : PageModel
         _signInManager = signInManager;
         _logger = logger;
         _emailSender = emailSender;
+        _emailService = emailService;
         _context = context;
     }
 
@@ -133,16 +137,16 @@ public class RegisterModel : PageModel
 
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
                     "/Account/ConfirmEmail",
                     pageHandler: null,
-                    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                    values: new { area = "Identity", userId = userId, code = encodedCode, returnUrl = returnUrl },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                await _userManager.AddToRoleAsync(user, "USER");
+                await _emailService.Execute(Input.Email, Input.UserName, $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.", "Confirm your email");
+                //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",$"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _userManager.AddToRoleAsync(user, RoleConstants.User);
 
                 var newPlayer = new Player
                 {

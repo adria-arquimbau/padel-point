@@ -4,6 +4,7 @@ using System.Text.Json;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Queries.Users.GetMyUser;
 using EventsManager.Server.Models;
+using EventsManager.Server.Services;
 using EventsManager.Server.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -32,7 +33,7 @@ public class Startup {
 
         services.AddDefaultIdentity<ApplicationUser>(options =>
         {
-            options.SignIn.RequireConfirmedAccount = false;
+            options.SignIn.RequireConfirmedAccount = true;
             options.User.RequireUniqueEmail = true;
             options.SignIn.RequireConfirmedEmail = true;
             options.Password.RequireDigit = false;
@@ -57,6 +58,10 @@ public class Startup {
             });
 
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
+        
+        var emailSection = configuration.GetSection("EmaiLService");
+        services.Configure<EmailOptions>(emailSection);
+        services.AddScoped<IEmailService, EmailService>();
         
         var googleAuthSection = configuration.GetSection("GoogleAuth");
         services.AddAuthentication()
