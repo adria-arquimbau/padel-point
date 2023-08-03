@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using EventsManager.Server.Models;
+using EventsManager.Server.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,13 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailService;
 
-        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IEmailService emailService)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -75,10 +78,8 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 pageHandler: null,
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
-            await _emailSender.SendEmailAsync(
-                Input.Email,
-                "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+            await _emailService.Execute(Input.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
             ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
             return Page();
