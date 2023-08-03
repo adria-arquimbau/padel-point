@@ -6,9 +6,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using EventsManager.Server.Data;
 using Microsoft.AspNetCore.Authorization;
 using EventsManager.Server.Models;
 using EventsManager.Server.Services;
+using EventsManager.Shared.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +28,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly IEmailService _emailService;
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
@@ -34,7 +37,8 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IEmailService emailService)
+            IEmailService emailService,
+            ApplicationDbContext context)
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -43,6 +47,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _emailService = emailService;
+            _context = context;
         }
 
         /// <summary>
@@ -179,6 +184,30 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                         await _emailService.Execute(Input.Email, $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.", "Confirm your email");
                         //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",$"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
+                        await _userManager.AddToRoleAsync(user, RoleConstants.User);
+
+                        var newPlayer = new Player
+                        {
+                            Id = Guid.Parse(user.Id),
+                            User = user,
+                            NickName = Input.UserName,
+                            Elo = 1500,
+                            CreationDate = DateTime.UtcNow
+                        };
+
+                        newPlayer.EloHistories.Add(new EloHistory
+                        {
+                            Player = newPlayer,
+                            CurrentElo = 1500,
+                            PreviousElo = 1500,
+                            ChangeDate = DateTime.UtcNow,
+                            ChangeReason = ChangeEloHistoryReason.InitialElo
+                        });
+
+                        _context.Player.Add(newPlayer);
+
+                        await _context.SaveChangesAsync();
+                        
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)
                         {
