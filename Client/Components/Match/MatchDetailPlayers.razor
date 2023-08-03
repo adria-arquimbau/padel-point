@@ -76,9 +76,17 @@
                     }
                 }
             </div>
-            @if (Match.PlayersTeamOne.Any())
+            @if (Match.PlayersTeamOne.Any() && Match.PlayersTeamTwo.Any())
             {
-                <p style="font-size: 12px; margin-top: 5px">Average Elo: @Match.AverageEloTeamOne</p>
+                <div class="team-average-elo-info">
+                    <div>Avg Elo: @Match.AverageEloTeamOne</div>
+                    <div>
+                        Odds: 
+                        <span class="@(Match.ProbabilityTeamOneWins >= 50 ? "odds-positive" : "odds-negative")">
+                            @Match.ProbabilityTeamOneWins %
+                        </span>
+                    </div>
+                </div>
             }
             @if (Match.ScoreConfirmedTeamOne)
             {
@@ -145,14 +153,21 @@
                     }
                 }
             </div>
-            @if (Match.PlayersTeamTwo.Any())
+            @if (Match.PlayersTeamOne.Any() && Match.PlayersTeamTwo.Any())
             {
-                <p style="font-size: 12px; margin-top: 5px">Average Elo: @Match.AverageEloTeamTwo</p>
+                <div class="team-average-elo-info">
+                    <div>Avg Elo: @Match.AverageEloTeamTwo</div>
+                    <div>
+                        Odds: 
+                        <span class="@(Match.ProbabilityTeamTwoWins >= 50 ? "odds-positive" : "odds-negative")">
+                            @Match.ProbabilityTeamTwoWins %
+                        </span>
+                    </div>
+                </div>
             }
             @if (Match.ScoreConfirmedTeamTwo)
             {
                 <p style="font-size: 12px; color: green">Confirmed result</p>
-
             }
         </div>
     </div>
@@ -246,6 +261,21 @@
 }
 
 <style>
+    .team-average-elo-info {
+        display: flex;
+        flex-direction: column;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    .odds-positive {
+        color: green;
+    }
+    
+    .odds-negative {
+        color: red;
+    }
+
     .teams {
         position: relative;
         display: flex;

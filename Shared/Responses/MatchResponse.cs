@@ -27,5 +27,7 @@ public class MatchResponse
     public Team? TeamWinner { get; set; }
     public bool RequesterIsAPlayer { get; set; }
     public string CreatorNickName { get; set; }
+    public double ProbabilityTeamOneWins { get; set; }  
+    public double ProbabilityTeamTwoWins { get; set; }
 }
                             

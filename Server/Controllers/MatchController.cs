@@ -280,6 +280,13 @@ public class MatchController : ControllerBase
         match.AverageEloTeamTwo = match.PlayersTeamTwo.Any()
             ? (int)Math.Round(match.PlayersTeamTwo.Average(mp => mp.EloBeforeFinish)) : 0;
         
+        var eloDifference = match.AverageEloTeamTwo - match.AverageEloTeamOne;
+        var probabilityTeamOneWins = 1 / (1 + Math.Pow(10, eloDifference / 400.0));
+        var probabilityTeamTwoWins = 1 - probabilityTeamOneWins;
+
+        match.ProbabilityTeamOneWins = Math.Round(probabilityTeamOneWins * 100, 2);
+        match.ProbabilityTeamTwoWins = Math.Round(probabilityTeamTwoWins * 100, 2);
+        
         return Ok(match);
     }
     
