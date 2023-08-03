@@ -32,8 +32,8 @@
                      <div class="pending-stamp">Pending</div>
                  }
                 <div style="font-size: 12px; text-align: center;">
-                    @match.StartDateTime.ToLocalTime().ToLongDateString() /
-                    @match.StartDateTime.ToLocalTime().ToShortTimeString() -
+                    @match.StartDateTime.ToLongDateString() /
+                    @match.StartDateTime.ToShortTimeString() -
                     Duration: @match.Duration h
                 </div>
                 <FluentDivider></FluentDivider>

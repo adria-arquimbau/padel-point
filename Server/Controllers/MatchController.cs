@@ -38,7 +38,7 @@ public class MatchController : ControllerBase
         {
             Creator = playerCreator,
             CreationDate = DateTime.UtcNow,
-            StartDateTime = request.StartDate.ToUniversalTime(),
+            StartDateTime = request.StartDate,
             Duration = request.Duration,
             PricePerHour = request.PricePerHour,
             MatchPlayers = new List<MatchPlayer>
@@ -79,7 +79,7 @@ public class MatchController : ControllerBase
             return Conflict("You can't edit a match with confirmed score.");
         }
 
-        match.StartDateTime = request.StartDate.ToUniversalTime();
+        match.StartDateTime = request.StartDate;
         match.Duration = request.Duration;
         match.IsPrivate = request.IsPrivate;
 
