@@ -6,7 +6,6 @@ namespace EventsManager.Server.Services;
 
 public class EmailService : IEmailService
 {
-    private const string Sender = "DoNotReply@arquimbau.dev";
     private readonly EmailOptions _emailSettings;
 
     public EmailService(IOptions<EmailOptions> emailSettings)
@@ -24,7 +23,7 @@ public class EmailService : IEmailService
             {
                 Html = body
             };
-            var emailMessage = new EmailMessage(Sender, recipient, emailContent);
+            var emailMessage = new EmailMessage(_emailSettings.ConnectionString, recipient, emailContent);
             var emailSendOperation = await emailClient.SendAsync(
                 wait: WaitUntil.Started,  
                 message: emailMessage);
@@ -41,6 +40,7 @@ public class EmailService : IEmailService
 public class EmailOptions
 {
     public required string ConnectionString { get; set; }
+    public required string EmailFrom { get; set; }
 }
 
 public interface IEmailService
