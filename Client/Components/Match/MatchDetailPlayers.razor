@@ -47,7 +47,7 @@
                                 @if (player.Country != null)
                                 {
                                     <div class="player-country">
-                                       <CountryFlag InputType="InputType.ISOA2" ISOA2="@player.Country" Size="FlagSize.Small" IsRounded="true" HasShadow="true"></CountryFlag>
+                                       <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
                                     </div>
                                 }
                             </div>
@@ -116,7 +116,7 @@
                                @if (player.Country != null)
                                {
                                    <div class="player-country">
-                                       <CountryFlag InputType="InputType.ISOA2" ISOA2="@player.Country" Size="FlagSize.Small" IsRounded="true" HasShadow="true"></CountryFlag>
+                                       <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
                                    </div>
                                }
                             </div>
@@ -263,7 +263,7 @@
         top: 32%; 
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 17px; 
+        font-size: 15px; 
     }
     
     .players-grid {
@@ -297,8 +297,8 @@
     }
     
     .player-avatar, .default-avatar {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -321,8 +321,8 @@
     
     .player-country {
         position: absolute;
-        bottom: -18px; /* Adjust this according to your needs */
-        left: -2px; /* Adjust this according to your needs */
+        bottom: -48px; /* Adjust this according to your needs */
+        left: 24px; /* Adjust this according to your needs */
         /* Add other styles for the country flag if necessary */
     }
     
