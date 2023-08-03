@@ -48,7 +48,7 @@ public class PlayerController : ControllerBase
             {
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
-                DevelopmentAnnouncementReadIt = x.DevelopmentAnnouncementReadIt
+                DevelopmentAnnouncementReadIt = x.Announcements.DevelopmentAnnouncementReadIt
             })
             .SingleAsync(cancellationToken: cancellationToken);
 
@@ -143,8 +143,9 @@ public class PlayerController : ControllerBase
 
         var player = await _dbContext.Player
             .Where(x => x.UserId == userId)
+            .Include(x => x.Announcements)
             .SingleAsync(cancellationToken: cancellationToken);
-        player.DevelopmentAnnouncementReadIt = true;
+        player.Announcements.DevelopmentAnnouncementReadIt = true;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Ok();

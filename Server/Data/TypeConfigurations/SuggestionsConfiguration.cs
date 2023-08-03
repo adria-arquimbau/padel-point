@@ -88,6 +88,14 @@ public class MatchPlayerConfiguration : IEntityTypeConfiguration<MatchPlayer>
     }
 }
 
+public class AnnouncementsConfiguration : IEntityTypeConfiguration<Announcements>
+{
+    public void Configure(EntityTypeBuilder<Announcements> builder)
+    {
+        builder.HasKey(mp => mp.Id);
+    }
+}
+
 public class SetConfiguration : IEntityTypeConfiguration<Set>
 {
     public void Configure(EntityTypeBuilder<Set> builder)

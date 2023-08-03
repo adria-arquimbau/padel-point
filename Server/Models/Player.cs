@@ -7,12 +7,12 @@ public class Player
     public int Elo { get; set; }
     public Uri? ImageUrl { get; set; }
     public string UserId { get; set; }
-    public bool DevelopmentAnnouncementReadIt { get; set; }
     public ApplicationUser User { get; set; }   
     public ICollection<Match> CreatedMatches { get; set; } = new List<Match>();
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public string? Country { get; set; }
     public DateTime CreationDate { get; set; }
+    
+    public Announcements Announcements { get; set; }
 }
- 

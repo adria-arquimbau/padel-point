@@ -17,6 +17,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<MatchPlayer> MatchPlayer { get; set; }
     public DbSet<EloHistory> EloHistories { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Announcements> Announcements { get; set; }
 
     public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
@@ -32,5 +33,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new SetConfiguration());
         modelBuilder.ApplyConfiguration(new EloHistoryConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+        modelBuilder.ApplyConfiguration(new AnnouncementsConfiguration());
     }
 }
