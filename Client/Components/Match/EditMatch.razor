@@ -27,8 +27,7 @@
                         </Select>
                     </div>
                     <div class="form-group form-check">
-                        <input type="checkbox" id="isPrivate" class="form-check-input">
-                        <label class="form-check-label" @bind="_editMatchRequest.IsPrivate" for="isPrivate">Is Private?</label>
+                        <Switch TValue="bool" @bind-Checked="@_editMatchRequest.IsPrivate">Is Private?</Switch>
                     </div>
                 </form>
 
