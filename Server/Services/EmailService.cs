@@ -6,6 +6,7 @@ namespace EventsManager.Server.Services;
 
 public class EmailService : IEmailService
 {
+    private const string Sender = "DoNotReply@arquimbau.dev";
     private readonly EmailOptions _emailSettings;
 
     public EmailService(IOptions<EmailOptions> emailSettings)
@@ -13,21 +14,20 @@ public class EmailService : IEmailService
         _emailSettings = emailSettings.Value; 
     }   
             
-    public async Task<EmailSendResult?> Execute(string toEmail, string body, string subject)
+    public async Task Execute(string recipient, string subject, string body)
     {
         var emailClient = new EmailClient(_emailSettings.ConnectionString);
-        const string sender = "DoNotReply@arquimbau.dev";
-
-        EmailSendResult? statusMonitor;
+        
         try
         {
+            var emailContent = new EmailContent(subject)
+            {
+                Html = body
+            };
+            var emailMessage = new EmailMessage(Sender, recipient, emailContent);
             var emailSendOperation = await emailClient.SendAsync(
                 wait: WaitUntil.Started,  
-                senderAddress: sender,  
-                recipientAddress: toEmail,
-                subject: subject,
-                htmlContent: body);
-            statusMonitor = emailSendOperation.Value;
+                message: emailMessage);
             
             var operationId = emailSendOperation.Id;
         }
@@ -35,8 +35,6 @@ public class EmailService : IEmailService
         {
             throw new Exception($"Error sending email: {ex.Message}");
         }
-        
-        return statusMonitor;
     }
 }
     
@@ -47,5 +45,5 @@ public class EmailOptions
 
 public interface IEmailService
 {
-    Task<EmailSendResult?> Execute(string toEmail, string body, string subject);
+    Task Execute(string recipient, string subject, string body);
 }

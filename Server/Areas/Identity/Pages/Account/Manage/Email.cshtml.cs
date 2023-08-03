@@ -171,7 +171,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account.Manage
                 values: new { area = "Identity", userId = userId, code = encodedCode },
                 protocol: Request.Scheme);
 
-            await _emailService.Execute(email, $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.", "Confirm your email");
+            await _emailService.Execute(email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
             /*await _emailSender.SendEmailAsync(
                 email,
                 "Confirm your email",

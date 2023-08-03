@@ -68,10 +68,10 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 var callbackUrl = Url.Page(
                     "/Account/ResetPassword",
                     pageHandler: null,
-                    values: new { area = "Identity", encodedCode },
+                    values: new { area = "Identity", code = encodedCode },
                     protocol: Request.Scheme);
 
-                await _emailService.Execute(Input.Email, $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.", "Reset Password");
+                await _emailService.Execute(Input.Email, "Reset Password", $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                 //await _emailSender.SendEmailAsync(Input.Email,"Reset Password",$"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                 return RedirectToPage("./ForgotPasswordConfirmation");
