@@ -30,7 +30,7 @@
                                 {
                                     if (provider.DisplayName.Equals("Google"))
                                     {
-                                        <button type="submit" 
+                                        <button id="googleLoginButton" type="submit" 
                                                 name="provider" 
                                                 value="@provider.Name" 
                                                 title="Log in using your @provider.DisplayName account"
@@ -38,7 +38,10 @@
                                             <img src="/SignInnLogos/google-logo.png" 
                                                  alt="@provider.DisplayName logo" 
                                                  style="width: 30px; margin-right: 10px;" />
-                                            Log in with @provider.DisplayName
+                                            <span id="googleLoginText">Log in with @provider.DisplayName</span>
+                                            <div id="googleSpinner" class="spinner-border text-light" role="status" style="display: none;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
                                         </button>
                                     }
                                     else
@@ -76,7 +79,12 @@
                     </label>
                 </div>
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">
+                        <span id="loginText">Log in</span>
+                        <div id="spinner" class="spinner-border text-light" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </button>
                 </div>
                 <div>
                     <p>
@@ -96,4 +104,26 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+    // On load
+    window.addEventListener('load', function() {
+        var loginSubmitButton = document.getElementById('login-submit');
+        var googleLoginButton = document.getElementById('googleLoginButton');
+    
+        // On Login Submit Button Click
+        loginSubmitButton.addEventListener('click', function() {
+            document.getElementById('loginText').style.display = 'none';
+            document.getElementById('spinner').style.display = 'block';
+        });
+    
+        // On Google Login Button Click
+        googleLoginButton.addEventListener('click', function() {
+            googleLoginButton.style.opacity = '0.5';
+            googleLoginButton.style.pointerEvents = 'none';
+            document.getElementById('googleLoginText').style.display = 'none';
+            document.getElementById('googleSpinner').style.display = 'block';
+        });
+    });
+    </script>
 }

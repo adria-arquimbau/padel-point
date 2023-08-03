@@ -30,11 +30,13 @@
                                 {
                                     if (provider.DisplayName.Equals("Google"))
                                     {
-                                        <button type="submit" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account" style="width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid grey; background-color: white; color: #1a1e21; font-size: 20px;">
-                                                <img src="/SignInnLogos/google-logo.png" alt="@provider.DisplayName logo" style="width: 30px; margin-right: 10px;" />
-                                                Register in with @provider.DisplayName
-                                            </button>
-    
+                                        <button id="googleRegisterButton" type="submit" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account" style="width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid grey; background-color: white; color: #1a1e21; font-size: 20px;">
+                                            <img src="/SignInnLogos/google-logo.png" alt="@provider.DisplayName logo" style="width: 30px; margin-right: 10px;" />
+                                            <span id="googleButtonText">Register in with @provider.DisplayName</span>
+                                            <div id="googleSpinner" class="spinner-border text-light" role="status" style="display: none;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </button>
                                     }
                                     else
                                     {
@@ -76,18 +78,46 @@
                 <label asp-for="Input.ConfirmPassword">Confirm Password</label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" onclick="hideButton()">Register</button>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" onclick="hideButton()">
+                <span id="buttonText">Register</span>
+                <div id="spinner" class="spinner-border text-light" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </button>
         </form>
     </div>
-
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
+    
+    <script>
+    function hideButton() {
+        document.getElementById('buttonText').style.display = 'none';
+        document.getElementById('spinner').style.display = 'block';
+    }
 
-<script>
-function hideButton() {
-    document.getElementById('registerSubmit').style.display = 'none';
+    // On load
+    window.addEventListener('load', function() {
+        var form = document.getElementById('registerForm');
+        var button = document.getElementById('registerSubmit');
+        var googleButton = document.getElementById('googleRegisterButton');  // Get the Google Button
+    
+        // On Google Button Click
+        googleButton.addEventListener('click', function() {
+            googleButton.style.opacity = '0.5';
+            googleButton.style.pointerEvents = 'none';
+            document.getElementById('googleButtonText').style.display = 'none';
+            document.getElementById('googleSpinner').style.display = 'block';
+        });
+    
+        // On form input change
+        form.addEventListener('input', function() {
+            // Check form validity and update button disabled state
+            button.disabled = !form.checkValidity();
+        });
+    });
+
+    </script>
 }
-</script>

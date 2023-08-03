@@ -27,7 +27,12 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary" onclick="hideButton()">Register</button>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary" onclick="hideButton()">
+                <span id="buttonText">Register</span>
+                <div id="spinner" class="spinner-border text-light" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </button>
         </form>
     </div>
 </div>
@@ -38,6 +43,7 @@
 
 <script>
 function hideButton() {
-    document.getElementById('registerSubmit').style.display = 'none';
+    document.getElementById('buttonText').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
 }
 </script>
