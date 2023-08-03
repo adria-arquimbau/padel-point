@@ -161,7 +161,8 @@ public class RegisterModel : PageModel
                     User = user,
                     NickName = Input.UserName,
                     Elo = 1500,
-                    CreationDate = DateTime.UtcNow
+                    CreationDate = DateTime.UtcNow,
+                    Announcements = new Announcements()
                 };
 
                 newPlayer.EloHistories.Add(new EloHistory

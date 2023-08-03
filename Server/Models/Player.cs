@@ -13,6 +13,5 @@ public class Player
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public string? Country { get; set; }
     public DateTime CreationDate { get; set; }
-    
-    public Announcements Announcements { get; set; }
+    public Announcements Announcements { get; set; } = new();
 }
