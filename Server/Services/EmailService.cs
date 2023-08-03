@@ -18,28 +18,22 @@ public class EmailService : IEmailService
         var emailClient = new EmailClient(_emailSettings.ConnectionString);
         const string sender = "DoNotReply@arquimbau.dev";
 
-        EmailSendResult? statusMonitor = null;
+        EmailSendResult? statusMonitor;
         try
         {
-            Console.WriteLine("Sending email...");
             var emailSendOperation = await emailClient.SendAsync(
-                wait: WaitUntil.Completed,  
+                wait: WaitUntil.Started,  
                 senderAddress: sender,  
                 recipientAddress: toEmail,
                 subject: subject,
                 htmlContent: body);
             statusMonitor = emailSendOperation.Value;
-    
-            Console.WriteLine($"Email Sent. Status = {emailSendOperation.Value.Status}");
-
-            /// Get the OperationId so that it can be used for tracking the message for troubleshooting
+            
             var operationId = emailSendOperation.Id;
-            Console.WriteLine($"Email operation id = {operationId}");
         }
         catch (RequestFailedException ex)
         {
-            /// OperationID is contained in the exception message and can be used for troubleshooting purposes
-            Console.WriteLine($"Email send operation failed with error code: {ex.ErrorCode}, message: {ex.Message}");
+            throw new Exception($"Error sending email: {ex.Message}");
         }
         
         return statusMonitor;
@@ -48,7 +42,7 @@ public class EmailService : IEmailService
     
 public class EmailOptions
 {
-    public string ConnectionString { get; set; }
+    public required string ConnectionString { get; set; }
 }
 
 public interface IEmailService
