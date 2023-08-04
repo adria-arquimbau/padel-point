@@ -67,6 +67,8 @@ public class MatchController : ControllerBase
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .Include(x => x.Creator)
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
 
         if (match.Creator.UserId != userId)
@@ -83,6 +85,18 @@ public class MatchController : ControllerBase
         match.Duration = request.Duration;
         match.IsPrivate = request.IsPrivate;
 
+        foreach (var matchPlayer in match.MatchPlayers)
+        {
+            var notification = new Notification
+            {
+                CreationDate = DateTime.Now,
+                Title = "Match edited",
+                Description = "Match you've registered for has been edited.",
+            };
+
+            matchPlayer.Player.Notifications.Add(notification);
+        }
+        
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Ok();

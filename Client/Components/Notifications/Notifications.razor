@@ -11,12 +11,12 @@
     {
         <div @onclick="ShowModal" class="bell-icon">
             <Icon Clicked="@ShowModal" IconSize="IconSize.Default" Class="icon" Name="IconName.Bell"/>
-            <div class="notification-circle"></div>
+            <div @onclick="ShowModal" class="notification-circle"></div>
         </div>
     }
     else
     {
-        <div class="bell-icon">
+        <div @onclick="ShowModal" class="bell-icon">
             <Icon Clicked="@ShowModal" Class="icon" Name="IconName.Bell"/>
         </div>
     }

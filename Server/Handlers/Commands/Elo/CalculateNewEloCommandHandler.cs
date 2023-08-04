@@ -87,6 +87,13 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
             });
 
             player.Elo = newElo;
+            
+            player.Notifications.Add(new Notification
+            {
+                CreationDate = DateTime.Now,
+                Title = "Elo Change",
+                Description = "Your elo has changed, your new elo points are " + newElo,
+            });
         }
 
         await _context.SaveChangesAsync(cancellationToken);
