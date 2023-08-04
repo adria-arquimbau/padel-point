@@ -1,5 +1,11 @@
 ﻿@using Blazored.Toast.Configuration
+@using EventsManager.Client.Components
+
 @inherits LayoutComponentBase
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IToastService ToastService
+@inject HttpClient Http
 
 <div class="page">
     <div class="sidebar">
@@ -14,3 +20,33 @@
 </div>
 
 <BlazoredToasts MaxToastCount="2" Timeout="2" ShowCloseButton="false" ShowProgressBar="true" Position="ToastPosition.TopCenter" RemoveToastsOnNavigation="true" />
+
+@code
+{
+    private bool _initialLevelFormDone;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            await GetInitialLevelForm();
+        }
+    }
+    
+    private async Task GetInitialLevelForm()
+    {
+        try
+        {
+            _initialLevelFormDone = await Http.GetFromJsonAsync<bool>("Announcement/initial-level-done");
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong while getting user information.");
+        }
+        finally
+        {
+
+        }
+    }
+}
