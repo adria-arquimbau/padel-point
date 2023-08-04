@@ -5,11 +5,14 @@
 @using EventsManager.Client.Components.Players
 @using EventsManager.Client.Components
 
+@using EventsManager.Client.Components.Notifications
+
 <PageTitle>Welcome</PageTitle>
 
 <AuthorizeView>
     <Authorized>
         <h1>Hello, @context.User.Identity?.Name! <UserImage></UserImage></h1> Welcome to Padel Point.
+         <Notifications></Notifications>
     </Authorized>
     <NotAuthorized>
         <h1>Hello, anonymous user! Please register or log in ;)</h1> Welcome to Padel Point.

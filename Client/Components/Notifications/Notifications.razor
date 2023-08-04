@@ -1,0 +1,176 @@
+﻿@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
+@using IconSize = Blazorise.IconSize
+
+@inject HttpClient Http
+@inject IToastService ToastService
+
+@if(_notifications != null)
+{
+    if (_notifications.Any(x => !x.IsRead))
+    {
+        <div @onclick="ShowModal" class="bell-icon">
+            <Icon Clicked="@ShowModal" IconSize="IconSize.Default" Class="icon" Name="IconName.Bell"/>
+            <div class="notification-circle"></div>
+        </div>
+    }
+    else
+    {
+        <div class="bell-icon">
+            <Icon Clicked="@ShowModal" Class="icon" Name="IconName.Bell"/>
+        </div>
+    }
+    
+    <Modal @ref="modalRef">
+        <ModalContent Centered>
+            <ModalHeader>
+                <ModalTitle>Notifications</ModalTitle>
+                <CloseButton />
+            </ModalHeader>
+            <ModalBody>
+                @if(_notifications.Any())
+                {
+                    @foreach (var notification in _notifications)
+                    {
+                        <Field>
+                            <div>
+                                <div>
+                                    @notification.Title
+                                </div>
+                                <div>
+                                    @notification.Description
+                                </div>
+                                <div>
+                                    <Icon Clicked="() => DeleteNotification(notification.Id)" Class="icon" Name="IconName.Delete"/>
+                                </div>
+                            </div>
+                        </Field>
+                        <Divider/>
+                    }
+                }
+                else
+                {
+                    <div>
+                        No notifications
+                    </div>
+                }
+            </ModalBody>
+        </ModalContent>
+    </Modal>
+}
+
+@code {
+    private Modal modalRef;
+
+    private async Task ShowModal()
+    {
+        await MarkNotificationsAsRead();
+        await modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return modalRef.Hide();
+    }
+    
+    private List<NotificationResponse>? _notifications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetNotifications();
+    }
+
+    private async Task GetNotifications()
+    {
+        try
+        {
+            var response = await Http.GetAsync("notification");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _notifications = await response.Content.ReadFromJsonAsync<List<NotificationResponse>>();
+            }
+            else
+            {
+
+            }
+        }
+        catch (Exception)
+        {
+            
+        }
+        finally
+        {
+            
+        }
+    }
+    
+    private async Task DeleteNotification(Guid id)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"notification/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            await GetNotifications();
+        }
+    }
+    
+    private async Task MarkNotificationsAsRead()
+    {
+        try
+        {
+            var response = await Http.PutAsync("notification/mark-as-read", null);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            await GetNotifications();
+        }
+    }
+}
+
+<style>
+.bell-icon {
+    position: relative;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.icon {
+    display: inline-block;
+    width: 24px;   /* Set to the width of your icon */
+    height: 24px;  /* Set to the height of your icon */
+}
+
+.notification-circle {
+    position: absolute;
+    top: -2px;     /* Adjust according to your needs */
+    right: 10px;   /* Adjust according to your needs */
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: orange;
+}
+
+</style>
