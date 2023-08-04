@@ -33,10 +33,11 @@
                                         <button id="googleRegisterButton" type="submit" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account" style="width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px; border: 2px solid grey; background-color: white; color: #1a1e21; font-size: 20px;">
                                             <img src="/SignInnLogos/google-logo.png" alt="@provider.DisplayName logo" style="width: 30px; margin-right: 10px;" />
                                             <span id="googleButtonText">Register in with @provider.DisplayName</span>
-                                            <div id="googleSpinner" class="spinner-border text-light" role="status" style="display: none;">
+                                            <div id="googleSpinner" class="spinner-border text-primary" role="status" style="display: none;">
                                                 <span class="visually-hidden">Loading...</span>
                                             </div>
                                         </button>
+
                                     }
                                     else
                                     {
@@ -100,13 +101,11 @@
 
     // On load
     window.addEventListener('load', function() {
-        var form = document.getElementById('registerForm');
-        var button = document.getElementById('registerSubmit');
-        var googleButton = document.getElementById('googleRegisterButton');  // Get the Google Button
+        const form = document.getElementById('registerForm');
+        const button = document.getElementById('registerSubmit');
+        const googleButton = document.getElementById('googleRegisterButton');
     
-        // On Google Button Click
         googleButton.addEventListener('click', function() {
-            googleButton.style.opacity = '0.5';
             googleButton.style.pointerEvents = 'none';
             document.getElementById('googleButtonText').style.display = 'none';
             document.getElementById('googleSpinner').style.display = 'block';
