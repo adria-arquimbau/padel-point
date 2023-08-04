@@ -39,7 +39,7 @@
                                                  alt="@provider.DisplayName logo" 
                                                  style="width: 30px; margin-right: 10px;" />
                                             <span id="googleLoginText">Log in with @provider.DisplayName</span>
-                                            <div id="googleSpinner" class="spinner-border text-light" role="status" style="display: none;">
+                                            <div id="googleSpinner" class="spinner-border text-primary" role="status" style="display: none;">
                                                 <span class="visually-hidden">Loading...</span>
                                             </div>
                                         </button>
@@ -118,12 +118,13 @@
         });
     
         // On Google Login Button Click
+       
         googleLoginButton.addEventListener('click', function() {
-            googleLoginButton.style.opacity = '0.5';
             googleLoginButton.style.pointerEvents = 'none';
             document.getElementById('googleLoginText').style.display = 'none';
             document.getElementById('googleSpinner').style.display = 'block';
         });
+
     });
     </script>
 }
