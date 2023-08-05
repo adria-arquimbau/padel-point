@@ -71,10 +71,10 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
                     eloPoints += 30;
                     break;
                 case OtherRacketSportsLevel.SemiPro:
-                    eloPoints += 100;  // Increase to 130 points for semi-pro level
+                    eloPoints += 75;  // Increase to 130 points for semi-pro level
                     break;
                 case OtherRacketSportsLevel.Pro:
-                    eloPoints += 200;  // Increase to 230 points for pro level
+                    eloPoints += 150;  // Increase to 230 points for pro level
                     break;
             }
         }
@@ -85,24 +85,25 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             case SelfAssessedPadelSkillLevel.Beginner:
                 break;
             case SelfAssessedPadelSkillLevel.BeginnerIntermediate:
-                eloPoints += 60; // Increased from 60
+                eloPoints += 90; 
                 break;
             case SelfAssessedPadelSkillLevel.Intermediate:
-                eloPoints += 150; // Increased from 150
+                eloPoints += 135; // 90 + (350 - 90) / 2^5
                 break;
             case SelfAssessedPadelSkillLevel.IntermediateAdvanced:
-                eloPoints += 240; // Increased from 240
+                eloPoints += 168; // 90 + (350 - 90) / 2^4
                 break;
             case SelfAssessedPadelSkillLevel.Advanced:
-                eloPoints += 330; // Increased from 330
+                eloPoints += 203; // 90 + (350 - 90) / 2^3 
                 break;
             case SelfAssessedPadelSkillLevel.SemiPro:
-                eloPoints += 420; // Increased from 420
+                eloPoints += 244; // 90 + (350 - 90) / 2^2
                 break;
             case SelfAssessedPadelSkillLevel.Pro:
-                eloPoints += 550;
+                eloPoints += 350; // Pro level
                 break;
         }
+
 
         // Add points based on years playing Padel
         eloPoints += Math.Min(request.YearsPlayingPadel, 5) * 15;  // Add 10 points per year, up to 5 years
