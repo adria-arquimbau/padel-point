@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
+using EventsManager.Shared.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ public class AnnouncementController : ControllerBase
     
     [HttpPost("initial-level-done")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> InitialLevelDone(CancellationToken cancellationToken)
+    public async Task<IActionResult> InitialLevelDone([FromBody] InitialLevelFormRequest request ,CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -41,7 +42,7 @@ public class AnnouncementController : ControllerBase
             .Where(x => x.Player.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        announcements.InitialLevelFormDone = true;
+        announcements.InitialLevelFormDone = true;  
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         

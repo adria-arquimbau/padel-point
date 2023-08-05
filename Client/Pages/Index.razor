@@ -1,11 +1,15 @@
 ﻿@page "/"
 
+@inject HttpClient Http
+
 @using EventsManager.Client.Components.User
 @using EventsManager.Client.Components.Match
 @using EventsManager.Client.Components.Players
 @using EventsManager.Client.Components
 
 @using EventsManager.Client.Components.Notifications
+@using EventsManager.Shared.Dtos
+@using System.Net
 
 <PageTitle>Welcome</PageTitle>
 
@@ -21,7 +25,11 @@
 
 <AuthorizeView>
     <Authorized>
-        <DevelopmentVersionAnnouncement></DevelopmentVersionAnnouncement>
+        @if(_player != null)
+        {
+            <InitialLevelForm IsDone="@_player.InitialLevelFormDone"></InitialLevelForm>
+            <DevelopmentVersionAnnouncement IsDone="@_player.DevelopmentAnnouncementReadIt"></DevelopmentVersionAnnouncement>
+        }
     </Authorized>
 </AuthorizeView>
 
@@ -34,3 +42,34 @@
 <Divider />
 
 <AllMatches></AllMatches>
+
+@code
+{
+    private PlayerDto? _player;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUser();
+    }
+    
+    private async Task GetUser()    
+    {
+        try
+        {
+            var response = await Http.GetAsync($"player");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
+            }
+            else
+            {
+              
+            }
+        }
+        catch (Exception)
+        {
+    // ignored
+        }
+    }
+}

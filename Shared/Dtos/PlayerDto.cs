@@ -12,4 +12,5 @@ public class PlayerDto
     public bool CanIDeleteIt { get; set; }
     public bool DevelopmentAnnouncementReadIt { get; set; }
     public int GainedElo { get; set; }
-}
+    public bool InitialLevelFormDone { get; set; }
+}   

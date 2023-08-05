@@ -48,7 +48,8 @@ public class PlayerController : ControllerBase
             {
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
-                DevelopmentAnnouncementReadIt = x.Announcements.DevelopmentAnnouncementReadIt
+                DevelopmentAnnouncementReadIt = x.Announcements.DevelopmentAnnouncementReadIt,
+                InitialLevelFormDone = x.Announcements.InitialLevelFormDone
             })
             .SingleAsync(cancellationToken: cancellationToken);
 

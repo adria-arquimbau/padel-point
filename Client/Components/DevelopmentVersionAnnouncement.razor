@@ -3,7 +3,7 @@
 @inject HttpClient Http
 @inject IToastService ToastService
 
-@if (_player is {DevelopmentAnnouncementReadIt: false })
+@if (!IsDone)
 {
     @if (_visible)
     {
@@ -29,12 +29,9 @@
 
 @code {
     private bool _visible = true;
-    private PlayerDto? _player;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await GetUser();
-    }
+    
+    [Parameter]
+    public bool IsDone { get; set; }
     
     private async Task CloseAlert()
     {
@@ -42,28 +39,6 @@
         try
         {
             await Http.PostAsync($"player/development-announcement-read-it", null);
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-    }
-    
-    private async Task GetUser()    
-    {
-        try
-        {
-            var response = await Http.GetAsync($"player");
-
-            if (response.IsSuccessStatusCode)
-            {
-                _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
-            }
-            else
-            {
-                var error = await response.Content.ReadAsStringAsync();
-                ToastService.ShowError(error);
-            }
         }
         catch (Exception)
         {

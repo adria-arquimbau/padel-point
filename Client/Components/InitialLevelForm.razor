@@ -1,19 +1,163 @@
-﻿@inject HttpClient Http
+﻿@using Color = Blazorise.Color
+@using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Requests
+@inject HttpClient Http
 @inject IToastService ToastService
 @inject NavigationManager Navigation
 
-<Button @onclick="SetDone" disabled="@_loading">Done</Button>
+
+@if (!IsDone)
+{
+    <Modal @ref="_modalRef" >
+        <ModalContent Size="ModalSize.Fullscreen" Centered>
+            <ModalHeader>
+                <ModalTitle>Beginning level balance quiz</ModalTitle>
+            </ModalHeader>
+            <ModalBody>
+                
+                <Steps @ref="_stepsRef" @bind-SelectedStep="_selectedStep">
+                    <Items>
+                        <Step Name="1">Intro</Step>
+                        <Step Name="2">Padel tennis</Step>
+                        <Step Name="3">Other sports</Step>
+                        <Step Name="4">Step 4</Step>
+                    </Items>
+                    <Content>
+                        <StepPanel Name="1">
+                            <Divider></Divider>
+                            Welcome to our player ranking quiz. This quiz is designed to help us assess your skill level in padel tennis and accurately assign you an initial Elo rating. By understanding your past experience and current abilities, we can ensure that you are paired with other players who are at a similar skill level. This helps make matches more competitive and enjoyable for everyone involved.
+                            In the following steps, we will be asking about your padel tennis experience, your experience with other racquet sports, and your specific strengths and weaknesses on the court. All of this information will be used solely for the purpose of determining your initial ranking and will not be shared with third parties.
+                            Please answer each question honestly and to the best of your ability. Thank you for taking the time to complete this quiz.
+                        </StepPanel>
+                        <StepPanel Name="2">
+                            <Divider></Divider>
+                            <h5>Years playing Padel Tennis</h5>
+                            <Select @bind-SelectedValue="@_initialLevelFormRequest.YearsPlayingPadel" TValue="int">
+                                <SelectItem Value="0">Less than 1 year</SelectItem>
+                                <SelectItem Value="1">1 year</SelectItem>
+                                <SelectItem Value="2">2 years</SelectItem>
+                                <SelectItem Value="3">3 years</SelectItem>
+                                <SelectItem Value="4">4 years</SelectItem>
+                                <SelectItem Value="5">5 years or more</SelectItem>
+                            </Select>
+                            <Divider></Divider>
+                            <h5>Your self-assessed skill level in padel tennis:</h5>
+                            <Select @bind-SelectedValue="@_initialLevelFormRequest.SelfAssessedPadelSkillLevel" TValue="SelfAssessedPadelSkillLevel">
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.Beginner">Beginner</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.BeginnerIntermediate">Beginner/Intermediate</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.Intermediate">Intermediate</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.IntermediateAdvanced">Intermediate/Advanced</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.Advanced">Advanced</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.SemiPro">Semi-Professional</SelectItem>
+                            </Select>
+                        </StepPanel>
+                        <StepPanel Name="3">
+                        <Divider></Divider>
+                            <h5>Did you play other racket sports before?</h5>
+                            <Select @bind-SelectedValue="@_initialLevelFormRequest.PlayedOtherRacketSportsBefore" TValue="bool">
+                                <SelectItem Value="false">No</SelectItem>
+                                <SelectItem Value="true">Yes</SelectItem>
+                            </Select>
+                            @if (_initialLevelFormRequest.PlayedOtherRacketSportsBefore)
+                            {
+                                <Divider></Divider>
+                                <h5>How long?</h5>
+                                <Select @bind-SelectedValue="@_initialLevelFormRequest.OtherRacketSportsYearsPlaying" TValue="int">
+                                    <SelectItem Value="0">Less than 1 year</SelectItem>
+                                    <SelectItem Value="1">1 year</SelectItem>
+                                    <SelectItem Value="2">2 years</SelectItem>
+                                    <SelectItem Value="3">3 years</SelectItem>
+                                    <SelectItem Value="4">4 years</SelectItem>
+                                    <SelectItem Value="5">5 years or more</SelectItem>
+                                </Select>
+                                <Divider></Divider>
+                                <h5>What level</h5>
+                                <Select @bind-SelectedValue="@_initialLevelFormRequest.OtherRacketSportsLevel" TValue="OtherRacketSportsLevel">
+                                    <SelectItem Value="OtherRacketSportsLevel.Amateur">Amateur</SelectItem>
+                                    <SelectItem Value="OtherRacketSportsLevel.SemiPro">Semi-professional</SelectItem>
+                                    <SelectItem Value="OtherRacketSportsLevel.Pro">Professional</SelectItem>
+                                </Select>
+                            }
+                        </StepPanel>
+                        <StepPanel Name="4">
+                            "Please take a moment to review all your responses before proceeding. It's important that the information you provide is accurate and honest, as it will be used to determine your initial Elo rating and to match you with players of a similar skill level. Fair play is a crucial aspect of padel tennis, and it begins here with providing truthful information.
+                            
+                            Your responses influence not only your own playing experience, but also the experience of others in the community. Misrepresenting your skill level could lead to unbalanced matches, which are less enjoyable for all participants. 
+                            
+                            Once you are certain that all your answers are correct and truthful, please click the 'Done' button to submit your responses. Thank you for your cooperation and commitment to fair play."
+                            <Divider></Divider>
+                            <Div Display="Display.Flex" Class="justify-content-center">
+                                @if (!_sureBoutQuiz)
+                                {
+                                    <Button Clicked="SetToSure" Color="Color.Primary">I reviewed everything and Im sure about my responses</Button>
+                                }
+                                @if (_sureBoutQuiz && !_loading)
+                                {
+                                    <Button Color="Color.Primary" @onclick="SetDone" disabled="@_loading">Send</Button>
+                                }
+                            </Div>
+                        </StepPanel>
+                    </Content>
+                </Steps>
+                <Div Display="Display.Flex" Class="justify-content-center">
+                    @if(_selectedStep != "1")
+                    {
+                        <Button Color="Color.Secondary" Margin="Margin.Is2.FromEnd" Clicked="() => _stepsRef.PreviousStep()">
+                            Previous
+                        </Button>
+                    }
+                    @if(_selectedStep != "4")
+                    {
+                        <Button Color="Color.Primary" Clicked="() => _stepsRef.NextStep()">
+                            Next
+                        </Button>
+                    }
+                </Div>
+                
+            </ModalBody>
+            <ModalFooter>
+                
+            </ModalFooter>
+        </ModalContent>
+    </Modal>
+}
+
 
 @code{
-  
     private bool _loading = false;
+    private Modal _modalRef;
+    private bool _cancelClose;
+    [Parameter]
+    public bool IsDone { get; set; }
+    private Steps _stepsRef;
+    private string _selectedStep = "1";
+
+    private bool _sureBoutQuiz = false;
+    
+    private InitialLevelFormRequest _initialLevelFormRequest = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await ShowModal();
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    
+    private Task ShowModal()
+    {
+        return _modalRef.Show();
+    }
+    
+    private void SetToSure()
+    {
+        _sureBoutQuiz = true;
+    }
     
     private async Task SetDone()
     {
         try
         {
             _loading = true;
-            var response = await Http.PostAsync("Announcement/initial-level-done", null);
+            var response = await Http.PostAsJsonAsync("Announcement/initial-level-done", _initialLevelFormRequest);
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
@@ -22,7 +166,7 @@
             else
             {
                 ToastService.ShowSuccess("You have successfully completed the initial level form.");
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/", forceLoad: true);
             }
         }
         catch (Exception)
