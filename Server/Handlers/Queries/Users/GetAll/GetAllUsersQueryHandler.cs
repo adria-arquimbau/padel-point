@@ -1,5 +1,6 @@
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Responses;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,15 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             ImageUrl = x.Player.ImageUrl,
             EmailConfirmed = x.EmailConfirmed,
             Country = x.Player.Country,
+            Elo = x.Player.Elo,
+            EloHistory = x.Player.EloHistories.Select(eh => new EloHistoryResponse
+            {
+                CurrentElo = eh.CurrentElo,
+                PreviousElo = eh.PreviousElo,
+                EloChange = eh.EloChange,
+                ChangeReason = eh.ChangeReason,
+                ChangeDate = eh.ChangeDate
+            }).OrderByDescending(x => x.ChangeDate).ToList()
         })
         .ToListAsync(cancellationToken: cancellationToken);
 

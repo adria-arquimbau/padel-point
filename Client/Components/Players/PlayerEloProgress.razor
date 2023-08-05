@@ -112,7 +112,7 @@ else
         return new LineChartDataset<double>
         {
             Label = "Your elo history",
-            Data = _eloHistory?.Select(e => (double)e.Elo).ToList(),
+            Data = _eloHistory?.Select(e => (double)e.CurrentElo).ToList(),
             BackgroundColor = _myPlayerBackgroundColors,
             BorderColor = _myPlayerBorderColors,
             Fill = true,
@@ -132,7 +132,7 @@ else
         return new LineChartDataset<double>
         {
             Label = label,
-            Data = OtherPlayerEloHistory?.Select(e => (double)e.Elo).ToList(),
+            Data = OtherPlayerEloHistory?.Select(e => (double)e.CurrentElo).ToList(),
             BackgroundColor = _myPlayerBackgroundColors,
             BorderColor = _myPlayerBorderColors,
             Fill = true,

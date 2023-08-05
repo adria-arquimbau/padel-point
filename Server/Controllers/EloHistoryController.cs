@@ -29,7 +29,7 @@ public class EloHistoryController : ControllerBase
             .OrderBy(x => x.ChangeDate)
             .Select(x => new EloHistoryResponse
             {
-                Elo = x.CurrentElo,
+                CurrentElo = x.CurrentElo,
                 ChangeDate = x.ChangeDate
             })
             .ToListAsync(cancellationToken);

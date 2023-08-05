@@ -1,4 +1,6 @@
-﻿namespace EventsManager.Shared.Dtos;
+﻿using EventsManager.Shared.Responses;
+
+namespace EventsManager.Shared.Dtos;
 
 public class UserDto
 {
@@ -8,6 +10,8 @@ public class UserDto
     public Uri? ImageUrl { get; set; }
     public bool EmailConfirmed { get; set; }    
     public bool RequestingUpdate { get; set; }
-    public string? Country { get; set; }
+    public string? Country { get; set; }    
     public Guid PlayerId { get; set; }
-}
+    public List<EloHistoryResponse>? EloHistory { get; set; }
+    public int Elo { get; set; }
+}   

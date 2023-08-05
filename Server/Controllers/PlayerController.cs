@@ -73,7 +73,7 @@ public class PlayerController : ControllerBase
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
                     {
-                        Elo = eh.CurrentElo,
+                        CurrentElo = eh.CurrentElo,
                         ChangeDate = eh.ChangeDate
                     }).OrderBy(eh => eh.ChangeDate).ToList(),
                 LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,

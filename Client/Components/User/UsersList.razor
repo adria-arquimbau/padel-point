@@ -70,6 +70,9 @@
                         <dt class="col-sm-4">User Name:</dt>
                         <dd class="col-sm-8">@selectedUser.UserName</dd>
                         
+                        <dt class="col-sm-4">Elo:</dt>
+                        <dd class="col-sm-8">@selectedUser.Elo</dd>
+                        
                         <dt class="col-sm-4">Country:</dt>
                         <dd class="col-sm-8">@selectedUser.Country</dd>
 
@@ -79,6 +82,22 @@
                         <dt class="col-sm-4">Email Confirmed:</dt>
                         <dd class="col-sm-8">@selectedUser.EmailConfirmed</dd>
                     </dl>
+                    <h4>Elo history</h4>
+                    @foreach (var eloHistory in selectedUser.EloHistory)
+                    {
+                        <Divider></Divider>
+                        <div>
+                            Date: @eloHistory.ChangeDate
+                            <br/>
+                            NewElo: @eloHistory.CurrentElo
+                            <br/>
+                            PreviousElo: @eloHistory.PreviousElo
+                            <br/>
+                            Elo difference: @eloHistory.EloChange
+                            <br/>
+                            Reason: @eloHistory.ChangeReason
+                       </div>
+                    }
                 </div>
                 <img src="@selectedUser.ImageUrl" alt="user-image"/>
                 <div class="modal-footer">
