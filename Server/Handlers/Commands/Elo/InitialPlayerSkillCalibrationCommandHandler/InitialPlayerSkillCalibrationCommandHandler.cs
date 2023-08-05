@@ -22,17 +22,18 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             .Include(x => x.Announcements)
             .SingleAsync(x => x.UserId == request.UserId, cancellationToken: cancellationToken);
         
-        var finalElo = CalculateInitialElo(request.Request);
+        var newElo = CalculateInitialElo(request.Request);
         
         player.EloHistories.Add(new EloHistory
         {
-            CurrentElo = finalElo,
+            CurrentElo = newElo,    
             PreviousElo = player.Elo,
             ChangeDate = DateTime.Now,
-            ChangeReason = ChangeEloHistoryReason.SkillCalibration
+            ChangeReason = ChangeEloHistoryReason.SkillCalibration,
+            EloChange = newElo - player.Elo,
         });
         
-        player.Elo = finalElo;
+        player.Elo = newElo;
         
         player.Announcements.InitialLevelFormDone = true;
         
