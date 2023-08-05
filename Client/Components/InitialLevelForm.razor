@@ -88,7 +88,7 @@
                             <p>Once you are certain that all your answers are correct and truthful, please click the 'Done' button to submit your responses. Thank you for your cooperation and commitment to fair play.</p>
                             <Divider></Divider>
                             <Div Display="Display.Flex" Class="justify-content-center">
-                                @if (!_sureBoutQuiz)
+                                @if (!_iAmSureFlag)
                                 {
                                     <Button Clicked="() => SetToSure(true)" Color="Color.Primary">I have reviewed everything and I'm sure about my responses</Button>
                                 }
@@ -97,7 +97,7 @@
                     </Content>
                 </Steps>
                 <Div Display="Display.Flex" Class="justify-content-center">
-                    @if(_selectedStep != "1" && !_sureBoutQuiz)
+                    @if(_selectedStep != "1" && !_iAmSureFlag)
                     {
                         <Button Color="Color.Secondary" Margin="Margin.Is2.FromEnd" Clicked="() => _stepsRef.PreviousStep()">
                             Previous
@@ -109,7 +109,7 @@
                             Next
                         </Button>
                     }
-                    @if (_sureBoutQuiz && !_loading)
+                    @if (_iAmSureFlag && !_loading)
                     {
                         <Button Margin="Margin.Is2.FromEnd" Color="Color.Primary" @onclick="() => SetToSure(false)" disabled="@_loading">Review again</Button>
                         <Button Color="Color.Success" @onclick="SetDone" disabled="@_loading">Go!</Button>
@@ -130,7 +130,7 @@
     private Steps _stepsRef;
     private string _selectedStep = "1";
 
-    private bool _sureBoutQuiz = false;
+    private bool _iAmSureFlag = false;
     
     private InitialLevelFormRequest _initialLevelFormRequest = new();
 
@@ -150,7 +150,7 @@
     
     private void SetToSure(bool sure)
     {
-        _sureBoutQuiz = sure;
+        _iAmSureFlag = sure;
     }
     
     private async Task SetDone()
@@ -173,9 +173,6 @@
         catch (Exception)
         {
             ToastService.ShowError("Something went wrong while getting user information.");
-        }
-        finally
-        {
             _loading = false;
         }
     }
