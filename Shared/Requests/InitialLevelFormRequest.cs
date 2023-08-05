@@ -23,5 +23,6 @@ public enum SelfAssessedPadelSkillLevel
     Intermediate,
     IntermediateAdvanced,
     Advanced,
-    SemiPro
+    SemiPro,
+    Pro
 } 

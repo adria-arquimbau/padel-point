@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo;
+using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
@@ -221,7 +222,7 @@ public class MatchController : ControllerBase
         
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
-            await _mediator.Send(new CalculateNewEloCommandRequest(matchId), cancellationToken);
+            await _mediator.Send(new CalculateEloResultAfterMatchCommandRequest(matchId), cancellationToken);
         }
         
         return Ok();

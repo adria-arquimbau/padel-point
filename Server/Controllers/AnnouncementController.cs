@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
+using EventsManager.Server.Handlers.Commands.Elo.InitialPlayerSkillCalibrationCommandHandler;
 using EventsManager.Shared.Requests;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +14,12 @@ namespace EventsManager.Server.Controllers;
 public class AnnouncementController : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext;
+    private readonly IMediator _mediator;
 
-    public AnnouncementController(ApplicationDbContext dbContext)
+    public AnnouncementController(ApplicationDbContext dbContext, IMediator mediator)
     {
         _dbContext = dbContext;
+        _mediator = mediator;
     }
     
     [HttpGet("initial-level-done")]
@@ -37,14 +41,8 @@ public class AnnouncementController : ControllerBase
     public async Task<IActionResult> InitialLevelDone([FromBody] InitialLevelFormRequest request ,CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        var announcements = await _dbContext.Announcements
-            .Where(x => x.Player.UserId == userId)
-            .SingleAsync(cancellationToken: cancellationToken);
         
-        announcements.InitialLevelFormDone = true;  
-        
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _mediator.Send(new InitialPlayerSkillCalibrationCommandRequest(request, userId), cancellationToken);
         
         return Ok();
     }

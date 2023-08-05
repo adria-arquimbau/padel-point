@@ -32,7 +32,7 @@
                         </StepPanel>
                         <StepPanel Name="2">
                             <Divider></Divider>
-                            <h5>Years playing Padel Tennis</h5>
+                            <h5>Total years playing Padel Tennis</h5>
                             <Select @bind-SelectedValue="@_initialLevelFormRequest.YearsPlayingPadel" TValue="int">
                                 <SelectItem Value="0">Less than 1 year</SelectItem>
                                 <SelectItem Value="1">1 year</SelectItem>
@@ -50,6 +50,7 @@
                                 <SelectItem Value="SelfAssessedPadelSkillLevel.IntermediateAdvanced">Intermediate/Advanced</SelectItem>
                                 <SelectItem Value="SelfAssessedPadelSkillLevel.Advanced">Advanced</SelectItem>
                                 <SelectItem Value="SelfAssessedPadelSkillLevel.SemiPro">Semi-Professional</SelectItem>
+                                <SelectItem Value="SelfAssessedPadelSkillLevel.Pro">Professional</SelectItem>
                             </Select>
                         </StepPanel>
                         <StepPanel Name="3">
@@ -62,7 +63,7 @@
                             @if (_initialLevelFormRequest.PlayedOtherRacketSportsBefore)
                             {
                                 <Divider></Divider>
-                                <h5>How long?</h5>
+                                <h5>Total years played?</h5>
                                 <Select @bind-SelectedValue="@_initialLevelFormRequest.OtherRacketSportsYearsPlaying" TValue="int">
                                     <SelectItem Value="0">Less than 1 year</SelectItem>
                                     <SelectItem Value="1">1 year</SelectItem>

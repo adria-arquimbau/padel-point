@@ -207,7 +207,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                             Player = newPlayer,
                             CurrentElo = 1500,
                             PreviousElo = 1500,
-                            ChangeDate = DateTime.UtcNow,
+                            ChangeDate = DateTime.Now,
                             ChangeReason = ChangeEloHistoryReason.InitialElo
                         });
 

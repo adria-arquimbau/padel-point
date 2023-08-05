@@ -4,18 +4,18 @@ using EventsManager.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace EventsManager.Server.Handlers.Commands.Elo;
+namespace EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 
-public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloCommandRequest>
+public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<CalculateEloResultAfterMatchCommandRequest>
 {
     private readonly ApplicationDbContext _context;
 
-    public CalculateNewEloCommandHandler(ApplicationDbContext context)
+    public CalculateEloResultAfterMatchCommandHandler(ApplicationDbContext context)
     {
         _context = context;
     }
     
-    public async Task Handle(CalculateNewEloCommandRequest request, CancellationToken cancellationToken)
+    public async Task Handle(CalculateEloResultAfterMatchCommandRequest request, CancellationToken cancellationToken)
     {
          var match = await _context.Match
         .Where(x => x.Id == request.MatchId)
@@ -57,7 +57,7 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
                 PreviousElo = player.Elo,
                 CurrentElo = newElo,
                 EloChange = newElo - player.Elo,
-                ChangeDate = DateTime.UtcNow,
+                ChangeDate = DateTime.Now,
                 MatchId = match.Id,
                 PlayerId = player.Id,
                 ChangeReason = ChangeEloHistoryReason.MatchPlayed
@@ -80,7 +80,7 @@ public class CalculateNewEloCommandHandler : IRequestHandler<CalculateNewEloComm
                 PreviousElo = player.Elo,
                 CurrentElo = newElo,
                 EloChange = newElo - player.Elo,
-                ChangeDate = DateTime.UtcNow,
+                ChangeDate = DateTime.Now,
                 MatchId = match.Id,
                 PlayerId = player.Id,
                 ChangeReason = ChangeEloHistoryReason.MatchPlayed
