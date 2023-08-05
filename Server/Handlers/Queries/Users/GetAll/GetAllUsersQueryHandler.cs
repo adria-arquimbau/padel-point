@@ -1,5 +1,6 @@
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,14 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             EmailConfirmed = x.EmailConfirmed,
             Country = x.Player.Country,
             Elo = x.Player.Elo,
+            InitialPlayerSkillCalibration = x.Player.InitialLevelForm != null ? new InitialPlayerSkillCalibrationResponse
+            {
+                OtherRacketSportsYearsPlaying = x.Player.InitialLevelForm.OtherRacketSportsYearsPlaying,
+                PlayedOtherRacketSportsBefore = x.Player.InitialLevelForm.PlayedOtherRacketSportsBefore,
+                OtherRacketSportsLevel = x.Player.InitialLevelForm.OtherRacketSportsLevel,
+                SelfAssessedPadelSkillLevel = x.Player.InitialLevelForm.SelfAssessedPadelSkillLevel,
+                YearsPlayingPadel = x.Player.InitialLevelForm.YearsPlayingPadel
+            } : null,
             EloHistory = x.Player.EloHistories.Select(eh => new EloHistoryResponse
             {
                 CurrentElo = eh.CurrentElo,

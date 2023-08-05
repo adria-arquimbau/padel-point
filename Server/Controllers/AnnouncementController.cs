@@ -35,7 +35,7 @@ public class AnnouncementController : ControllerBase
             .Select(x => x.Announcements.InitialLevelFormDone)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        return Ok(new InitialLevelResponse
+        return Ok(new InitialLevelIsDoneResponse
         {
             Done = done
         });

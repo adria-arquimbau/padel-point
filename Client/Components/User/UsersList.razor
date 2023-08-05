@@ -80,6 +80,23 @@
                         <dt class="col-sm-4">Email Confirmed:</dt>
                         <dd class="col-sm-8">@selectedUser.EmailConfirmed</dd>
                     </dl>
+                    @if (selectedUser.InitialPlayerSkillCalibration != null)
+                    {
+                        <Divider></Divider>
+                        <h4>Initial skill calibration</h4>
+                        <div>
+                            YearsPlayingPadel: @selectedUser.InitialPlayerSkillCalibration.YearsPlayingPadel
+                            <br/>
+                            SelfAssessedPadelSkillLevel: @selectedUser.InitialPlayerSkillCalibration.SelfAssessedPadelSkillLevel
+                            <br/>
+                            PlayedOtherRacketSportsBefore: @selectedUser.InitialPlayerSkillCalibration.PlayedOtherRacketSportsBefore
+                            <br/>
+                            OtherRacketSportsYearsPlaying: @selectedUser.InitialPlayerSkillCalibration.OtherRacketSportsYearsPlaying
+                            <br/>
+                            OtherRacketSportsLevel: @selectedUser.InitialPlayerSkillCalibration.OtherRacketSportsLevel
+                        </div>
+                    }
+                    <Divider></Divider>
                     <h4>Elo history</h4>
                     @foreach (var eloHistory in selectedUser.EloHistory)
                     {
@@ -96,6 +113,7 @@
                             Reason: @eloHistory.ChangeReason
                        </div>
                     }
+                    <Divider></Divider>
                 </div>
                 <img src="@selectedUser.ImageUrl" alt="user-image"/>
                 <div class="modal-footer">

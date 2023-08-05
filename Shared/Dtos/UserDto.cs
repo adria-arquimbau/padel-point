@@ -14,5 +14,6 @@ public class UserDto
     public Guid PlayerId { get; set; }
     public List<EloHistoryResponse>? EloHistory { get; set; }
     public int Elo { get; set; }    
-    public DateTime? RegistrationDate { get; set; }
-}   
+    public DateTime? RegistrationDate { get; set; } 
+    public InitialPlayerSkillCalibrationResponse? InitialPlayerSkillCalibration { get; set; }
+}       

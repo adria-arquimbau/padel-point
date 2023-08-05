@@ -49,7 +49,7 @@
 @code
 {
     private AnnouncementDevelopmentResponse? _announcementDevelopmentResponse;
-    private InitialLevelResponse? _initialLevelResponse;
+    private InitialLevelIsDoneResponse? _initialLevelResponse;
     
     protected override async Task OnInitializedAsync()
     {
@@ -64,7 +64,7 @@
 
             if (response.IsSuccessStatusCode)
             {
-                _initialLevelResponse = await response.Content.ReadFromJsonAsync<InitialLevelResponse>();
+                _initialLevelResponse = await response.Content.ReadFromJsonAsync<InitialLevelIsDoneResponse>();
             }
             else
             {
