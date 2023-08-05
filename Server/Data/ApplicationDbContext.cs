@@ -18,7 +18,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<EloHistory> EloHistories { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Announcements> Announcements { get; set; }
-
+    public DbSet<Promotion> Promotion { get; set; }
+    
     public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
     }

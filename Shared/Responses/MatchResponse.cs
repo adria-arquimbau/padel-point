@@ -28,6 +28,7 @@ public class MatchResponse
     public bool RequesterIsAPlayer { get; set; }
     public string CreatorNickName { get; set; }
     public double ProbabilityTeamOneWins { get; set; }  
-    public double ProbabilityTeamTwoWins { get; set; }
+    public double ProbabilityTeamTwoWins { get; set; }  
+    public List<PromotionResponse> Promotions { get; set; }
 }
-                            
+                                

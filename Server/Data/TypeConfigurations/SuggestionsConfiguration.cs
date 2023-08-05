@@ -134,4 +134,12 @@ public class EloHistoryConfiguration : IEntityTypeConfiguration<EloHistory>
     }
 }
 
+public class PromotionConfiguration : IEntityTypeConfiguration<Promotion>
+{
+    public void Configure(EntityTypeBuilder<Promotion> builder)
+    {
+        builder.HasKey(u => u.Id);
+    }
+}
+
 

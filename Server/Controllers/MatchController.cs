@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging;
+using NuGet.Protocol;
 
 namespace EventsManager.Server.Controllers;
 
@@ -311,11 +312,12 @@ public class MatchController : ControllerBase
         var matches = await _dbContext.Match
             .Where(x => x.IsPrivate == false || x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo)
             .Include(x => x.MatchPlayers)
-                .ThenInclude(matchPlayer => matchPlayer.Player)
+            .ThenInclude(matchPlayer => matchPlayer.Player)
             .Include(x => x.EloHistories)
+            .Include(match => match.Promotions)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        var response = matches.Select(x => new MatchResponse
+        var matchResponses = matches.Select(x => new MatchResponse
         {
             Id = x.Id,
             StartDateTime = x.StartDateTime,
@@ -326,10 +328,15 @@ public class MatchController : ControllerBase
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
             AverageElo = x.MatchPlayers.Any() ? 
                 (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
-                : 0
+                : 0,
+            Promotions = x.Promotions.Select(p => new PromotionResponse
+            {
+                Title = p.Title,
+                Description = p.Description
+            }).ToList()
         }).OrderByDescending(x => x.StartDateTime).ToList();
         
-        return Ok(response);
+        return Ok(matchResponses);
     }
     
     [HttpDelete("{matchId:guid}/remove/{playerId:guid}")]

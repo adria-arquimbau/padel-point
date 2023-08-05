@@ -1,5 +1,6 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Loaders
+@using Color = Blazorise.Color
 
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
@@ -31,11 +32,22 @@
                  {
                      <div class="pending-stamp">Pending</div>
                  }
-                <div style="font-size: 12px; text-align: center;">
-                    @match.StartDateTime.ToLongDateString() /
-                    @match.StartDateTime.ToShortTimeString() -
-                    Duration: @match.Duration h
-                </div>
+                 <div style="font-size: 12px; text-align: center;">
+                     @match.StartDateTime.ToLongDateString() /
+                     @match.StartDateTime.ToShortTimeString() -
+                     Duration: @match.Duration h
+                 </div>
+                 @if (match.Promotions.Any())
+                 {
+                     <FluentDivider></FluentDivider>
+                     <Alert Class="promotion" Color="Color.Info" Visible>
+                         <AlertMessage>@match.Promotions.First().Title |</AlertMessage>
+                         <AlertDescription>@match.Promotions.First().Description</AlertDescription>
+                     </Alert>
+                 }
+                 <div>
+                     
+                 </div>
                 <FluentDivider></FluentDivider>
                 <div style="width: 60%; float: left; margin-bottom: 20px;">
                     <p style="font-size: 14px"><b>Players:</b> @match.PlayersCount / 4</p>
@@ -60,6 +72,7 @@
 @code {
     private List<MatchResponse>? _matches;
     private bool _loading = false;
+    private bool specialPromotion = false;
     
     protected override async Task OnInitializedAsync()
     {
@@ -159,4 +172,10 @@
         font-weight: bold;
         font-size: 14px;
     }    
+    
+    .promotion {
+        font-size: 12px;
+        margin: 0px;
+        padding: 0 0 5px 5px;
+    }
 </style>
