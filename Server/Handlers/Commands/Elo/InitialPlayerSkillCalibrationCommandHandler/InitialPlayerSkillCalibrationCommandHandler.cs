@@ -61,7 +61,6 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         // For "Other Racket Sports"
         if(request.PlayedOtherRacketSportsBefore)
         {
-            eloPoints += 50;  // Add 100 points if player has other racket sports experience
             eloPoints += Math.Min(request.OtherRacketSportsYearsPlaying, 5) * 10;  // Add 8 points per year of experience, up to 5 years
 
             // Add points based on the other racket sports level
