@@ -34,7 +34,7 @@ public class MatchController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var playerCreator = await _dbContext.Player.Where(x => x.UserId == userId).SingleAsync(cancellationToken: cancellationToken);
-        
+    
         var newMatch = new Match
         {
             Creator = playerCreator,
@@ -50,14 +50,27 @@ public class MatchController : ControllerBase
                     Team = Team.Team1
                 }
             },
-            IsPrivate = request.IsPrivate
+            IsPrivate = request.IsPrivate,
         };
+        
+        var random = new Random();
+        var randomNumber = random.Next(1, 21);
+        
+        if (randomNumber == 1)
+        {
+            newMatch.Promotions.Add(new Promotion
+            {
+                Title = "Akira Bar",
+                Description = "After the match, players get x2 in drinks.",
+            });
+        }
 
         _dbContext.Match.Add(newMatch);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Ok(new CreateMatchResponse { Id = newMatch.Id });
     }
+
     
     [HttpPut("{matchId:guid}")]
     [Authorize(Roles = "User")]
