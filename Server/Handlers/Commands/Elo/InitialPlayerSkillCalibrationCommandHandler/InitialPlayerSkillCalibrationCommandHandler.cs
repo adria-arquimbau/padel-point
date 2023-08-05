@@ -1,6 +1,7 @@
 ﻿using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
+using EventsManager.Shared.Exceptions;
 using EventsManager.Shared.Requests;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,15 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             .Include(x => x.Announcements)
             .SingleAsync(x => x.UserId == request.UserId, cancellationToken: cancellationToken);
         
+        var didItBefore = await _context.EloHistories
+            .Where(x => x.PlayerId == player.Id && x.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration)
+            .AnyAsync(cancellationToken: cancellationToken);
+
+        if (didItBefore)
+        {
+            throw new InitialSkillCalibrationAlreadyDoneException("Initial skill calibration already done");
+        }
+        
         var newElo = CalculateInitialElo(request.Request);
         
         player.EloHistories.Add(new EloHistory
@@ -29,7 +39,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             CurrentElo = newElo,    
             PreviousElo = player.Elo,
             ChangeDate = DateTime.Now,
-            ChangeReason = ChangeEloHistoryReason.SkillCalibration,
+            ChangeReason = ChangeEloHistoryReason.InitialSkillCalibration,
             EloChange = newElo - player.Elo,
         });
         

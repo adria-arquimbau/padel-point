@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.InitialPlayerSkillCalibrationCommandHandler;
+using EventsManager.Shared.Exceptions;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using MediatR;
@@ -62,8 +63,19 @@ public class AnnouncementController : ControllerBase
     public async Task<IActionResult> InitialLevelCalculate([FromBody] InitialLevelFormRequest request ,CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        await _mediator.Send(new InitialPlayerSkillCalibrationCommandRequest(request, userId), cancellationToken);
+
+        try
+        {
+            await _mediator.Send(new InitialPlayerSkillCalibrationCommandRequest(request, userId), cancellationToken);
+        }
+        catch (InitialSkillCalibrationAlreadyDoneException)
+        {
+            return Conflict("Initial skill calibration already done");
+        }
+        catch (Exception)
+        {
+            return BadRequest("Something went wrong");
+        }
         
         return Ok();
     }
