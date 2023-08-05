@@ -213,6 +213,8 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
 
                         _context.Player.Add(newPlayer);
 
+                        user.SetRegistrationDate();
+                        
                         await _context.SaveChangesAsync();
                         
                         // If account confirmation is required, we need to show the link if we don't have a real email sender

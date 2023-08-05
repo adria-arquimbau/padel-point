@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
+using Duende.IdentityServer.Configuration;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Queries.Users.GetMyUser;
 using EventsManager.Server.Models;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 
 namespace EventsManager.Server;
 
@@ -24,8 +26,7 @@ public class Startup {
         configRoot = configuration;
     }
     
-    public void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
-        // Add services to the container.
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
         var connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
@@ -46,17 +47,23 @@ public class Startup {
         .AddRoles<IdentityRole>()
         .AddEntityFrameworkStores<ApplicationDbContext>();
 
+        services.ConfigureApplicationCookie(ops =>
+        {
+            ops.ExpireTimeSpan = TimeSpan.FromSeconds(5);
+            ops.SlidingExpiration = true;
+        });
+        
         var issuer = configuration.GetSection("IdentityServer")["IssuerUri"];
         services.AddIdentityServer(options =>
-            { 
-                options.IssuerUri = issuer;
-            })
-            .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => 
-            {
-                opt.IdentityResources["openid"].UserClaims.Add("role");
-                opt.ApiResources.Single().UserClaims.Add("role");
-            });
-
+        { 
+            options.IssuerUri = issuer;
+        })
+        .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => 
+        {
+            opt.IdentityResources["openid"].UserClaims.Add("role");
+            opt.ApiResources.Single().UserClaims.Add("role");
+        });
+        
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("role");
         
         var emailSection = configuration.GetSection("EmailService");
@@ -67,12 +74,12 @@ public class Startup {
         services.AddAuthentication()
             .AddGoogle(options =>
             {
-                options.ClientId = googleAuthSection["Settings:ClientId"];
-                options.ClientSecret = googleAuthSection["Settings:ClientSecret"];
+                options.ClientId = googleAuthSection["Settings:ClientId"] ?? throw new NullReferenceException();
+                options.ClientSecret = googleAuthSection["Settings:ClientSecret"] ?? throw new InvalidOperationException();
                 options.Scope.Add("email");
-            })
+            })  
             .AddIdentityServerJwt();
-
+    
         services.AddControllersWithViews();
         services.AddRazorPages();
         
