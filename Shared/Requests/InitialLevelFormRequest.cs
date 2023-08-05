@@ -11,6 +11,7 @@ public class InitialLevelFormRequest
 
 public enum OtherRacketSportsLevel
 {
+    None,
     Amateur,
     SemiPro,
     Pro 
