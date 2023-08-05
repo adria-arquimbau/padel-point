@@ -174,4 +174,13 @@ public class PlayerController : ControllerBase
         
         return Ok(matches);
     }
+    
+    [HttpDelete("delete-all-initial-player-calibration")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> DeleteAllInitialPlayerCalibration(CancellationToken cancellationToken)
+    {
+      
+        
+        return Ok();
+    }
 }

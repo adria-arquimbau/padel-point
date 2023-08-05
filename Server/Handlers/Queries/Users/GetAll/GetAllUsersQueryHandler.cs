@@ -22,6 +22,7 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             Id = x.Id,
             UserName = x.UserName,
             Email = x.Email,
+            RegistrationDate = x.RegistrationDate,
             ImageUrl = x.Player.ImageUrl,
             EmailConfirmed = x.EmailConfirmed,
             Country = x.Player.Country,
@@ -34,7 +35,7 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
                 ChangeReason = eh.ChangeReason,
                 ChangeDate = eh.ChangeDate
             }).OrderByDescending(x => x.ChangeDate).ToList()
-        })
+        }).OrderByDescending(x => x.RegistrationDate)
         .ToListAsync(cancellationToken: cancellationToken);
 
         return users;

@@ -1,13 +1,44 @@
 ﻿@page "/users-manager"
 @using Microsoft.AspNetCore.Authorization
 @using EventsManager.Client.Components.User
+@using Color = Blazorise.Color
+
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject IMessageService MessageService
 
 @attribute [Authorize(Roles = "Administrator")] 
 
 <h3>Users Manager</h3>
 <FluentDivider></FluentDivider>
+<Button Clicked="DeleteCalibrations" Color="Color.Danger">Delete Calibrations</Button>
+<FluentDivider></FluentDivider>
 <UsersList></UsersList>
 
 @code {
-    
+
+    private async Task DeleteCalibrations()
+    {
+        if (await MessageService.Confirm( "Are you sure?", "Delete calibrations"))
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"player/delete-all-initial-player-calibration");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowInfo("Calibrations removed.");
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        }
+    }
 }

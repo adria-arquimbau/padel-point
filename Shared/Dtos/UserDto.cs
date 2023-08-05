@@ -13,5 +13,6 @@ public class UserDto
     public string? Country { get; set; }    
     public Guid PlayerId { get; set; }
     public List<EloHistoryResponse>? EloHistory { get; set; }
-    public int Elo { get; set; }
+    public int Elo { get; set; }    
+    public DateTime? RegistrationDate { get; set; }
 }   
