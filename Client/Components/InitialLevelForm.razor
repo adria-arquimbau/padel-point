@@ -11,7 +11,7 @@
     <Modal @ref="_modalRef" >
         <ModalContent Size="ModalSize.Fullscreen" Centered>
             <ModalHeader>
-                <ModalTitle>Beginning level balance quiz</ModalTitle>
+                <ModalTitle>Initial Player Skill Calibration</ModalTitle>
             </ModalHeader>
             <ModalBody>
                 
@@ -20,14 +20,15 @@
                         <Step Name="1">Intro</Step>
                         <Step Name="2">Padel tennis</Step>
                         <Step Name="3">Other sports</Step>
-                        <Step Name="4">Step 4</Step>
+                        <Step Name="4">Submit!</Step>
                     </Items>
                     <Content>
                         <StepPanel Name="1">
                             <Divider></Divider>
-                            Welcome to our player ranking quiz. This quiz is designed to help us assess your skill level in padel tennis and accurately assign you an initial Elo rating. By understanding your past experience and current abilities, we can ensure that you are paired with other players who are at a similar skill level. This helps make matches more competitive and enjoyable for everyone involved.
-                            In the following steps, we will be asking about your padel tennis experience, your experience with other racquet sports, and your specific strengths and weaknesses on the court. All of this information will be used solely for the purpose of determining your initial ranking and will not be shared with third parties.
-                            Please answer each question honestly and to the best of your ability. Thank you for taking the time to complete this quiz.
+                            <h4>Welcome to Our Player Ranking Quiz</h4>
+                            <p>This quiz is designed to help us assess your skill level in padel tennis and accurately assign you an initial Elo rating. By understanding your past experience and current abilities, we can ensure that you are paired with other players who are at a similar skill level. This helps make matches more competitive and enjoyable for everyone involved.</p>
+                            <p>In the following steps, we will be asking about your padel tennis experience, your experience with other racquet sports, and your specific strengths and weaknesses on the court. All of this information will be used solely for the purpose of determining your initial ranking and will not be shared with third parties.</p>
+                            <p>Please answer each question honestly and to the best of your ability. Thank you for taking the time to complete this quiz.</p>
                         </StepPanel>
                         <StepPanel Name="2">
                             <Divider></Divider>
@@ -80,27 +81,22 @@
                             }
                         </StepPanel>
                         <StepPanel Name="4">
-                            "Please take a moment to review all your responses before proceeding. It's important that the information you provide is accurate and honest, as it will be used to determine your initial Elo rating and to match you with players of a similar skill level. Fair play is a crucial aspect of padel tennis, and it begins here with providing truthful information.
-                            
-                            Your responses influence not only your own playing experience, but also the experience of others in the community. Misrepresenting your skill level could lead to unbalanced matches, which are less enjoyable for all participants. 
-                            
-                            Once you are certain that all your answers are correct and truthful, please click the 'Done' button to submit your responses. Thank you for your cooperation and commitment to fair play."
+                            <h4>Review and Confirm</h4>
+                            <p>Please take a moment to review all your responses before proceeding. It's important that the information you provide is accurate and honest, as it will be used to determine your initial Elo rating and to match you with players of a similar skill level. Fair play is a crucial aspect of padel tennis, and it begins here with providing truthful information.</p>
+                            <p>Your responses influence not only your own playing experience, but also the experience of others in the community. Misrepresenting your skill level could lead to unbalanced matches, which are less enjoyable for all participants.</p> 
+                            <p>Once you are certain that all your answers are correct and truthful, please click the 'Done' button to submit your responses. Thank you for your cooperation and commitment to fair play.</p>
                             <Divider></Divider>
                             <Div Display="Display.Flex" Class="justify-content-center">
                                 @if (!_sureBoutQuiz)
                                 {
-                                    <Button Clicked="SetToSure" Color="Color.Primary">I reviewed everything and Im sure about my responses</Button>
-                                }
-                                @if (_sureBoutQuiz && !_loading)
-                                {
-                                    <Button Color="Color.Primary" @onclick="SetDone" disabled="@_loading">Send</Button>
+                                    <Button Clicked="() => SetToSure(true)" Color="Color.Primary">I have reviewed everything and I'm sure about my responses</Button>
                                 }
                             </Div>
                         </StepPanel>
                     </Content>
                 </Steps>
                 <Div Display="Display.Flex" Class="justify-content-center">
-                    @if(_selectedStep != "1")
+                    @if(_selectedStep != "1" && !_sureBoutQuiz)
                     {
                         <Button Color="Color.Secondary" Margin="Margin.Is2.FromEnd" Clicked="() => _stepsRef.PreviousStep()">
                             Previous
@@ -112,12 +108,13 @@
                             Next
                         </Button>
                     }
+                    @if (_sureBoutQuiz && !_loading)
+                    {
+                        <Button Margin="Margin.Is2.FromEnd" Color="Color.Primary" @onclick="() => SetToSure(false)" disabled="@_loading">Review again</Button>
+                        <Button Color="Color.Success" @onclick="SetDone" disabled="@_loading">Go!</Button>
+                    }
                 </Div>
-                
             </ModalBody>
-            <ModalFooter>
-                
-            </ModalFooter>
         </ModalContent>
     </Modal>
 }
@@ -138,7 +135,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await ShowModal();
+        if (!IsDone)
+        {
+            await ShowModal();
+        }
         await base.OnAfterRenderAsync(firstRender);
     }
     
@@ -147,9 +147,9 @@
         return _modalRef.Show();
     }
     
-    private void SetToSure()
+    private void SetToSure(bool sure)
     {
-        _sureBoutQuiz = true;
+        _sureBoutQuiz = sure;
     }
     
     private async Task SetDone()

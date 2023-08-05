@@ -27,8 +27,14 @@
     <Authorized>
         @if(_player != null)
         {
-            <InitialLevelForm IsDone="@_player.InitialLevelFormDone"></InitialLevelForm>
-            <DevelopmentVersionAnnouncement IsDone="@_player.DevelopmentAnnouncementReadIt"></DevelopmentVersionAnnouncement>
+            @if (_player.InitialLevelFormDone == false)
+            {
+                <InitialLevelForm IsDone="@_player.InitialLevelFormDone"></InitialLevelForm>
+            }
+            @if (_player.DevelopmentAnnouncementReadIt == false)
+            {
+                <DevelopmentVersionAnnouncement IsDone="@_player.DevelopmentAnnouncementReadIt"></DevelopmentVersionAnnouncement>
+            }
         }
     </Authorized>
 </AuthorizeView>
