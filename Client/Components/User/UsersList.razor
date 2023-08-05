@@ -8,7 +8,7 @@
 @inject IJSRuntime JSRuntime
 
 <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch" />
-
+<p>Total: <strong>@numResults results found</strong></p>
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -32,8 +32,6 @@
         <span class="regular-user">Regular User</span>
     </div>
 </div>
-
-<p>Total: <strong>@numResults results found</strong></p>
 
 @if (selectedUser != null)
 {

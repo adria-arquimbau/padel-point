@@ -172,6 +172,7 @@ public class PlayerController : ControllerBase
         var players = await _dbContext.Player
             .Where(x => x.EloHistories.Any(eh => eh.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration))
             .Include(x => x.EloHistories)
+            .Include(x => x.InitialLevelForm)
             .ToListAsync(cancellationToken: cancellationToken);
 
         foreach (var player in players)
@@ -180,6 +181,7 @@ public class PlayerController : ControllerBase
             
             player.Elo = initialCalibrationHistory.PreviousElo;
             player.EloHistories.Remove(initialCalibrationHistory);
+            player.InitialLevelForm = null;
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);

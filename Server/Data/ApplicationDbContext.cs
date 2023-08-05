@@ -1,6 +1,7 @@
 ﻿using Duende.IdentityServer.EntityFramework.Options;
 using EventsManager.Server.Data.TypeConfigurations;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Requests;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -19,7 +20,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Announcements> Announcements { get; set; }
     public DbSet<Promotion> Promotion { get; set; }
-    
+    public DbSet<InitialLevelForm> InitialLevelForms { get; set; }
+        
     public ApplicationDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
     }
@@ -35,5 +37,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new EloHistoryConfiguration());
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
         modelBuilder.ApplyConfiguration(new AnnouncementsConfiguration());
+        modelBuilder.ApplyConfiguration(new InitialLevelFormConfiguration());
     }
 }

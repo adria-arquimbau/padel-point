@@ -32,7 +32,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             throw new InitialSkillCalibrationAlreadyDoneException("Initial skill calibration already done");
         }
         
-        var newElo = CalculateInitialElo(request.Request);
+        var newElo = CalculateInitialElo(request.Request, player.Elo);
         
         player.EloHistories.Add(new EloHistory
         {
@@ -42,23 +42,27 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             ChangeReason = ChangeEloHistoryReason.InitialSkillCalibration,
             EloChange = newElo - player.Elo,
         });
-        
         player.Elo = newElo;
-        
         player.Announcements.InitialLevelFormDone = true;
+        player.InitialLevelForm = new InitialLevelForm
+        {
+            OtherRacketSportsYearsPlaying = request.Request.OtherRacketSportsYearsPlaying,
+            OtherRacketSportsLevel = request.Request.OtherRacketSportsLevel,
+            PlayedOtherRacketSportsBefore = request.Request.PlayedOtherRacketSportsBefore,
+            SelfAssessedPadelSkillLevel = request.Request.SelfAssessedPadelSkillLevel,
+            YearsPlayingPadel = request.Request.YearsPlayingPadel,
+        };
         
         await _context.SaveChangesAsync(cancellationToken);
     }
     
-    private static int CalculateInitialElo(InitialLevelFormRequest request)
+    private static int CalculateInitialElo(InitialLevelFormRequest request, int eloPoints)
     {
-        var eloPoints = 1500;  // base Elo score
-        
         // For "Other Racket Sports"
         if(request.PlayedOtherRacketSportsBefore)
         {
-            eloPoints += 100;  // Add 100 points if player has other racket sports experience
-            eloPoints += Math.Min(request.OtherRacketSportsYearsPlaying, 5) * 8;  // Add 8 points per year of experience, up to 5 years
+            eloPoints += 50;  // Add 100 points if player has other racket sports experience
+            eloPoints += Math.Min(request.OtherRacketSportsYearsPlaying, 5) * 10;  // Add 8 points per year of experience, up to 5 years
 
             // Add points based on the other racket sports level
             switch(request.OtherRacketSportsLevel)
@@ -67,10 +71,10 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
                     eloPoints += 30;
                     break;
                 case OtherRacketSportsLevel.SemiPro:
-                    eloPoints += 130;  // Increase to 130 points for semi-pro level
+                    eloPoints += 100;  // Increase to 130 points for semi-pro level
                     break;
                 case OtherRacketSportsLevel.Pro:
-                    eloPoints += 230;  // Increase to 230 points for pro level
+                    eloPoints += 200;  // Increase to 230 points for pro level
                     break;
             }
         }
@@ -81,27 +85,27 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             case SelfAssessedPadelSkillLevel.Beginner:
                 break;
             case SelfAssessedPadelSkillLevel.BeginnerIntermediate:
-                eloPoints += 80; // Increased from 60
+                eloPoints += 60; // Increased from 60
                 break;
             case SelfAssessedPadelSkillLevel.Intermediate:
-                eloPoints += 180; // Increased from 150
+                eloPoints += 150; // Increased from 150
                 break;
             case SelfAssessedPadelSkillLevel.IntermediateAdvanced:
-                eloPoints += 280; // Increased from 240
+                eloPoints += 240; // Increased from 240
                 break;
             case SelfAssessedPadelSkillLevel.Advanced:
-                eloPoints += 400; // Increased from 330
+                eloPoints += 330; // Increased from 330
                 break;
             case SelfAssessedPadelSkillLevel.SemiPro:
-                eloPoints += 500; // Increased from 420
+                eloPoints += 420; // Increased from 420
                 break;
             case SelfAssessedPadelSkillLevel.Pro:
-                eloPoints += 700; // Increased from 600
+                eloPoints += 550;
                 break;
         }
 
         // Add points based on years playing Padel
-        eloPoints += Math.Min(request.YearsPlayingPadel, 5) * 10;  // Add 10 points per year, up to 5 years
+        eloPoints += Math.Min(request.YearsPlayingPadel, 5) * 15;  // Add 10 points per year, up to 5 years
         
         return eloPoints;
     }
