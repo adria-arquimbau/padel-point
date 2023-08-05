@@ -194,10 +194,8 @@
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity?.IsAuthenticated == false)
             {
-                ToastService.ShowError("You must be logged in to register for this match.");
                 ReturnUrl = "~/" + ReturnUrl;
-                NavigationManager.NavigateTo($"Identity/Account/Login?returnUrl={ReturnUrl}", 
-                    forceLoad:true);
+                NavigationManager.NavigateTo($"Identity/Account/Login?returnUrl={ReturnUrl}", forceLoad: true);
                 return;
             }
         
