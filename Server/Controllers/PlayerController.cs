@@ -70,7 +70,7 @@ public class PlayerController : ControllerBase
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
                 Country = x.Country,
-                MatchesPlayed = x.EloHistories.Count - 1,
+                MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
                     {
@@ -78,62 +78,51 @@ public class PlayerController : ControllerBase
                         ChangeDate = eh.ChangeDate
                     }).OrderBy(eh => eh.ChangeDate).ToList(),
                 LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
+                Rank = 0
             })  
             .SingleAsync(cancellationToken: cancellationToken);
-        
-        var allPlayers = await _dbContext.Player
-            .Where(p => p.EloHistories.Count >= 2)
+
+        var allPlayers = await _dbContext.EloHistories
+            .Where(x => x.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
+            .Select(x => x.Player)
+            .Distinct()
             .ToListAsync(cancellationToken: cancellationToken);
-        
+
         if (response.MatchesPlayed > 0)
         {
-            response.Rank = response.EloHistory.Count == 1 ? 0 : allPlayers.Count(p => p.Elo > response.Elo) + 1;
+            response.Rank = allPlayers.Count(p => p.Elo > response.Elo) + 1;
         }
-        else
-        {
-            response.Rank = 0;
-        }
-
+    
         return Ok(response);
     }
+
     
     [HttpGet("ranking")]
     [AllowAnonymous]
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)
     {
-        var players = await _dbContext.Player
-            .Where(x => x.EloHistories.Count >= 2)
-            .Select(x => new 
+        var rankedPlayers = (await _dbContext.EloHistories
+            .Where(x => x.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
+            .Select(x => x.Player)
+            .Distinct()
+            .OrderByDescending(x => x.Elo)
+            .Select(x => new PlayerDetailResponse
             {
-                PlayerDetail = new PlayerDetailResponse
-                {
-                    Id = x.Id,
-                    NickName = x.NickName,
-                    ImageUrl = x.ImageUrl,
-                    Elo = x.Elo,
-                    Country = x.Country,
-                    LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).Single().EloChange,
-                    MatchesPlayed = x.EloHistories.Count - 1,
-                },
-                OrderKey1 = x.Elo
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl,
+                Elo = x.Elo,
+                MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
+                LastEloGained = x.EloHistories
+                    .Where(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
+                    .OrderByDescending(eh => eh.ChangeDate).First().EloChange,
+                Rank = 0, // Rank is set to 0 for now
+                Country = x.Country,
+                Id = x.Id
             })
-            .OrderByDescending(x => x.OrderKey1)
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        var rankedPlayers = players
-            .Select((x, i) => new PlayerDetailResponse
-            {
-                Id = x.PlayerDetail.Id,
-                NickName = x.PlayerDetail.NickName,
-                ImageUrl = x.PlayerDetail.ImageUrl,
-                Elo = x.PlayerDetail.Elo,
-                Country = x.PlayerDetail.Country,
-                LastEloGained = x.PlayerDetail.LastEloGained,
-                MatchesPlayed = x.PlayerDetail.MatchesPlayed,
-                Rank = x.PlayerDetail.MatchesPlayed == 0 ? 0 : i + 1
-            })
-            .ToList();
-
+            .ToListAsync(cancellationToken: cancellationToken))
+        .Select((player, index) => { player.Rank = index + 1; return player; }) // Assign ranks
+        .ToList();
+        
         return Ok(rankedPlayers);
     }
     
