@@ -180,8 +180,9 @@ public class PlayerController : ControllerBase
             var initialCalibrationHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration);
             
             player.Elo = initialCalibrationHistory.PreviousElo;
-            player.EloHistories.Remove(initialCalibrationHistory);
             player.InitialLevelForm = null;
+            
+            _dbContext.EloHistories.Remove(initialCalibrationHistory);
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);
