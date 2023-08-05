@@ -133,8 +133,8 @@ else
         {
             Label = label,
             Data = OtherPlayerEloHistory?.Select(e => (double)e.Elo).ToList(),
-            BackgroundColor = _otherPlayerBackgroundColors,
-            BorderColor = _otherPlayerBorderColors,
+            BackgroundColor = _myPlayerBackgroundColors,
+            BorderColor = _myPlayerBorderColors,
             Fill = true,
             PointRadius = 3,
             CubicInterpolationMode = "monotone",

@@ -49,7 +49,7 @@ public class Startup {
 
         services.ConfigureApplicationCookie(ops =>
         {
-            ops.ExpireTimeSpan = TimeSpan.FromSeconds(5);
+            ops.ExpireTimeSpan = TimeSpan.FromDays(90);
             ops.SlidingExpiration = true;
         });
         
