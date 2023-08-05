@@ -108,7 +108,7 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
         {
             return 40;
         }
-        if (elo is >= 1650 and < 2000)
+        if (elo is >= 1650 and < 1899)
         {
             return 32;
         }
