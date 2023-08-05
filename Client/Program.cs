@@ -4,6 +4,7 @@ using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using EventsManager.Client;
 using EventsManager.Client.Authorization;
+using EventsManager.Client.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -23,6 +24,7 @@ builder.Services.AddBlazoredToast();
 builder.Services.AddApiAuthorization()
     .AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 builder.Services.AddFluentUIComponents();
+builder.Services.AddScoped<ClipboardService>();
 builder.Services.AddBlazorise( options =>
     {
         options.Immediate = true;

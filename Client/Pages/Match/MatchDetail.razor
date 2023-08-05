@@ -4,6 +4,7 @@
 @using EventsManager.Client.Components.Modals
 @using EventsManager.Client.Components.Match
 @using EventsManager.Client.Components.Match.Results
+@using EventsManager.Client.Services
 @using EventsManager.Shared.Requests
 @using Color = Blazorise.Color
 
@@ -12,7 +13,7 @@
 @inject IToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-
+@inject ClipboardService ClipboardService
 @if (_loading)
 {
     <MatchDetailSkeleton></MatchDetailSkeleton>
@@ -96,12 +97,11 @@
                 <i class="bi bi-unlock"></i> <p style="font-size: 12px"> Public</p>
             </div>
         }
-        <div class="separator"></div>
         <div class="creator">
             <p style="font-size: 12px">Created By: @_match.CreatorNickName</p>
         </div>
         <div class="share">
-            <Icon Name="IconName.Share" ></Icon>
+            <Icon Name="IconName.Share" Clicked="Share"></Icon>
         </div>
     </div>
     
@@ -181,6 +181,14 @@
                 _loading = false;
             }
         }
+    }
+    
+    private async Task Share()
+    {
+        var url = NavigationManager.Uri;
+        Console.WriteLine(url);
+        await ClipboardService.CopyToClipboard(url);
+        ToastService.ShowSuccess("Link copied to clipboard.");
     }
     
     private void ShowEditModal()
@@ -318,7 +326,7 @@
      
     .match-detail-private {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
         padding: 12px 0;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
@@ -332,17 +340,9 @@
         margin: 0;
     }
     
-    .status, .creator {
+    .status, .creator, .share {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 45%;
-    }
-    
-    .separator {
-        width: 2px;
-        background-color: grey;
-        height: 50%;
-        align-self: center;
     }
 </style>
