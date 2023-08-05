@@ -1,10 +1,9 @@
 ﻿@using Blazored.Toast.Configuration
+@using Color = Blazorise.Color
 
 @inherits LayoutComponentBase
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IToastService ToastService
-@inject HttpClient Http
+@inject NavigationManager NavigationManager
 
 <div class="page">
     <div class="sidebar">
@@ -13,7 +12,18 @@
 
     <main>
         <article class="content px-4">
-            @Body
+            <ErrorBoundary>
+                <ChildContent>
+                    @Body
+                </ChildContent>
+                <ErrorContent>
+                    <Alert Color="Color.Danger" Visible>
+                        <AlertMessage>Error</AlertMessage>
+                        <AlertDescription>Something went wrong. Please try again later.</AlertDescription>
+                        <Button Color="Color.Primary" Clicked="GoToMainPage">Go to main page</Button>
+                    </Alert>
+                </ErrorContent>
+            </ErrorBoundary>
         </article>
     </main>
 </div>
@@ -22,30 +32,8 @@
 
 @code
 {
-    private bool _initialLevelFormDone;
-    
-    protected override async Task OnInitializedAsync()
+    private void GoToMainPage()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (authState.User.Identity?.IsAuthenticated == true)
-        {
-            await GetInitialLevelForm();
-        }
-    }
-    
-    private async Task GetInitialLevelForm()
-    {
-        try
-        {
-            _initialLevelFormDone = await Http.GetFromJsonAsync<bool>("Announcement/initial-level-done");
-        }
-        catch (Exception)
-        {
-            ToastService.ShowError("Something went wrong while getting user information.");
-        }
-        finally
-        {
-
-        }
+        NavigationManager.NavigateTo("/", forceLoad: true);
     }
 }

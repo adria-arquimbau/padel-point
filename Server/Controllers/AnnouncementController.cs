@@ -2,6 +2,7 @@
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.InitialPlayerSkillCalibrationCommandHandler;
 using EventsManager.Shared.Requests;
+using EventsManager.Shared.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -33,12 +34,32 @@ public class AnnouncementController : ControllerBase
             .Select(x => x.Announcements.InitialLevelFormDone)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        return Ok(done);
+        return Ok(new InitialLevelResponse
+        {
+            Done = done
+        });
+    }
+    
+    [HttpGet("development-announcement-read-it")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> DevelopmentAnnouncement(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var done = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .Select(x => x.Announcements.DevelopmentAnnouncementReadIt)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        return Ok(new AnnouncementDevelopmentResponse
+        {
+            Done = done
+        });
     }
     
     [HttpPost("initial-level-done")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> InitialLevelDone([FromBody] InitialLevelFormRequest request ,CancellationToken cancellationToken)
+    public async Task<IActionResult> InitialLevelCalculate([FromBody] InitialLevelFormRequest request ,CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         

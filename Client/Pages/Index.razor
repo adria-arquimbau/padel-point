@@ -9,6 +9,7 @@
 
 @using EventsManager.Client.Components.Notifications
 @using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Responses
 
 <PageTitle>Welcome</PageTitle>
 
@@ -24,16 +25,13 @@
 
 <AuthorizeView>
     <Authorized>
-        @if(_player != null)
+        @if (_initialLevelResponse is {Done: false })
         {
-            @if (_player.InitialLevelFormDone == false)
-            {
-                <InitialLevelForm IsDone="@_player.InitialLevelFormDone"></InitialLevelForm>
-            }
-            @if (_player.DevelopmentAnnouncementReadIt == false)
-            {
-                <DevelopmentVersionAnnouncement IsDone="@_player.DevelopmentAnnouncementReadIt"></DevelopmentVersionAnnouncement>
-            }
+            <InitialLevelForm IsDone="@_initialLevelResponse.Done"></InitialLevelForm>
+        }
+        @if (_announcementDevelopmentResponse is {Done: false })
+        {
+            <DevelopmentVersionAnnouncement IsDone="@_announcementDevelopmentResponse.Done"></DevelopmentVersionAnnouncement>
         }
     </Authorized>
 </AuthorizeView>
@@ -50,22 +48,41 @@
 
 @code
 {
-    private PlayerDto? _player;
+    private AnnouncementDevelopmentResponse? _announcementDevelopmentResponse;
+    private InitialLevelResponse? _initialLevelResponse;
     
     protected override async Task OnInitializedAsync()
     {
-        await GetUser();
+        await GetInfo();    
     }
     
-    private async Task GetUser()    
+    private async Task GetInfo()    
     {
         try
         {
-            var response = await Http.GetAsync($"player");
+            var response = await Http.GetAsync("Announcement/initial-level-done");
 
             if (response.IsSuccessStatusCode)
             {
-                _player = await response.Content.ReadFromJsonAsync<PlayerDto>();
+                _initialLevelResponse = await response.Content.ReadFromJsonAsync<InitialLevelResponse>();
+            }
+            else
+            {
+              
+            }
+        }
+        catch (Exception)
+        {
+            // ignored
+        }
+        
+        try
+        {
+            var response = await Http.GetAsync($"Announcement/development-announcement-read-it");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _announcementDevelopmentResponse = await response.Content.ReadFromJsonAsync<AnnouncementDevelopmentResponse>();
             }
             else
             {
@@ -78,3 +95,4 @@
         }
     }
 }
+    
