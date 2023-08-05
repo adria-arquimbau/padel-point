@@ -180,6 +180,9 @@
     [Parameter] 
     public EventCallback RefreshMatch { get; set; }
 
+    [Parameter]
+    public string ReturnUrl {get; set;}
+    
     private bool _loading = false;
     
     private async Task AddPlayer(string team)
@@ -192,6 +195,9 @@
             if (authState.User.Identity?.IsAuthenticated == false)
             {
                 ToastService.ShowError("You must be logged in to register for this match.");
+                ReturnUrl = "~/" + ReturnUrl;
+                NavigationManager.NavigateTo($"Identity/Account/Login?returnUrl={ReturnUrl}", 
+                    forceLoad:true);
                 return;
             }
         

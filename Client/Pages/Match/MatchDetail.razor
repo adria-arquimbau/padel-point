@@ -102,7 +102,7 @@
         </div>
     </div>
     
-    <MatchDetailPlayers RefreshMatch="GetMatch" Match="_match"></MatchDetailPlayers>
+    <MatchDetailPlayers ReturnUrl="@MatchPath" RefreshMatch="GetMatch" Match="_match"></MatchDetailPlayers>
     
     @if (_match.PlayersCount == 4)
     {
@@ -119,6 +119,8 @@
     
     private bool _loading;
 
+    private string MatchPath => $"match/{MatchId}/detail";
+    
     private MatchResponse? _match;
     private bool _editModalVisible;
     private bool _deleteModalVisible;
