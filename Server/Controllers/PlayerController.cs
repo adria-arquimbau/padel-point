@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
+using EventsManager.Shared.Enums;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -179,7 +180,20 @@ public class PlayerController : ControllerBase
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteAllInitialPlayerCalibration(CancellationToken cancellationToken)
     {
-      
+        var players = await _dbContext.Player
+            .Where(x => x.EloHistories.Any(eh => eh.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration))
+            .Include(x => x.EloHistories)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        foreach (var player in players)
+        {
+            var initialCalibrationHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration);
+            
+            player.Elo = initialCalibrationHistory.PreviousElo;
+            player.EloHistories.Remove(initialCalibrationHistory);
+        }
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
         
         return Ok();
     }
