@@ -133,9 +133,9 @@ public class EloHistoryConfiguration : IEntityTypeConfiguration<EloHistory>
     public void Configure(EntityTypeBuilder<EloHistory> builder)
     {
         builder.HasKey(eh => eh.Id);
-        builder.Property(eh => eh.PreviousElo)
+        builder.Property(eh => eh.OldElo)
             .IsRequired();
-        builder.Property(eh => eh.CurrentElo)
+        builder.Property(eh => eh.NewElo)
             .IsRequired();
         builder.HasOne(eh => eh.Player)
             .WithMany(p => p.EloHistories)

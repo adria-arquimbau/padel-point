@@ -275,7 +275,7 @@ public class MatchController : ControllerBase
                     ImageUrl = p.Player.ImageUrl,
                     EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
-                        .Select(e => (int?)e.PreviousElo)
+                        .Select(e => (int?)e.OldElo)
                         .SingleOrDefault() ?? p.Player.Elo,
                     CanIDeleteIt = userId != null && p.Player.UserId == userId,
                     GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
@@ -289,7 +289,7 @@ public class MatchController : ControllerBase
                     ImageUrl = p.Player.ImageUrl,
                     EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
-                        .Select(e => (int?)e.PreviousElo)
+                        .Select(e => (int?)e.OldElo)
                         .SingleOrDefault() ?? p.Player.Elo,
                     CanIDeleteIt = userId != null && p.Player.UserId == userId,
                     GainedElo = p.Player.EloHistories.Where(e => e.MatchId == matchId).Sum(e => e.EloChange),
@@ -340,7 +340,7 @@ public class MatchController : ControllerBase
             PlayersCount = x.MatchPlayers.Count,
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
             AverageElo = x.MatchPlayers.Any() ? 
-                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
+                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
                 : 0,
             Promotions = x.Promotions.Select(p => new PromotionResponse
             {
@@ -465,7 +465,7 @@ public class MatchController : ControllerBase
                 Id = x.Id,
                 StartDateTime = x.StartDateTime,
                 Duration = x.Duration,
-                AverageElo = x.EloHistories.Any() ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : 0,
+                AverageElo = x.EloHistories.Any() ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : 0,
                 IsPrivate = x.IsPrivate,
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 PlayersCount = x.MatchPlayers.Count,
@@ -511,7 +511,7 @@ public class MatchController : ControllerBase
                 }).ToList(),
             PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
             AverageElo = x.MatchPlayers.Any() ? 
-                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
+                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
                 : 0,
             Promotions = x.Promotions.Select(p => new PromotionResponse
             {
@@ -549,7 +549,7 @@ public class MatchController : ControllerBase
 
                 if (eloHistoryForThePlayer is not null)
                 {
-                    player.Elo = eloHistoryForThePlayer.PreviousElo;
+                    player.Elo = eloHistoryForThePlayer.OldElo;
                 }
             }
             _dbContext.EloHistories.RemoveRange(eloHistoriesFromTheMatch);

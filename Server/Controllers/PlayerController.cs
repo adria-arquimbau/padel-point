@@ -74,7 +74,7 @@ public class PlayerController : ControllerBase
                 EloHistory = x.EloHistories
                     .Select(eh => new EloHistoryResponse
                     {
-                        CurrentElo = eh.CurrentElo,
+                        CurrentElo = eh.NewElo,
                         ChangeDate = eh.ChangeDate
                     }).OrderBy(eh => eh.ChangeDate).ToList(),
                 LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
@@ -157,7 +157,7 @@ public class PlayerController : ControllerBase
                 Duration = x.Duration,
                 PlayerWon = x.MatchPlayers.Single(mp => mp.PlayerId == playerId).Team == x.Winner,
                 EloChange = x.EloHistories.Single(eh => eh.PlayerId == playerId).EloChange,
-                AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)),
+                AverageElo = (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)),
             })
             .OrderByDescending(x => x.StartDateTime)
             .ToListAsync(cancellationToken: cancellationToken);
@@ -179,7 +179,7 @@ public class PlayerController : ControllerBase
         
             var initialCalibrationHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration);
             
-            player.Elo = initialCalibrationHistory.PreviousElo;
+            player.Elo = initialCalibrationHistory.OldElo;
             player.InitialLevelForm = null;
             player.Announcements.InitialLevelFormDone = false;
             

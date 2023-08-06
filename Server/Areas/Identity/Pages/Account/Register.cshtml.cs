@@ -168,8 +168,8 @@ public class RegisterModel : PageModel
                 newPlayer.EloHistories.Add(new EloHistory
                 {
                     Player = newPlayer,
-                    CurrentElo = 1500,
-                    PreviousElo = 1500,
+                    NewElo = 1500,
+                    OldElo = 1500,
                     ChangeDate = DateTime.Now,
                     ChangeReason = ChangeEloHistoryReason.InitialElo
                 });

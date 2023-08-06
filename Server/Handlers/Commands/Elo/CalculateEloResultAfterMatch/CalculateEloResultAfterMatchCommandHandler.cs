@@ -92,8 +92,8 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
     {
         player.EloHistories.Add(new EloHistory
         {
-            PreviousElo = player.Elo,
-            CurrentElo = newElo,
+            OldElo = player.Elo,
+            NewElo = newElo,
             EloChange = newElo - player.Elo,
             ChangeDate = DateTime.Now,
             MatchId = match.Id,

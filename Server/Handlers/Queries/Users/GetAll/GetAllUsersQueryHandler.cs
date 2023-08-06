@@ -39,8 +39,8 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             } : null,
             EloHistory = x.Player.EloHistories.Select(eh => new EloHistoryResponse
             {
-                CurrentElo = eh.CurrentElo,
-                PreviousElo = eh.PreviousElo,
+                CurrentElo = eh.NewElo,
+                PreviousElo = eh.OldElo,
                 EloChange = eh.EloChange,
                 ChangeReason = eh.ChangeReason,
                 ChangeDate = eh.ChangeDate

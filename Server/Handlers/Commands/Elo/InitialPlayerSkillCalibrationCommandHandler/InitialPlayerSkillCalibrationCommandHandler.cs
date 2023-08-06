@@ -36,8 +36,8 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         
         player.EloHistories.Add(new EloHistory
         {
-            CurrentElo = newElo,    
-            PreviousElo = player.Elo,
+            NewElo = newElo,    
+            OldElo = player.Elo,
             ChangeDate = DateTime.Now,
             ChangeReason = ChangeEloHistoryReason.InitialSkillCalibration,
             EloChange = newElo - player.Elo,
