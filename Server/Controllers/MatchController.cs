@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
-using EventsManager.Server.Handlers.Commands.Elo;
 using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
@@ -42,6 +41,7 @@ public class MatchController : ControllerBase
             StartDateTime = request.StartDate,
             Duration = request.Duration,
             PricePerHour = request.PricePerHour,
+            Location = request.Location,
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -247,6 +247,7 @@ public class MatchController : ControllerBase
             .Select(x => new MatchResponse
             {
                 Id = x.Id,
+                Location = x.Location,
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 RequesterIsAPlayer = x.MatchPlayers.Any(p => p.Player.UserId == userId),
@@ -333,6 +334,7 @@ public class MatchController : ControllerBase
         var matchResponses = matches.Select(x => new MatchResponse
         {
             Id = x.Id,
+            Location = x.Location,
             StartDateTime = x.StartDateTime,
             ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
             ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,

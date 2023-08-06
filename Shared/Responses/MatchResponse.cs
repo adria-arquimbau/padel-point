@@ -30,5 +30,5 @@ public class MatchResponse
     public double ProbabilityTeamOneWins { get; set; }  
     public double ProbabilityTeamTwoWins { get; set; }  
     public List<PromotionResponse> Promotions { get; set; }
+    public MatchLocation Location { get; set; }
 }
-                                

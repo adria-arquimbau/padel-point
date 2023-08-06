@@ -2,6 +2,7 @@
 
 @using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
+@using EventsManager.Shared.Enums
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -33,6 +34,13 @@
         <NumericEdit TValue="double" @bind-Value="@_pricePerHour" />    
     </div>
     <div class="form-group">
+            <label>Location</label>
+            <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
+                <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+                <SelectItem Value="MatchLocation.None">-</SelectItem>
+            </Select>
+        </div>
+    <div class="form-group">
         <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
     </div>
     <button type="submit" class="btn btn-primary">Create Match</button>
@@ -42,6 +50,7 @@
 
     private DateTime _start = DateTime.Now;
     private int _durationSelect = 1;
+    private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private double _pricePerHour;
     private bool _isPrivate;
     private bool _loading;
@@ -64,7 +73,8 @@
             StartDate = _start,
             Duration = durationInHours,
             IsPrivate = _isPrivate,
-            PricePerHour = _pricePerHour
+            PricePerHour = _pricePerHour,
+            Location = _location
         };
 
         try

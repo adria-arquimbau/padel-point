@@ -1,5 +1,6 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Loaders
+@using EventsManager.Shared.Enums
 @using Color = Blazorise.Color
 
 @inject HttpClient Http
@@ -53,6 +54,7 @@
                 <div style="width: 60%; float: left; margin-bottom: 20px;">
                     <p style="font-size: 14px"><b>Players:</b> @match.PlayersCount / 4</p>
                     <p style="font-size: 14px"><b>Average Elo:</b> @match.AverageElo</p>
+                    <p style="font-size: 14px">@GetLocationFullName(match.Location)</p>
                 </div>
                 <div style="width: 40%; float: right; text-align: right;">
                     <p style="font-size: 14px; margin-bottom: 0;"><b></b></p>
@@ -80,6 +82,15 @@
     private void GoToTheMatch(Guid id)
     {
         NavigationManager.NavigateTo($"/match/{id}/detail");
+    }
+    
+    private string GetLocationFullName(MatchLocation matchLocation)
+    {
+        if (matchLocation == MatchLocation.PadelBaseSalzburg)
+        {
+            return "Padel Base Salzburg";
+        }
+        return "";
     }
 
     private async Task GetAllMatches()

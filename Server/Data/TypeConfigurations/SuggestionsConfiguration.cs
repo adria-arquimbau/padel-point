@@ -1,4 +1,5 @@
 ﻿using EventsManager.Server.Models;
+using EventsManager.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -82,6 +83,9 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .HasForeignKey(eh => eh.MatchId)
             .OnDelete(DeleteBehavior.Restrict);
         builder.Property(mp => mp.Winner)
+            .HasConversion<string>();
+        builder.Property(mp => mp.Location)
+            .HasDefaultValue(MatchLocation.None)
             .HasConversion<string>();
         builder.HasMany(m => m.Promotions)
             .WithOne()

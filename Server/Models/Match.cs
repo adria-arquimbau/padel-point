@@ -19,4 +19,6 @@ public class Match
     public bool ScoreConfirmedTeamTwo { get; set; } 
     public Team? Winner { get; set; }
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
+    public MatchLocation Location { get; set; }
 }
+    
