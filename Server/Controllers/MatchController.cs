@@ -566,10 +566,10 @@ public class MatchController : ControllerBase
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Simulate(CancellationToken cancellationToken)
     {
-        var player1 = new Player{Elo = 1820};
-        var player2 = new Player{Elo = 1707};
-        var player3 = new Player{Elo = 1697};
-        var player4 = new Player{Elo = 1750};
+        var player1 = new Player{Elo = 1700};
+        var player2 = new Player{Elo = 1700};
+        var player3 = new Player{Elo = 1800};
+        var player4 = new Player{Elo = 1800};
 
         var player1PreviousElo = player1.Elo;
         var player2PreviousElo = player2.Elo;
@@ -578,7 +578,7 @@ public class MatchController : ControllerBase
         
         var sets = new List<Set>
         {
-            new Set{SetNumber = 1, Team1Score = 6, Team2Score = 0},
+            new Set{SetNumber = 1, Team1Score = 6, Team2Score = 4},
             new Set{SetNumber = 2, Team1Score = 6, Team2Score = 3},
         };
         

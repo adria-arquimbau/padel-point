@@ -83,6 +83,9 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
             .OnDelete(DeleteBehavior.Restrict);
         builder.Property(mp => mp.Winner)
             .HasConversion<string>();
+        builder.HasMany(m => m.Promotions)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 
