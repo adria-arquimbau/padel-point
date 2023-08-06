@@ -1,10 +1,12 @@
 @page "/matches-manager"
 @using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
 
 @inject NavigationManager NavManager
 
 @inject HttpClient Http
 @inject IToastService ToastService
+@inject IMessageService MessageService
 
 <h3>Matches Manager</h3>
 
@@ -19,7 +21,29 @@
         foreach (var match in _matches)
         {
             <Divider></Divider>
-            @match.Id
+            <b>Id: </b>@match.Id
+            <br/>
+            <b>Private: </b>@match.IsPrivate
+            <br/>
+            <b>Creator: </b>@match.CreatorNickName
+            <br/>
+            <b>Start date: </b>@match.StartDateTime
+            <br/>
+            <b>Finished: </b>@match.Finished
+            <br/>
+            <b>TeamOne: </b>
+            foreach (var player in @match.PlayersTeamOne)
+            {
+                @player.NickName @PlusSymbol
+            }
+            <br/>
+            <b>TeamTwo: </b>
+            foreach (var player in @match.PlayersTeamTwo)
+            {
+                @player.NickName @PlusSymbol
+            }
+            <br/>
+            <Button Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete</Button>
         }
     }
     else
@@ -32,17 +56,23 @@
 
 
 @code {
-    private List<MatchResponse>? _matches;
+    private List<MatchAdministratorResponse>? _matches;
+    private const string PlusSymbol = " + ";
 
     protected override async Task OnInitializedAsync()
     {
+        await GetAll();
+    }
+
+    private async Task GetAll()
+    {
         try
         {
-            var response = await Http.GetAsync("match");
+            var response = await Http.GetAsync("match/administration/all");
 
             if (response.IsSuccessStatusCode)
             {
-                _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+                _matches = await response.Content.ReadFromJsonAsync<List<MatchAdministratorResponse>>();
             }
             else
             {
@@ -50,9 +80,35 @@
                 ToastService.ShowError(error);
             }
         }
-        catch(Exception)
+        catch (Exception)
         {
             ToastService.ShowError("Something went wrong, please try again later.");
+        }
+    }
+
+    private async Task DeleteMatch(Guid matchId)
+    {
+        if (await MessageService.Confirm( "Are you sure?", "Delete match"))
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"match/administration/{matchId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowSuccess("Match deleted successfully.");
+                    await GetAll();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
         }
     }
 }

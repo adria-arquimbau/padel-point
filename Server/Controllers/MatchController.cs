@@ -476,4 +476,50 @@ public class MatchController : ControllerBase
         
         return Ok(matches);
     }
+    
+    [HttpGet("administration/all")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> GetAllAdministrator(CancellationToken cancellationToken)
+    {
+        var matches = await _dbContext.Match
+            .Include(x => x.MatchPlayers)
+            .ThenInclude(matchPlayer => matchPlayer.Player)
+            .Include(x => x.EloHistories)
+            .Include(match => match.Promotions)
+            .Include(match => match.Creator)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var matchResponses = matches.Select(x => new MatchAdministratorResponse
+        {
+            Id = x.Id,
+            CreatorNickName = x.Creator.NickName,
+            StartDateTime = x.StartDateTime,
+            IsPrivate = x.IsPrivate,
+            ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
+            ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
+            Duration = x.Duration,
+            PlayersCount = x.MatchPlayers.Count,
+            PlayersTeamOne = x.MatchPlayers.Where(mp => mp.Team == Team.Team1)
+                .Select(mp => new PlayerDto
+                {
+                    NickName = mp.Player.NickName,
+                }).ToList(),
+            PlayersTeamTwo = x.MatchPlayers.Where(mp => mp.Team == Team.Team2)
+                .Select(mp => new PlayerDto
+                {
+                    NickName = mp.Player.NickName,
+                }).ToList(),
+            PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
+            AverageElo = x.MatchPlayers.Any() ? 
+                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.PreviousElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
+                : 0,
+            Promotions = x.Promotions.Select(p => new PromotionResponse
+            {
+                Title = p.Title,
+                Description = p.Description
+            }).ToList()
+        }).OrderByDescending(x => x.StartDateTime).ToList();    
+        
+        return Ok(matchResponses);
+    }
 }
