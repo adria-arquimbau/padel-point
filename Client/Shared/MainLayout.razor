@@ -1,9 +1,21 @@
 ﻿@using Blazored.Toast.Configuration
+@using EventsManager.Shared.Responses
 @using Color = Blazorise.Color
+@using System.Net
 
 @inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+@using EventsManager.Client.Components.User
+@using EventsManager.Client.Components.Match
+@using EventsManager.Client.Components.Players
+@using EventsManager.Client.Components
+
+@using EventsManager.Client.Components.Notifications
+@using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Responses
 
 <div class="page">
     <div class="sidebar">
@@ -28,12 +40,45 @@
     </main>
 </div>
 
+<AuthorizeView>
+    <Authorized>
+        @if (_initialLevelResponse is {Done: false })
+        {
+            <InitialLevelForm IsDone="@_initialLevelResponse.Done"></InitialLevelForm>
+        }
+    </Authorized>
+</AuthorizeView>
+
 <BlazoredToasts MaxToastCount="2" Timeout="2" ShowCloseButton="false" ShowProgressBar="true" Position="ToastPosition.TopCenter" RemoveToastsOnNavigation="true" />
 
 @code
 {
+    private InitialLevelIsDoneResponse? _initialLevelResponse;
+    
     private void GoToMainPage()
     {
         NavigationManager.NavigateTo("/", forceLoad: true);
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetInitialLevelInfo();    
+    }
+    
+    private async Task GetInitialLevelInfo()    
+    {
+        try
+        {
+            var response = await Http.GetAsync("Announcement/initial-level-done");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _initialLevelResponse = await response.Content.ReadFromJsonAsync<InitialLevelIsDoneResponse>();
+            }
+        }
+        catch (Exception)
+        {
+    // ignored
+        }
     }
 }

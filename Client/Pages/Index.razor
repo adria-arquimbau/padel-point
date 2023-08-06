@@ -25,10 +25,6 @@
 
 <AuthorizeView>
     <Authorized>
-        @if (_initialLevelResponse is {Done: false })
-        {
-            <InitialLevelForm IsDone="@_initialLevelResponse.Done"></InitialLevelForm>
-        }
         @if (_announcementDevelopmentResponse is {Done: false })
         {
             <DevelopmentVersionAnnouncement IsDone="@_announcementDevelopmentResponse.Done"></DevelopmentVersionAnnouncement>
