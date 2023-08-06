@@ -5,6 +5,7 @@
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
+@inject NavigationManager NavigationManager
 
 @if (_loading)
 {
@@ -19,7 +20,7 @@
     <div>
         @foreach (var match in _matches)
         {
-            <div class="border match-card" style="position: relative;">
+            <div @onclick="() => GoToTheMatch(match.Id)" class="border match-card" style="position: relative;">
                  @if (match.Finished)
                  {
                      <div class="finished-stamp">Finished</div>
@@ -60,9 +61,6 @@
                         <p style="font-size: 12px; margin: 0;">@player</p>
                     }
                 </div>
-                <div style="position: absolute; bottom: 10px; left: 10px;">
-                    <a href="/match/@match.Id/detail">View Details</a>
-                </div>
                 <div style="clear: both;"></div>
             </div>
         }
@@ -72,11 +70,16 @@
 @code {
     private List<MatchResponse>? _matches;
     private bool _loading = false;
-    private bool specialPromotion = false;
+    private bool _specialPromotion = false;
     
     protected override async Task OnInitializedAsync()
     {
         await GetAllMatches();
+    }
+    
+    private void GoToTheMatch(Guid id)
+    {
+        NavigationManager.NavigateTo($"/match/{id}/detail");
     }
 
     private async Task GetAllMatches()
