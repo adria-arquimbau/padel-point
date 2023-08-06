@@ -165,33 +165,6 @@ public class PlayerController : ControllerBase
         return Ok(matches);
     }
     
-    [HttpDelete("delete-all-initial-player-calibration")]
-    [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> DeleteAllInitialPlayerCalibrations(CancellationToken cancellationToken)
-    {
-        var players = await _dbContext.Player
-            .Where(x => x.EloHistories.Any(eh => eh.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration))
-            .Include(x => x.EloHistories)
-            .Include(x => x.InitialLevelForm)
-            .Include(x => x.Announcements)
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        foreach (var player in players)
-        {
-            var initialCalibrationHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialSkillCalibration);
-            
-            player.Elo = initialCalibrationHistory.PreviousElo;
-            player.InitialLevelForm = null;
-            player.Announcements.InitialLevelFormDone = false;
-            
-            _dbContext.EloHistories.Remove(initialCalibrationHistory);
-        }
-        
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        
-        return Ok();
-    }
-    
     [HttpDelete("delete-initial-player-calibration/{playerId:guid}")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteInitialPlayerCalibration([FromRoute] Guid playerId, CancellationToken cancellationToken)

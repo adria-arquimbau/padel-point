@@ -64,7 +64,6 @@
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
-                    <Button Clicked="() => DeleteCalibration(selectedUser.PlayerId)" Color="Color.Danger">Delete Calibration</Button>
                     <dl class="row">
                         <dt class="col-sm-4">User Id:</dt>
                         <dd class="col-sm-8">@selectedUser.Id</dd>
@@ -99,6 +98,7 @@
                             <br/>
                             OtherRacketSportsLevel: @selectedUser.InitialPlayerSkillCalibration.OtherRacketSportsLevel
                         </div>
+                        <Button Clicked="() => DeleteCalibration(selectedUser.PlayerId)" Color="Color.Danger">Delete Calibration</Button>
                     }
                     <Divider></Divider>
                     <h4>Elo history</h4>

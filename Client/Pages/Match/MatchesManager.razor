@@ -1,0 +1,58 @@
+@page "/matches-manager"
+@using EventsManager.Shared.Responses
+
+@inject NavigationManager NavManager
+
+@inject HttpClient Http
+@inject IToastService ToastService
+
+<h3>Matches Manager</h3>
+
+<Divider></Divider>
+
+<h4>All matches</h4>
+
+@if (_matches != null)
+{
+    @if (_matches.Any())
+    {
+        foreach (var match in _matches)
+        {
+            <Divider></Divider>
+            @match.Id
+        }
+    }
+    else
+    {
+        <p>No matches found.</p>
+    }
+}
+
+<Divider></Divider>
+
+
+@code {
+    private List<MatchResponse>? _matches;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await Http.GetAsync("match");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch(Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+    }
+}

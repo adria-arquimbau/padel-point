@@ -1,21 +1,12 @@
 ﻿@using Blazored.Toast.Configuration
 @using EventsManager.Shared.Responses
 @using Color = Blazorise.Color
-@using System.Net
 
 @inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
-
-@using EventsManager.Client.Components.User
-@using EventsManager.Client.Components.Match
-@using EventsManager.Client.Components.Players
 @using EventsManager.Client.Components
-
-@using EventsManager.Client.Components.Notifications
-@using EventsManager.Shared.Dtos
-@using EventsManager.Shared.Responses
 
 <div class="page">
     <div class="sidebar">
@@ -78,7 +69,7 @@
         }
         catch (Exception)
         {
-    // ignored
+            // ignored
         }
     }
 }
