@@ -13,6 +13,7 @@ public enum OtherRacketSportsLevel
 {
     None,
     Amateur,
+    Competitive,
     SemiPro,
     Pro 
 }   

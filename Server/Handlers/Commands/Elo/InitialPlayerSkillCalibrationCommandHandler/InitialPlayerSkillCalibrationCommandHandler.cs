@@ -47,7 +47,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         player.InitialLevelForm = new InitialLevelForm
         {
             OtherRacketSportsYearsPlaying = request.Request.OtherRacketSportsYearsPlaying,
-            OtherRacketSportsLevel = request.Request.PlayedOtherRacketSportsBefore ? request.Request.OtherRacketSportsLevel : OtherRacketSportsLevel.None,
+            OtherRacketSportsLevel = !request.Request.PlayedOtherRacketSportsBefore ? OtherRacketSportsLevel.None : request.Request.OtherRacketSportsLevel,
             PlayedOtherRacketSportsBefore = request.Request.PlayedOtherRacketSportsBefore,
             SelfAssessedPadelSkillLevel = request.Request.SelfAssessedPadelSkillLevel,
             YearsPlayingPadel = request.Request.YearsPlayingPadel,
@@ -69,11 +69,14 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
                 case OtherRacketSportsLevel.Amateur:
                     eloPoints += 30;
                     break;
+                case OtherRacketSportsLevel.Competitive:
+                    eloPoints += 50;  
+                    break;
                 case OtherRacketSportsLevel.SemiPro:
-                    eloPoints += 75;  // Increase to 130 points for semi-pro level
+                    eloPoints += 75;  
                     break;
                 case OtherRacketSportsLevel.Pro:
-                    eloPoints += 150;  // Increase to 230 points for pro level
+                    eloPoints += 150;  
                     break;
             }
         }
