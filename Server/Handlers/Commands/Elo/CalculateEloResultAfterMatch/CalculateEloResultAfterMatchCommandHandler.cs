@@ -18,11 +18,11 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
     public async Task Handle(CalculateEloResultAfterMatchCommandRequest request, CancellationToken cancellationToken)
     {
          var match = await _context.Match
-        .Where(x => x.Id == request.MatchId)
-        .Include(x => x.MatchPlayers)
-            .ThenInclude(x => x.Player)
-        .Include(x => x.Sets)
-        .SingleAsync(cancellationToken: cancellationToken);
+            .Where(x => x.Id == request.MatchId)
+            .Include(x => x.MatchPlayers)
+                .ThenInclude(x => x.Player)
+            .Include(x => x.Sets)
+            .SingleAsync(cancellationToken: cancellationToken);
 
         // Assume team1 is the first two players and team2 is the second two
         var playersTeamOne = match.MatchPlayers.Where(x => x.Team == Team.Team1).ToList();
@@ -48,9 +48,9 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
                 eloChange *= 2; // Double the amount of Elo lost if the team lost the match
             }
             var newElo = player.Elo + (int)eloChange;
-            player.Elo = newElo;
             
             CreateEloHistory(player, newElo, match);
+            player.Elo = newElo;
         }
         
         foreach (var player in team2)
@@ -66,9 +66,9 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
             }
 
             var newElo = player.Elo + (int)eloChange;
-            player.Elo = newElo;
             
             CreateEloHistory(player, newElo, match);
+            player.Elo = newElo;
         }
 
         await _context.SaveChangesAsync(cancellationToken);

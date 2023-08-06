@@ -502,7 +502,7 @@ public class MatchController : ControllerBase
             PlayersTeamOne = x.MatchPlayers.Where(mp => mp.Team == Team.Team1)
                 .Select(mp => new PlayerDto
                 {
-                    NickName = mp.Player.NickName,
+                    NickName = mp.Player.NickName
                 }).ToList(),
             PlayersTeamTwo = x.MatchPlayers.Where(mp => mp.Team == Team.Team2)
                 .Select(mp => new PlayerDto
@@ -591,7 +591,6 @@ public class MatchController : ControllerBase
         var team1Won = team1TotalScore > team2TotalScore;
         var team2Won = team2TotalScore > team1TotalScore;
         
-
         foreach (var player in team1)
         {
             var kFactor = GetKFactor(player.Elo);
