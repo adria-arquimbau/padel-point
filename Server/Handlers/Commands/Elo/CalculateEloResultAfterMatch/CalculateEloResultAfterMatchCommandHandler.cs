@@ -34,74 +34,46 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
         var team1TotalScore = match.Sets.Sum(set => set.Team1Score);
         var team2TotalScore = match.Sets.Sum(set => set.Team2Score);
         var team1Won = team1TotalScore > team2TotalScore;
+        var team2Won = team2TotalScore > team1TotalScore;
         
-
         foreach (var player in team1)
         {
             var kFactor = GetKFactor(player.Elo);
-            
-            // Average Elo rating of the opposing team
             var otherTeamElo = team2.Average(p => p.Elo);
-
-            // Expected score, based on the player's current Elo rating and the average Elo rating of the opposing team
             var expectedScore = 1.0 / (1.0 + Math.Pow(10, (otherTeamElo - player.Elo) / 400.0));
-
-            // Actual score, based on whether the player's team won and by how much
             var actualScore = team1Won ? 1.0 + (team1TotalScore - team2TotalScore) / 10.0 : 0.0;
-
-            // New Elo rating, based on the player's current Elo rating, the expected score, the actual score, and the K-factor
-            var newElo = player.Elo + (int)(kFactor * (actualScore - expectedScore));
-
-            // Save the Elo rating change in the player's history
-            player.EloHistories.Add(new EloHistory
+            var eloChange = kFactor * (actualScore - expectedScore);
+            if (!team1Won)
             {
-                PreviousElo = player.Elo,
-                CurrentElo = newElo,
-                EloChange = newElo - player.Elo,
-                ChangeDate = DateTime.Now,
-                MatchId = match.Id,
-                PlayerId = player.Id,
-                ChangeReason = ChangeEloHistoryReason.MatchPlayed
-            });
-
-            // Update the player's Elo rating
+                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+            }
+            var newElo = player.Elo + (int)eloChange;
             player.Elo = newElo;
+            
+            CreateEloHistory(player, newElo, match);
         }
-
-        // Repeat the same process for team 2
+        
         foreach (var player in team2)
         {
             var kFactor = GetKFactor(player.Elo);
-            
             var otherTeamElo = team1.Average(p => p.Elo);
             var expectedScore = 1.0 / (1.0 + Math.Pow(10, (otherTeamElo - player.Elo) / 400.0));
             var actualScore = team1Won ? 0.0 : 1.0 + (team2TotalScore - team1TotalScore) / 10.0;
-            var newElo = player.Elo + (int)(kFactor * (actualScore - expectedScore));
-
-            player.EloHistories.Add(new EloHistory
+            var eloChange = kFactor * (actualScore - expectedScore);
+            if (!team2Won)
             {
-                PreviousElo = player.Elo,
-                CurrentElo = newElo,
-                EloChange = newElo - player.Elo,
-                ChangeDate = DateTime.Now,
-                MatchId = match.Id,
-                PlayerId = player.Id,
-                ChangeReason = ChangeEloHistoryReason.MatchPlayed
-            });
+                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+            }
 
+            var newElo = player.Elo + (int)eloChange;
             player.Elo = newElo;
             
-            player.Notifications.Add(new Notification
-            {
-                CreationDate = DateTime.Now,
-                Title = "Elo Change",
-                Description = "Your elo has changed, your new elo points are " + newElo,
-            });
+            CreateEloHistory(player, newElo, match);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
     }
-
+    
     private static int GetKFactor(int elo)
     {
         if (elo < 1650)
@@ -114,5 +86,26 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
         }
 
         return 24;
+    }
+    
+    private static void CreateEloHistory(Player player, int newElo, Match match)
+    {
+        player.EloHistories.Add(new EloHistory
+        {
+            PreviousElo = player.Elo,
+            CurrentElo = newElo,
+            EloChange = newElo - player.Elo,
+            ChangeDate = DateTime.Now,
+            MatchId = match.Id,
+            PlayerId = player.Id,
+            ChangeReason = ChangeEloHistoryReason.MatchPlayed
+        });
+
+        player.Notifications.Add(new Notification
+        {
+            CreationDate = DateTime.Now,
+            Title = "Elo Change",
+            Description = "Your elo has changed, your new elo points are " + newElo,
+        });
     }
 }

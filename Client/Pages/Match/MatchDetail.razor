@@ -186,7 +186,6 @@
     private async Task Share()
     {
         var url = NavigationManager.Uri;
-        Console.WriteLine(url);
         await ClipboardService.CopyToClipboard(url);
         ToastService.ShowSuccess("Link copied to clipboard.");
     }

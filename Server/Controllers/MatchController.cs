@@ -527,7 +527,6 @@ public class MatchController : ControllerBase
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteMatch([FromRoute] Guid matchId, CancellationToken cancellationToken)
     {
-        //3003a5de-7a09-490d-e275-08db96677c873003a5de-7a09-490d-e275-08db96677c87
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
             .SingleAsync(cancellationToken: cancellationToken);
@@ -561,5 +560,89 @@ public class MatchController : ControllerBase
         await _dbContext.SaveChangesAsync(cancellationToken);
         
         return Ok();
+    }
+    
+    [HttpPost("administration/simulate")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> Simulate(CancellationToken cancellationToken)
+    {
+        var player1 = new Player{Elo = 1820};
+        var player2 = new Player{Elo = 1707};
+        var player3 = new Player{Elo = 1697};
+        var player4 = new Player{Elo = 1750};
+
+        var player1PreviousElo = player1.Elo;
+        var player2PreviousElo = player2.Elo;
+        var player3PreviousElo = player3.Elo;
+        var player4PreviousElo = player4.Elo;
+        
+        var sets = new List<Set>
+        {
+            new Set{SetNumber = 1, Team1Score = 6, Team2Score = 0},
+            new Set{SetNumber = 2, Team1Score = 6, Team2Score = 3},
+        };
+        
+        var team1 = new [] { player1, player2 };
+        var team2 = new [] { player3, player4 };
+
+        // Assume team1 won if they have a higher total score than team2
+        var team1TotalScore = sets.Sum(set => set.Team1Score);
+        var team2TotalScore = sets.Sum(set => set.Team2Score);
+        var team1Won = team1TotalScore > team2TotalScore;
+        var team2Won = team2TotalScore > team1TotalScore;
+        
+
+        foreach (var player in team1)
+        {
+            var kFactor = GetKFactor(player.Elo);
+            var otherTeamElo = team2.Average(p => p.Elo);
+            var expectedScore = 1.0 / (1.0 + Math.Pow(10, (otherTeamElo - player.Elo) / 400.0));
+            var actualScore = team1Won ? 1.0 + (team1TotalScore - team2TotalScore) / 10.0 : 0.0;
+            var eloChange = kFactor * (actualScore - expectedScore);
+            if (!team1Won)
+            {
+                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+            }
+            var newElo = player.Elo + (int)eloChange;
+            player.Elo = newElo;
+        }
+
+        // Repeat the same process for team 2
+        foreach (var player in team2)
+        {
+            var kFactor = GetKFactor(player.Elo);
+            var otherTeamElo = team1.Average(p => p.Elo);
+            var expectedScore = 1.0 / (1.0 + Math.Pow(10, (otherTeamElo - player.Elo) / 400.0));
+            var actualScore = team1Won ? 0.0 : 1.0 + (team2TotalScore - team1TotalScore) / 10.0;
+            var eloChange = kFactor * (actualScore - expectedScore);
+            if (!team2Won)
+            {
+                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+            }
+
+            var newElo = player.Elo + (int)eloChange;
+            player.Elo = newElo;
+        }
+        
+        Console.WriteLine("Player 1 elo gained: " + (player1.Elo - player1PreviousElo));
+        Console.WriteLine("Player 2 elo gained: " + (player2.Elo - player2PreviousElo));
+        Console.WriteLine("Player 3 elo gained: " + (player3.Elo - player3PreviousElo));
+        Console.WriteLine("Player 4 elo gained: " + (player4.Elo - player4PreviousElo));
+        
+        return Ok();
+    }
+    
+    private static int GetKFactor(int elo)
+    {
+        if (elo < 1650)
+        {
+            return 40;
+        }
+        if (elo is >= 1650 and < 1899)
+        {
+            return 32;
+        }
+
+        return 24;
     }
 }

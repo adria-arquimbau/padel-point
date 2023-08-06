@@ -11,6 +11,8 @@
 <h3>Matches Manager</h3>
 
 <Divider></Divider>
+    <Button Color="Color.Primary" Clicked="Simulate">Match Simulator</Button>
+<Divider></Divider>
 
 <h4>All matches</h4>
 
@@ -119,6 +121,11 @@
     private void GoToMatch(Guid matchId)
     {
         NavManager.NavigateTo($"match/{matchId}/detail");
+    }
+
+    private async Task Simulate()
+    {
+        await Http.PostAsync($"match/administration/simulate", null);
     }
 
 }
