@@ -21,29 +21,35 @@
         foreach (var match in _matches)
         {
             <Divider></Divider>
-            <b>Id: </b>@match.Id
-            <br/>
-            <b>Private: </b>@match.IsPrivate
-            <br/>
-            <b>Creator: </b>@match.CreatorNickName
-            <br/>
-            <b>Start date: </b>@match.StartDateTime
-            <br/>
-            <b>Finished: </b>@match.Finished
-            <br/>
-            <b>TeamOne: </b>
-            foreach (var player in @match.PlayersTeamOne)
-            {
-                @player.NickName @PlusSymbol
-            }
-            <br/>
-            <b>TeamTwo: </b>
-            foreach (var player in @match.PlayersTeamTwo)
-            {
-                @player.NickName @PlusSymbol
-            }
-            <br/>
-            <Button Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete</Button>
+            <div @onclick="() => GoToMatch(match.Id)">
+                <b>Id: </b>@match.Id
+                <br/>
+                <b>Private: </b>@match.IsPrivate
+                <br/>
+                <b>Average Elo: </b>@match.AverageElo
+                <br/>
+                <b>Creator: </b>@match.CreatorNickName
+                <br/>
+                <b>Start date: </b>@match.StartDateTime 
+                <br/>
+                <b>Finished: </b>@match.Finished
+                <br/>
+                <b>TeamOne: </b>
+                @foreach (var player in @match.PlayersTeamOne)
+                {
+                    @player.NickName @PlusSymbol
+                }
+                <br/>
+                <b>TeamTwo: </b>
+                @foreach (var player in @match.PlayersTeamTwo)
+                {
+                    @player.NickName @PlusSymbol
+                }
+                <br/>
+                <Button Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete</Button>
+            </div>
+            
+           
         }
     }
     else
@@ -109,6 +115,12 @@
             {
                 ToastService.ShowError("Something went wrong, please try again later.");
             }
-        }
+        }   
     }
+
+    private void GoToMatch(Guid matchId)
+    {
+        NavManager.NavigateTo($"match/{matchId}/detail");
+    }
+
 }

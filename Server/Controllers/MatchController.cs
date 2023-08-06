@@ -522,4 +522,44 @@ public class MatchController : ControllerBase
         
         return Ok(matchResponses);
     }
+    
+    [HttpDelete("administration/{matchId:guid}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> DeleteMatch([FromRoute] Guid matchId, CancellationToken cancellationToken)
+    {
+        //3003a5de-7a09-490d-e275-08db96677c873003a5de-7a09-490d-e275-08db96677c87
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var eloHistoriesFromTheMatch = await _dbContext.EloHistories
+            .Where(x => x.MatchId == matchId)
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        var playersFromTheMatch = await _dbContext.MatchPlayer
+            .Where(x => x.MatchId == matchId)
+            .Select(x => x.Player)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        if (playersFromTheMatch.Any())  
+        {
+            foreach (var player in playersFromTheMatch)
+            {
+                var eloHistoryForThePlayer = eloHistoriesFromTheMatch
+                    .SingleOrDefault(x => x.PlayerId == player.Id);
+
+                if (eloHistoryForThePlayer is not null)
+                {
+                    player.Elo = eloHistoryForThePlayer.PreviousElo;
+                }
+            }
+            _dbContext.EloHistories.RemoveRange(eloHistoriesFromTheMatch);
+        }
+        
+        _dbContext.Match.Remove(match);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
 }
