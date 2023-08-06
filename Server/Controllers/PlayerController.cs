@@ -192,7 +192,7 @@ public class PlayerController : ControllerBase
         return Ok();
     }
     
-    [HttpDelete("delete-initial-player-calibration")]
+    [HttpDelete("delete-initial-player-calibration/{playerId:guid}")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> DeleteInitialPlayerCalibration([FromRoute] Guid playerId, CancellationToken cancellationToken)
     {

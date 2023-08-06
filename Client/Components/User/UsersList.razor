@@ -62,19 +62,19 @@
                 <div class="modal-header">
                     <h5 class="modal-title">User Details</h5>
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                    <Button Clicked="() => DeleteCalibration(selectedUser.PlayerId)" Color="Color.Danger">Delete Calibration</Button>
                 </div>
                 <div class="modal-body">
+                    <Button Clicked="() => DeleteCalibration(selectedUser.PlayerId)" Color="Color.Danger">Delete Calibration</Button>
                     <dl class="row">
                         <dt class="col-sm-4">User Id:</dt>
                         <dd class="col-sm-8">@selectedUser.Id</dd>
-                        
+
                         <dt class="col-sm-4">User Name:</dt>
                         <dd class="col-sm-8">@selectedUser.UserName</dd>
-                        
+
                         <dt class="col-sm-4">Elo:</dt>
                         <dd class="col-sm-8">@selectedUser.Elo</dd>
-                        
+
                         <dt class="col-sm-4">Country:</dt>
                         <dd class="col-sm-8">@selectedUser.Country</dd>
 
@@ -115,7 +115,7 @@
                             Elo difference: @eloHistory.EloChange
                             <br/>
                             Reason: @eloHistory.ChangeReason
-                       </div>
+                        </div>
                     }
                     <Divider></Divider>
                 </div>

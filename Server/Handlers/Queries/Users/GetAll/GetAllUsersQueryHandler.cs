@@ -28,6 +28,7 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             EmailConfirmed = x.EmailConfirmed,
             Country = x.Player.Country,
             Elo = x.Player.Elo,
+            PlayerId = x.Player.Id,
             InitialPlayerSkillCalibration = x.Player.InitialLevelForm != null ? new InitialPlayerSkillCalibrationResponse
             {
                 OtherRacketSportsYearsPlaying = x.Player.InitialLevelForm.OtherRacketSportsYearsPlaying,
