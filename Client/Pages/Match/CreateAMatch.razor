@@ -69,9 +69,7 @@
     }  
     
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
-    
 
-    
     private async Task HandleValidSubmit()
     {
         _loading = true;

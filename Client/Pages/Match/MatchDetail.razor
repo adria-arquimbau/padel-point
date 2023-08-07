@@ -6,6 +6,7 @@
 @using EventsManager.Client.Components.Match.Results
 @using EventsManager.Client.Services
 @using EventsManager.Shared.Requests
+@using Microsoft.AspNetCore.SignalR.Client
 @using Color = Blazorise.Color
 
 @inject HttpClient Http
@@ -14,6 +15,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject ClipboardService ClipboardService
+@implements IAsyncDisposable
+
 @if (_loading)
 {
     <MatchDetailSkeleton></MatchDetailSkeleton>
@@ -130,8 +133,18 @@
     private double _matchPrice;
     private string _hourWord = "hour";   
     
+    private HubConnection hubConnection;
+    private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    Task SendMessage() => hubConnection.SendAsync("SendMessage");
+
     protected override async Task OnInitializedAsync()
     {
+        hubConnection = new HubConnectionBuilder()  
+            .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
+            .Build();  
+  
+        await hubConnection.StartAsync();  
+        
         await GetMatch();
         if (_match != null)
         {
@@ -212,6 +225,10 @@
                 if(response.IsSuccessStatusCode)
                 {
                     ToastService.ShowInfo("Match has been removed successfully.");
+                    if (IsConnected)
+                    {
+                        await SendMessage();
+                    }
                     NavigationManager.NavigateTo("/");
                 }
                 else
@@ -242,6 +259,10 @@
                 if(response.IsSuccessStatusCode)    
                 {
                     ToastService.ShowInfo("Match has been updated successfully.");
+                    if (IsConnected)
+                    {
+                        await SendMessage();
+                    }
                     await GetMatch();
                 }
                 else
@@ -259,6 +280,12 @@
         _editModalVisible = false;
         _loading = false;
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+
 }
 
 <style>
