@@ -3,14 +3,14 @@
 @using EventsManager.Shared
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
 @inject IToastService ToastService
 @inject IMessageService MessageService
 @inject NavigationManager NavigationManager
-
-
+@implements IAsyncDisposable
 
 @if (_loading)
 {
@@ -185,6 +185,19 @@
     
     private bool _loading = false;
     
+    private HubConnection hubConnection;
+    private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    Task SendMessage() => hubConnection.SendAsync("SendMessage");
+
+    protected override async Task OnInitializedAsync()  
+    {  
+        hubConnection = new HubConnectionBuilder()  
+            .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
+            .Build();  
+  
+        await hubConnection.StartAsync();  
+    }  
+    
     private async Task AddPlayer(string team)
     {
         _loading = true;
@@ -203,6 +216,10 @@
 
             if(response.IsSuccessStatusCode)
             {
+                if (IsConnected)
+                {
+                    await SendMessage();
+                }
                 ToastService.ShowInfo("You have been added to the match.");
                 await RefreshMatch.InvokeAsync();
             }
@@ -235,6 +252,10 @@
                 var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
                 if (response.IsSuccessStatusCode)
                 {
+                    if (IsConnected)
+                    {
+                        await SendMessage();
+                    }
                     ToastService.ShowInfo("Player removed from the match.");
                     _loading = false;
                     await RefreshMatch.InvokeAsync();
@@ -262,6 +283,12 @@
     {
         NavigationManager.NavigateTo($"/player-detail/{playerId}");
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+
 }
 
 <style>
