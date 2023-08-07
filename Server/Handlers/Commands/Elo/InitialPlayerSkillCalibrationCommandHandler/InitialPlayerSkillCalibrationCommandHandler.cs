@@ -47,7 +47,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         player.InitialLevelForm = new InitialLevelForm
         {
             OtherRacketSportsYearsPlaying = request.Request.OtherRacketSportsYearsPlaying,
-            OtherRacketSportsLevel = !request.Request.PlayedOtherRacketSportsBefore ? OtherRacketSportsLevel.None : request.Request.OtherRacketSportsLevel,
+            OtherRacketSportsLevel = request.Request.PlayedOtherRacketSportsBefore == false ? OtherRacketSportsLevel.None : request.Request.OtherRacketSportsLevel,
             PlayedOtherRacketSportsBefore = request.Request.PlayedOtherRacketSportsBefore,
             SelfAssessedPadelSkillLevel = request.Request.SelfAssessedPadelSkillLevel,
             YearsPlayingPadel = request.Request.YearsPlayingPadel,

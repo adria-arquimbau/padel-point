@@ -24,11 +24,11 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             UserName = x.UserName,
             Email = x.Email,
             RegistrationDate = x.RegistrationDate,
-            ImageUrl = x.Player.ImageUrl,
-            EmailConfirmed = x.EmailConfirmed,
-            Country = x.Player.Country,
-            Elo = x.Player.Elo,
-            PlayerId = x.Player.Id,
+            ImageUrl = x.Player != null ? x.Player.ImageUrl : null,
+            EmailConfirmed = x.Player != null ? x.EmailConfirmed : false,
+            Country = x.Player != null ? x.Player.Country : null,
+            Elo = x.Player != null ? x.Player.Elo : 0,
+            PlayerId = x.Player != null ? x.Player.Id : null,
             InitialPlayerSkillCalibration = x.Player.InitialLevelForm != null ? new InitialPlayerSkillCalibrationResponse
             {
                 OtherRacketSportsYearsPlaying = x.Player.InitialLevelForm.OtherRacketSportsYearsPlaying,
@@ -39,12 +39,12 @@ public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQueryRequest, 
             } : null,
             EloHistory = x.Player.EloHistories.Select(eh => new EloHistoryResponse
             {
-                CurrentElo = eh.NewElo,
+                CurrentElo = eh.NewElo, 
                 PreviousElo = eh.OldElo,
                 EloChange = eh.EloChange,
                 ChangeReason = eh.ChangeReason,
                 ChangeDate = eh.ChangeDate
-            }).OrderByDescending(x => x.ChangeDate).ToList()
+            }).OrderByDescending(eh => eh.ChangeDate).ToList()
         }).OrderByDescending(x => x.RegistrationDate)
         .ToListAsync(cancellationToken: cancellationToken);
 

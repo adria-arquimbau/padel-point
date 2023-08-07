@@ -11,7 +11,7 @@ public class UserDto
     public bool EmailConfirmed { get; set; }    
     public bool RequestingUpdate { get; set; }
     public string? Country { get; set; }    
-    public Guid PlayerId { get; set; }
+    public Guid? PlayerId { get; set; }
     public List<EloHistoryResponse>? EloHistory { get; set; }
     public int Elo { get; set; }    
     public DateTime? RegistrationDate { get; set; } 

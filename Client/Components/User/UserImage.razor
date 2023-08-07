@@ -32,7 +32,7 @@
         if (user != null)
         {
             UserImageUrl = user.ImageUrl;
-            _playerId = user.PlayerId;
+            _playerId = user.PlayerId.Value;
         }
        
         RequestingImage = false;
