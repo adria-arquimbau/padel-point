@@ -186,17 +186,34 @@
     private bool _loading = false;
     
     private HubConnection hubConnection;
+    private HubConnection hubConnectionMatch;
     private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
+    private bool IsConnectedMatch => hubConnectionMatch.State == HubConnectionState.Connected;
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
+    Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString());
 
     protected override async Task OnInitializedAsync()  
     {  
         hubConnection = new HubConnectionBuilder()  
             .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
             .Build();  
-  
+        
         await hubConnection.StartAsync();  
+
+        hubConnectionMatch = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/matchhub"))
+            .Build();
+
+        hubConnectionMatch.On<string>("ReceiveMessage", async (matchId) =>
+        {
+            await RefreshMatch.InvokeAsync();
+            StateHasChanged();  
+        });
+
+        await hubConnectionMatch.StartAsync();
+        await hubConnectionMatch.SendAsync("JoinGroup", Match.Id.ToString());
     }  
+
     
     private async Task AddPlayer(string team)
     {
@@ -216,6 +233,10 @@
 
             if(response.IsSuccessStatusCode)
             {
+                if (IsConnectedMatch)
+                {
+                    await SendMessageMatch();
+                }
                 if (IsConnected)
                 {
                     await SendMessage();
@@ -252,6 +273,10 @@
                 var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
                 if (response.IsSuccessStatusCode)
                 {
+                    if (IsConnectedMatch)
+                    {
+                        await SendMessageMatch();
+                    }
                     if (IsConnected)
                     {
                         await SendMessage();
@@ -287,6 +312,7 @@
     public async ValueTask DisposeAsync()
     {
         await hubConnection.DisposeAsync();
+        await hubConnectionMatch.DisposeAsync();
     }
 
 }

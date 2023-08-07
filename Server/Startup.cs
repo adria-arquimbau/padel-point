@@ -144,6 +144,7 @@ public class Startup {
         app.MapRazorPages();
         app.MapControllers();
         app.MapHub<AllMatchesHub>("/allmatcheshub");
+        app.MapHub<MatchHub>("/matchhub");
 
         app.MapFallbackToFile("index.html");
         
@@ -159,7 +160,6 @@ public class Startup {
             ResponseWriter = WriteResponseAsync,
             Predicate = reg => reg.Tags.Contains(LiteTag)
         });
-        
         
         app.Run();
     }
