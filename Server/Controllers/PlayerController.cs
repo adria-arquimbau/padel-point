@@ -72,11 +72,15 @@ public class PlayerController : ControllerBase
                 Country = x.Country,
                 MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                 EloHistory = x.EloHistories
+                    .OrderByDescending(eh => eh.ChangeDate)
+                    .Take(5)
                     .Select(eh => new EloHistoryResponse
                     {
                         CurrentElo = eh.NewElo,
                         ChangeDate = eh.ChangeDate
-                    }).OrderBy(eh => eh.ChangeDate).ToList(),
+                    })
+                    .OrderBy(eh => eh.ChangeDate)
+                    .ToList(),
                 LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
                 Rank = 0
             })  
