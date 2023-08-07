@@ -163,7 +163,15 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account.Manage
                 values: new { area = "Identity", userId = userId, code = encodedCode },
                 protocol: Request.Scheme);
 
-            await _emailService.Execute(email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            try
+            {
+                await _emailService.Execute(email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(string.Empty, "Email sending failed. Use another email domain or try using Google.");
+                return Page();
+            }
 
             StatusMessage = "Verification email sent. Please check your email.";
             return RedirectToPage();

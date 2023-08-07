@@ -25,7 +25,7 @@ public class EmailService : IEmailService
             };
             var emailMessage = new EmailMessage(_emailSettings.EmailFrom, recipient, emailContent);
             var emailSendOperation = await emailClient.SendAsync(
-                wait: WaitUntil.Started,  
+                wait: WaitUntil.Completed,
                 message: emailMessage);
             
             var operationId = emailSendOperation.Id;

@@ -150,7 +150,8 @@ public class RegisterModel : PageModel
                 }
                 catch (Exception)
                 {
-                    // ignored
+                    ModelState.AddModelError(string.Empty, "Email sending failed. Use another email domain or try using Google.");
+                    return Page();
                 }
 
                 await _userManager.AddToRoleAsync(user, RoleConstants.User);

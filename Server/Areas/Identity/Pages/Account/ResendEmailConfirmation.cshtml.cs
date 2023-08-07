@@ -79,7 +79,15 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
 
-            await _emailService.Execute(Input.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            try
+            {
+                await _emailService.Execute(Input.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(string.Empty, "Email sending failed. Please try again later or contact the administrator.");
+                return Page();
+            }
 
             ModelState.AddModelError(string.Empty, "Verification email sent. Please check your email.");
             return Page();
