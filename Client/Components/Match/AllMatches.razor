@@ -79,6 +79,7 @@
     
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
         hubConnection = new HubConnectionBuilder()  
             .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
             .Build();  
@@ -119,7 +120,6 @@
     {
         try
         {
-            _loading = true;
             var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
             var response = await http.GetAsync("match");
 
