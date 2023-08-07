@@ -26,14 +26,15 @@ public class EloHistoryController : ControllerBase
 
         var eloHistory = await _dbContext.EloHistories
             .Where(x => x.Player.UserId == userId)
-            .OrderBy(x => x.ChangeDate)
+            .OrderByDescending(x => x.ChangeDate)
+            .Take(5)
             .Select(x => new EloHistoryResponse
             {
                 CurrentElo = x.NewElo,
                 ChangeDate = x.ChangeDate
             })
+            .OrderBy(x => x.ChangeDate)
             .ToListAsync(cancellationToken);
-        
         
         return Ok(eloHistory);
     }
