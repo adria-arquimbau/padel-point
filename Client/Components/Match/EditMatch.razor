@@ -1,5 +1,6 @@
 @using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
+@using EventsManager.Shared.Enums
 @inject HttpClient Http
 @inject IToastService ToastService
 
@@ -24,6 +25,13 @@
                             <SelectItem Value="3">2 hours</SelectItem>
                             <SelectItem Value="4">2,5 hours</SelectItem>
                             <SelectItem Value="5">3 hours</SelectItem>
+                        </Select>
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <Select @bind-SelectedValue="@_editMatchRequest.Location" TValue="MatchLocation">
+                            <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+                            <SelectItem Value="MatchLocation.None">-</SelectItem>
                         </Select>
                     </div>
                     <div class="form-group form-check">
@@ -59,6 +67,7 @@
         {   
             _editMatchRequest.StartDate = Match.StartDateTime;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
+            _editMatchRequest.Location = Match.Location;
         }
         var duration = Match?.Duration switch
         {

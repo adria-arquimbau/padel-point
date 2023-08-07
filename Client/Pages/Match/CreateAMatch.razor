@@ -36,12 +36,12 @@
         <NumericEdit TValue="double" @bind-Value="@_pricePerHour" />    
     </div>
     <div class="form-group">
-            <label>Location</label>
-            <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
-                <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
-                <SelectItem Value="MatchLocation.None">-</SelectItem>
-            </Select>
-        </div>
+        <label>Location</label>
+        <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
+            <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+            <SelectItem Value="MatchLocation.None">-</SelectItem>
+        </Select>
+    </div>
     <div class="form-group">
         <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
     </div>

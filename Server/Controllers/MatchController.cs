@@ -97,6 +97,7 @@ public class MatchController : ControllerBase
 
         match.StartDateTime = request.StartDate;
         match.Duration = request.Duration;
+        match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
 
         foreach (var matchPlayer in match.MatchPlayers)
