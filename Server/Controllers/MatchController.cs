@@ -489,40 +489,41 @@ public class MatchController : ControllerBase
             .Include(x => x.EloHistories)
             .Include(match => match.Promotions)
             .Include(match => match.Creator)
-            .ToListAsync(cancellationToken: cancellationToken);
-
-        var matchResponses = matches.Select(x => new MatchAdministratorResponse
-        {
-            Id = x.Id,
-            CreatorNickName = x.Creator.NickName,
-            StartDateTime = x.StartDateTime,
-            IsPrivate = x.IsPrivate,
-            ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
-            ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
-            Duration = x.Duration,
-            PlayersCount = x.MatchPlayers.Count,
-            PlayersTeamOne = x.MatchPlayers.Where(mp => mp.Team == Team.Team1)
-                .Select(mp => new PlayerDto
-                {
-                    NickName = mp.Player.NickName
-                }).ToList(),
-            PlayersTeamTwo = x.MatchPlayers.Where(mp => mp.Team == Team.Team2)
-                .Select(mp => new PlayerDto
-                {
-                    NickName = mp.Player.NickName,
-                }).ToList(),
-            PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
-            AverageElo = x.MatchPlayers.Any() ? 
-                (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
-                : 0,
-            Promotions = x.Promotions.Select(p => new PromotionResponse
+            .OrderByDescending(x => x.CreationDate)
+            .Select(x => new MatchAdministratorResponse
             {
-                Title = p.Title,
-                Description = p.Description
-            }).ToList()
-        }).OrderByDescending(x => x.StartDateTime).ToList();    
+                Id = x.Id,
+                CreationDate = x.CreationDate,
+                CreatorNickName = x.Creator.NickName,
+                StartDateTime = x.StartDateTime,
+                IsPrivate = x.IsPrivate,
+                ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
+                ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
+                Duration = x.Duration,
+                PlayersCount = x.MatchPlayers.Count,
+                PlayersTeamOne = x.MatchPlayers.Where(mp => mp.Team == Team.Team1)
+                    .Select(mp => new PlayerDto
+                    {
+                        NickName = mp.Player.NickName
+                    }).ToList(),
+                PlayersTeamTwo = x.MatchPlayers.Where(mp => mp.Team == Team.Team2)
+                    .Select(mp => new PlayerDto
+                    {
+                        NickName = mp.Player.NickName,
+                    }).ToList(),
+                PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
+                AverageElo = x.MatchPlayers.Any() ? 
+                    (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
+                    : 0,
+                Promotions = x.Promotions.Select(p => new PromotionResponse
+                {
+                    Title = p.Title,
+                    Description = p.Description
+                }).ToList()
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
         
-        return Ok(matchResponses);
+        return Ok(matches);
     }
     
     [HttpDelete("administration/{matchId:guid}")]

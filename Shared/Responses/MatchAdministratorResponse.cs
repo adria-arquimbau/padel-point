@@ -30,4 +30,5 @@ public class MatchAdministratorResponse
     public double ProbabilityTeamOneWins { get; set; }  
     public double ProbabilityTeamTwoWins { get; set; }  
     public List<PromotionResponse> Promotions { get; set; }
+    public DateTime CreationDate { get; set; }
 }
