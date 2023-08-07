@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using EventsManager.Server.Hubs;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace EventsManager.Server;
 
@@ -82,6 +84,13 @@ public class Startup {
         services.AddRazorPages();
         
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("padelpointdb", tags: new []{ FullTag, LiteTag });
+
+        services.AddSignalR();
+        services.AddResponseCompression(opts =>
+        {
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                new[] { "application/octet-stream" });
+        });
         
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetMyUserQueryHandler).Assembly));
         services.AddMediatR(config =>
@@ -102,6 +111,7 @@ public class Startup {
         }
         else
         {
+            app.UseResponseCompression();
             app.UseExceptionHandler("/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
@@ -133,7 +143,10 @@ public class Startup {
         
         app.MapRazorPages();
         app.MapControllers();
+        app.MapHub<AllMatchesHub>("/allmatcheshub");
+
         app.MapFallbackToFile("index.html");
+        
         
         app.UseHealthChecks("/hc", new HealthCheckOptions
         {
@@ -146,6 +159,7 @@ public class Startup {
             ResponseWriter = WriteResponseAsync,
             Predicate = reg => reg.Tags.Contains(LiteTag)
         });
+        
         
         app.Run();
     }

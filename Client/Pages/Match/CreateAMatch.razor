@@ -3,9 +3,11 @@
 @using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
 @using EventsManager.Shared.Enums
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @inject IToastService ToastService
+@implements IAsyncDisposable
 
 @if (_loading)
 {
@@ -54,7 +56,22 @@
     private double _pricePerHour;
     private bool _isPrivate;
     private bool _loading;
+    private HubConnection hubConnection;
+    private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
 
+    protected override async Task OnInitializedAsync()  
+    {  
+        hubConnection = new HubConnectionBuilder()  
+            .WithUrl(NavManager.ToAbsoluteUri("/allmatcheshub"))  
+            .Build();  
+  
+        await hubConnection.StartAsync();  
+    }  
+    
+    Task SendMessage() => hubConnection.SendAsync("SendMessage");
+    
+
+    
     private async Task HandleValidSubmit()
     {
         _loading = true;
@@ -83,6 +100,10 @@
         
             if(response.IsSuccessStatusCode)
             {
+                if (IsConnected)
+                {
+                    await SendMessage();
+                }
                 var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
                 NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
                 ToastService.ShowSuccess("Match created successfully.");
@@ -100,5 +121,10 @@
         {
             _loading = false;
         }
+    }
+    
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
     }
 }

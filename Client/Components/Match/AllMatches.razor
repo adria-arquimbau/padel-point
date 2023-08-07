@@ -1,12 +1,14 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Loaders
 @using EventsManager.Shared.Enums
+@using Microsoft.AspNetCore.SignalR.Client
 @using Color = Blazorise.Color
 
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
 @if (_loading)
 {
@@ -73,11 +75,31 @@
     private List<MatchResponse>? _matches;
     private bool _loading = false;
     private bool _specialPromotion = false;
+    private HubConnection hubConnection;  
     
     protected override async Task OnInitializedAsync()
     {
+        hubConnection = new HubConnectionBuilder()  
+            .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
+            .Build();  
+        hubConnection.On("ReceiveMessage", async () =>  
+        {  
+            await GetAllMatches();
+            StateHasChanged();  
+        });  
+  
+        await hubConnection.StartAsync();  
+        
         await GetAllMatches();
     }
+    
+    private void CallLoadData()   
+    {  
+        Task.Run(async () =>  
+        {  
+            await GetAllMatches();  
+        });  
+    }  
     
     private void GoToTheMatch(Guid id)
     {
@@ -104,6 +126,7 @@
             if (response.IsSuccessStatusCode)
             {
                 _matches = await response.Content.ReadFromJsonAsync<List<MatchResponse>>();
+                StateHasChanged(); 
             }
             else
             {
@@ -119,6 +142,11 @@
         {
             _loading = false;
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
     }
 }
 
