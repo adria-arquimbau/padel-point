@@ -26,6 +26,8 @@
             <div @onclick="() => GoToMatch(match.Id)">
                 <b>Id: </b>@match.Id
                 <br/>
+                <b>Blocked: </b>@match.IsBlocked
+                <br/>
                 <b>CreationDate: </b>@match.CreationDate
                 <br/>
                 <b>Private: </b>@match.IsPrivate
@@ -175,7 +177,7 @@
         {
             try
             {
-                var response = await Http.PostAsync($"MatchManager/{matchId}/block/{block}", null);
+                var response = await Http.PutAsync($"MatchManager/{matchId}/block/{block}", null);
 
                 if (response.IsSuccessStatusCode)
                 {

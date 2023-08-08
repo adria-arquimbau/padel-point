@@ -153,7 +153,7 @@ public class MatchManagerController : ControllerBase
     
     [HttpPut("{matchId:guid}/block/{isBlocked:bool}")]
     [Authorize(Roles = "Administrator")]
-    public async Task<IActionResult> DeleteMatch([FromRoute] Guid matchId, [FromRoute] bool isBlocked, CancellationToken cancellationToken)
+    public async Task<IActionResult> BlockMatch([FromRoute] Guid matchId, [FromRoute] bool isBlocked, CancellationToken cancellationToken)
     {
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
