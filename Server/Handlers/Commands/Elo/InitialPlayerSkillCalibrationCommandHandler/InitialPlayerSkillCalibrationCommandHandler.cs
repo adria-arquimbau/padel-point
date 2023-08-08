@@ -33,18 +33,20 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             throw new InitialSkillCalibrationAlreadyDoneException("Initial skill calibration already done");
         }
         
-        var newElo = CalculateInitialElo(request.Request, player.Elo);
         
+        var initialEloHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialElo);
+        player.EloHistories.Remove(initialEloHistory);
+        
+        var newElo = CalculateInitialElo(request.Request, player.Elo);
         player.EloHistories.Add(new EloHistory
         {
             NewElo = newElo,    
-            OldElo = 0,
+            OldElo = player.EloHistories.Any() ? player.Elo : 0,
             ChangeDate = DateTime.Now,
             ChangeReason = ChangeEloHistoryReason.InitialSkillCalibration,
             EloChange = newElo - player.Elo,
         });
-        var initialEloHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialElo);
-        player.EloHistories.Remove(initialEloHistory);
+        
         player.Elo = newElo;
         
         player.Announcements.InitialLevelFormDone = true;
