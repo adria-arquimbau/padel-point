@@ -168,15 +168,16 @@
         {
             _loading = true;
             var response = await Http.PostAsJsonAsync("Announcement/initial-level-done", _initialLevelFormRequest);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowSuccess("You have successfully completed the initial level form.");
+                Navigation.NavigateTo("/", forceLoad: true);
+            }
+            
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
-                Navigation.NavigateTo("/", forceLoad: true);
-            }
-            else
-            {
-                ToastService.ShowSuccess("You have successfully completed the initial level form.");
             }
         }
         catch (Exception)
