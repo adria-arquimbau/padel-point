@@ -31,4 +31,5 @@ public class MatchAdministratorResponse
     public double ProbabilityTeamTwoWins { get; set; }  
     public List<PromotionResponse> Promotions { get; set; }
     public DateTime CreationDate { get; set; }
+    public bool IsBlocked { get; set; }
 }

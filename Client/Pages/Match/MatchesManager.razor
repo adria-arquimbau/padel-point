@@ -51,8 +51,20 @@
                 }
                 <br/>
             </div>
-            <Button Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete Match</Button>
-            <Button Clicked="() => DeletePunctuation(match.Id)" Color="Color.Warning">Delete Punctuation</Button>
+            <Button Size="Size.Small" Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete Match</Button>
+            @if (match.Finished)
+            {
+                <Button Size="Size.Small" Clicked="() => DeletePunctuation(match.Id)" Color="Color.Warning">Delete Punctuation</Button>
+            }
+            @if (match.IsBlocked)
+            {
+                <Button Size="Size.Small" Clicked="() => BlockMatch(match.Id, false)" Color="Color.Dark">Unblock match</Button>
+
+            }
+            @if (!match.IsBlocked)
+            {
+                <Button Size="Size.Small" Clicked="() => BlockMatch(match.Id, true)" Color="Color.Dark">Block match</Button>
+            }
         }
     }
     else
@@ -155,6 +167,32 @@
     private async Task Simulate()
     {
         await Http.PostAsync($"MatchManager/simulate", null);
+    }
+
+    private async Task BlockMatch(Guid matchId, bool block)
+    {
+        if (await MessageService.Confirm( "Are you sure?", "Block/UnBlock match"))
+        {
+            try
+            {
+                var response = await Http.PostAsync($"MatchManager/{matchId}/block/{block}", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowSuccess("Match blocked/unblocked successfully.");
+                    await GetAll();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        }   
     }
 
 }

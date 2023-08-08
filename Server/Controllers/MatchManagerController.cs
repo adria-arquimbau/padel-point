@@ -78,6 +78,7 @@ public class MatchManagerController : ControllerBase
             .Select(x => new MatchAdministratorResponse
             {
                 Id = x.Id,
+                IsBlocked = x.IsBlocked,
                 CreationDate = x.CreationDate,
                 CreatorNickName = x.Creator.NickName,
                 StartDateTime = x.StartDateTime,
@@ -144,6 +145,21 @@ public class MatchManagerController : ControllerBase
         }
         
         _dbContext.Match.Remove(match);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
+    [HttpPut("{matchId:guid}/block/{isBlocked:bool}")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> DeleteMatch([FromRoute] Guid matchId, [FromRoute] bool isBlocked, CancellationToken cancellationToken)
+    {
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        match.IsBlocked = isBlocked;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
         
