@@ -1,7 +1,7 @@
 @inject NavigationManager NavigationManager 
 @inject IJSRuntime JSRuntime
 
-<div @onclick="Redirect" class="border" style="background-image: url('https://padelpointsblob.blob.core.windows.net/banners/NineTPadelBanner.jpeg')">
+<div @onclick="Redirect" class="banner-card" style="background-image: url('https://padelpointsblob.blob.core.windows.net/banners/NineTPadelBanner.jpeg')">
 </div>
 
 @code {
@@ -13,16 +13,16 @@
 }   
 
 <style>
-    .border {
-        border: 1px solid #ccc;
+    .banner-card {
+        border: 1px;
         border-radius: 8px;
         padding: 10px;
-        margin: 10px;
         background-color: white;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         background-size: cover; 
         background-repeat: no-repeat; 
         background-position: center center; 
         min-height: 100px; 
+        margin: 10px 10px 15px;
     }  
 </style>
