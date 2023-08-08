@@ -44,7 +44,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
                     SetNumber = s.SetNumber,
                     Team1Score = s.Team1Score,
                     Team2Score = s.Team2Score
-                }).ToList(),
+                }).OrderBy(s => s.SetNumber).ToList(),
                 PlayersTeamOne = x.MatchPlayers.Where(p => p.Team == Team.Team1)
                     .Select(p => new PlayerDto
                 {
