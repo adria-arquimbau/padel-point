@@ -45,6 +45,13 @@
             }
         </div>
         <Divider />
+        @if (_match.IsBlocked)
+        {
+            <Alert Color="Color.Warning" Visible>
+                <AlertMessage>Match Blocked</AlertMessage>
+                <AlertDescription>Match Blocked by an Administrator. You can't confirm results.</AlertDescription>
+            </Alert>
+        }
         <div class="info-footer">
             <div class="info-footer-box">
                 <div class="info-footer-box-content">

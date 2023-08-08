@@ -26,6 +26,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
             {
                 Id = x.Id,
                 Location = x.Location,
+                IsBlocked = x.IsBlocked,
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,
                 RequesterIsAPlayer = x.MatchPlayers.Any(p => p.Player.UserId == userId),

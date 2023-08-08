@@ -5,6 +5,7 @@ namespace EventsManager.Shared.Responses;
 
 public class MatchResponse
 {
+    public bool IsBlocked { get; set; }
     public Guid Id { get; set; }
     public DateTime StartDateTime { get; set; }
     public bool IsPrivate { get; set; }
