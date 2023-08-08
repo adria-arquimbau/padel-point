@@ -1,0 +1,31 @@
+﻿@using EventsManager.Shared.Responses
+
+@if (Match?.Sets?.Count > 0)
+{
+    <table>
+        <thead>
+        <tr>
+            <th>Set</th>
+            <th>Team 1</th>
+            <th>Team 2</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var set in Match.Sets)
+        {
+            var team1ScoreClass = set.Team1Score > set.Team2Score ? "green" : "red";
+            var team2ScoreClass = set.Team2Score > set.Team1Score ? "green" : "red";
+            <tr>
+                <td>@set.SetNumber</td>
+                <td class="@team1ScoreClass">@set.Team1Score</td>
+                <td class="@team2ScoreClass">@set.Team2Score</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public MatchResponse? Match { get; set; }
+}

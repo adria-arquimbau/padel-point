@@ -15,7 +15,13 @@
 {
     <LoadingSpinner></LoadingSpinner>
 }
-@if (Match != null)
+@if (Match is {RequesterIsAPlayer: false })
+{
+    <div class="match-set-results info">
+        <ShowSets Match="Match"></ShowSets>
+    </div>
+}
+@if (Match is {RequesterIsAPlayer: true })
 {
     <div class="match-set-results info">
         <AuthorizeView>
@@ -41,32 +47,9 @@
             </Authorized>
         </AuthorizeView>
         
-        @if (Match?.Sets?.Count > 0)
-        {
-            <table>
-                <thead>
-                <tr>
-                    <th>Set</th>
-                    <th>Team 1</th>
-                    <th>Team 2</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach (var set in Match.Sets)
-                {
-                    var team1ScoreClass = set.Team1Score > set.Team2Score ? "green" : "red";
-                    var team2ScoreClass = set.Team2Score > set.Team1Score ? "green" : "red";
-                    <tr>
-                        <td>@set.SetNumber</td>
-                        <td class="@team1ScoreClass">@set.Team1Score</td>
-                        <td class="@team2ScoreClass">@set.Team2Score</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        }
+        <ShowSets Match="Match"></ShowSets>
         
-        @if (Match is {Finished: false,RequesterIsAPlayer: true })
+        @if (Match is {Finished: false, RequesterIsAPlayer: true })
         {
             @if (Match.Sets is {Count: 0 } && Match.PlayersCount == 4)
             {
