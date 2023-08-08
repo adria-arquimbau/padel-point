@@ -184,16 +184,22 @@
     public string ReturnUrl {get; set;}
     
     private bool _loading = false;
-    
+
+    private string? userId;
     private HubConnection hubConnection;
     private HubConnection hubConnectionMatch;
     private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
     private bool IsConnectedMatch => hubConnectionMatch.State == HubConnectionState.Connected;
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
-    Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString());
+    Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString(), userId);
 
     protected override async Task OnInitializedAsync()  
-    {  
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            userId = authState.User.FindFirst("sub")?.Value;
+        }
         hubConnection = new HubConnectionBuilder()  
             .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
             .Build();  
@@ -204,9 +210,9 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/matchhub"))
             .Build();
 
-        hubConnectionMatch.On<string>("ReceiveMessage", async (matchId) =>
+        hubConnectionMatch.On<MatchResponse?>("ReceiveMessage", (match) =>
         {
-            await RefreshMatch.InvokeAsync();
+            Match = match;
             StateHasChanged();  
         });
 
@@ -242,7 +248,6 @@
                     await SendMessage();
                 }
                 ToastService.ShowInfo("You have been added to the match.");
-                await RefreshMatch.InvokeAsync();
             }
             else
             {
@@ -283,7 +288,6 @@
                     }
                     ToastService.ShowInfo("Player removed from the match.");
                     _loading = false;
-                    await RefreshMatch.InvokeAsync();
                 }
                 else
                 {
