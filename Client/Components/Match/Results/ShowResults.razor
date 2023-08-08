@@ -71,14 +71,14 @@
             @if (Match.Sets is {Count: 0 } && Match.PlayersCount == 4)
             {
                 <div class="button-container">
-                    <button style="font-size: 15px" @onclick="ShowAddResultsModal" class="btn btn-primary">Add results</button>
+                    <Button Size="Size.Small" Color="Color.Primary" Style="font-size: 15px" Clicked="ShowAddResultsModal" Outline>Add results</Button>
                 </div>
             }
             @if (Match.Sets is {Count: > 0 })
             {
                 <div class="button-container">
-                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" @onclick="ShowEditResultsModal" Outline>Edit score</Button>
-                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" @onclick="DeleteScoreResult" Outline>Delete score</Button>
+                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" Clicked="ShowEditResultsModal" Outline>Edit score</Button>
+                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" Clicked="DeleteScoreResult" Outline>Delete score</Button>
                 </div>
             }
         }
