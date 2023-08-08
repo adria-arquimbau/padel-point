@@ -21,6 +21,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
     {
         var player = await _context.Player
             .Include(x => x.Announcements)
+            .Include(player => player.EloHistories)
             .SingleAsync(x => x.UserId == request.UserId, cancellationToken: cancellationToken);
         
         var didItBefore = await _context.EloHistories
@@ -42,7 +43,10 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
             ChangeReason = ChangeEloHistoryReason.InitialSkillCalibration,
             EloChange = newElo - player.Elo,
         });
+        var initialEloHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialElo);
+        player.EloHistories.Remove(initialEloHistory);
         player.Elo = newElo;
+        
         player.Announcements.InitialLevelFormDone = true;
         player.InitialLevelForm = new InitialLevelForm
         {
