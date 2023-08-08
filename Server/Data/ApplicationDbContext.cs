@@ -1,7 +1,6 @@
 ﻿using Duende.IdentityServer.EntityFramework.Options;
 using EventsManager.Server.Data.TypeConfigurations;
 using EventsManager.Server.Models;
-using EventsManager.Shared.Requests;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
