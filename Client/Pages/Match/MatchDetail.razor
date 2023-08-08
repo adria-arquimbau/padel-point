@@ -23,7 +23,7 @@
 }
 @if (_match != null)
 {
-    <div class="border info">
+    <div class="border-match-detail info">
         <div class="header">
             <div>
                 PADEL
@@ -87,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="border match-detail-private">
+    <div class="match-detail-private">
         @if (_match.IsPrivate)
         {
             <div class="status">
@@ -296,11 +296,10 @@
         margin-top: 12px;
     }
     
-    .border
+    .border-match-detail
     {
         position: relative;
         padding: 12px;
-        border: 2px solid grey;
         border-radius: 10px;   
         display: flex;  
         background-color: white;
@@ -353,9 +352,12 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
-        padding: 12px 0;
+        padding: 12px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         margin-bottom: 5px;
+        position: relative;
+        border-radius: 10px;   
+        background-color: white;
     }
     
     .match-detail-private i {
