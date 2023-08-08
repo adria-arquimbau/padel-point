@@ -10,13 +10,9 @@
 
 @attribute [Authorize(Roles = "User")] 
 
-<h3>My account</h3>
-
 @if(User != null)
 {
-    <FluentDivider></FluentDivider>
     <UserInformation User="@User"></UserInformation>
-    <FluentDivider></FluentDivider>
 }
 @if(_loading)
 {

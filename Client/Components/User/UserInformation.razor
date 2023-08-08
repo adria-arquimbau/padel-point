@@ -15,46 +15,40 @@
     <LoadingSpinner></LoadingSpinner>
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg p-3 mb-5 bg-white rounded">
-                <div class="card-body">
-                    <div class="d-flex justify-content-center">
-                        @if (User?.ImageUrl != null)
-                        {
-                            <img class="user-image-picture rounded-circle mb-4" src="@($"{User.ImageUrl}?v={_imageUpdateCount}")" alt="User image"/>
-                        }
-                    </div>
-                    <ImageUploader Type="ImageUploader.ImageType.User" ImageUrl="@User?.ImageUrl" RefreshInformation="GetUserInformation" />
-                    <FluentDivider></FluentDivider>
-                    <h4 class="card-title text-center mb-4">Basic information</h4>
-                    
-                    <form>
-                        <div class="mb-3">
-                            <label class="form-label">Country</label><CountryFlag HasShadow="true" IsRounded="true" Country="@_userCountry"></CountryFlag>
-                            <Select @bind-SelectedValue="@_userCountry" TValue="Country">
-                                @foreach (var country in _countries)
-                                {
-                                    <SelectItem Value="@country">@country.GetDescription()</SelectItem>
-                                }
-                            </Select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" value="@User?.Email" readonly />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">User name</label>
-                            <input type="text" class="form-control" value="@User?.UserName" readonly />
-                        </div>
-                        <Button Clicked="UpdateUserInformation" Color="Color.Primary" Size="Size.Small">Update</Button>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="border">
+    <div class="image-container">
+        @if (User?.ImageUrl != null)
+        {
+            <img class="user-image-picture rounded-circle mb-4" src="@($"{User.ImageUrl}?v={_imageUpdateCount}")" alt="User image"/>
+        }
     </div>
+    <ImageUploader Type="ImageUploader.ImageType.User" ImageUrl="@User?.ImageUrl" RefreshInformation="GetUserInformation" />
+    <FluentDivider></FluentDivider>
+    <form class="form">
+        <div class="mb-3">
+            <div class="country-container">
+                <label class="form-label">Country</label>
+                <CountryFlag HasShadow="true" IsRounded="true" Country="@_userCountry"></CountryFlag>
+            </div>
+            <Select @bind-SelectedValue="@_userCountry" TValue="Country">
+                @foreach (var country in _countries)
+                {
+                    <SelectItem Value="@country">@country.GetDescription()</SelectItem>
+                }
+            </Select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" value="@User?.Email" readonly />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">User name</label>
+            <input type="text" class="form-control" value="@User?.UserName" readonly />
+        </div>
+    </form>
+    <Button Clicked="UpdateUserInformation" Color="Color.Primary" Size="Size.Small">Update</Button>
 </div>
+
 
 @code { 
     [Parameter]
@@ -120,19 +114,33 @@
 }
 
 <style>
-    .card-title{
-        margin-top: 10px;
+    .border {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: white;    
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        margin-bottom: 15px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 10px;
     }
-
-     .user-image-picture {
-            width: 150px; /* Adjust the width as needed */
-            height: 150px; /* Adjust the height as needed */
-            border-radius: 50%;
-            object-fit: cover; /* This ensures the image is scaled properly */
-            margin: 0 auto 20px; /* Add margin at the bottom */
-            display: block; /* This centers the image horizontally */
-        }
    
+.country-container {
+    display: flex;
+    align-items: center;  /* This ensures vertical alignment */
+}
+   .user-image-picture {
+            width: 150px;
+           height: 150px;
+           border-radius: 50%;
+           object-fit: cover;
+           display: block;
+           margin: 15px;
+           box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
     .form-label {
         font-size: 18px;
         color: #333;
