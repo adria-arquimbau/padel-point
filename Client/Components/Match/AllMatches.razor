@@ -23,7 +23,7 @@
     <div>
         @foreach (var match in _matches)
         {
-            <div @onclick="() => GoToTheMatch(match.Id)" class="border match-card" style="position: relative;">
+            <div @onclick="() => GoToTheMatch(match.Id)" class="match-card" style="position: relative;">
                  @if (match.Finished)
                  {
                      <div class="finished-stamp">Finished</div>
@@ -152,14 +152,13 @@
 
 <style>
     .border {
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 10px;
-        margin: 10px;
-        background-color: white;
+        
     }
         
     .match-card {
+        border-radius: 8px;
+        padding: 10px;
+        background-color: white;
         margin-bottom: 15px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }   
