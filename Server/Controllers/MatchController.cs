@@ -1,9 +1,11 @@
 using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
+using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Handlers.Queries.Matches.Get;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
+using EventsManager.Shared.Exceptions;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using MediatR;
@@ -187,59 +189,21 @@ public class MatchController : ControllerBase
     public async Task<IActionResult> ConfirmMyTeamResult([FromRoute] Guid matchId, [FromRoute] bool confirmation, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        var player = await _dbContext.Player
-            .Where(x => x.UserId == userId)
-            .SingleAsync(cancellationToken: cancellationToken);
-        
-        var match = await _dbContext.Match
-            .Where(x => x.Id == matchId)
-            .Include(x => x.MatchPlayers)
-            .ThenInclude(x => x.Player)
-            .Include(x => x.Sets)
-            .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
+        try
+        {
+            await _mediator.Send(new ConfirmTeamCommandRequest(userId, matchId, confirmation), cancellationToken);
+        }
+        catch (ScoreIsAlreadyConfirmedException)
         {
             return Conflict("Score is already confirmed.");
         }
-
-        if (match.IsBlocked)
+        catch (MatchIsBlockedException)
         {
             return Conflict("Match is blocked, you can't confirm score. Try again later.");
         }
         
-        var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
-        
-        var myTeam = matchPlayer.Team;
-
-        if (myTeam == Team.Team1)
-        {
-            match.ScoreConfirmedTeamOne = confirmation;
-        }
-        if (myTeam == Team.Team2)
-        {
-            match.ScoreConfirmedTeamTwo = confirmation;
-        }
-
-        match.Winner = CalculateMatchWinner(match.Sets.ToList());
-        
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        
-        if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
-        {
-            await _mediator.Send(new CalculateEloResultAfterMatchCommandRequest(matchId), cancellationToken);
-        }
-        
         return Ok();
-    }
-    
-    public Team? CalculateMatchWinner(List<Set> sets)
-    {
-        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
-        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
-
-        return team1Wins != team2Wins ? (team1Wins > team2Wins ? Team.Team1 : Team.Team2) : null;
     }
 
     [HttpGet("{matchId:guid}")]

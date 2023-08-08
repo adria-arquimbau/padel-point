@@ -1,4 +1,5 @@
 using EventsManager.Server.Data;
+using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
@@ -162,6 +163,15 @@ public class MatchManagerController : ControllerBase
         match.IsBlocked = isBlocked;
         
         await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
+    [HttpPost("{matchId:guid}/confirm-all-results")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> ConfirmAllResultsMatch([FromRoute] Guid matchId, CancellationToken cancellationToken)
+    {
+        await _mediator.Send(new ConfirmTeamCommandRequest(null, matchId, true, true), cancellationToken);
         
         return Ok();
     }
