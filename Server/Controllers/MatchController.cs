@@ -203,6 +203,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("Score is already confirmed.");
         }
+
+        if (match.IsBlocked)
+        {
+            return Conflict("Match is blocked, you can't confirm score. Try again later.");
+        }
         
         var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
         
