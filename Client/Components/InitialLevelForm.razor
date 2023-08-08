@@ -25,6 +25,13 @@
                     <Content>
                         <StepPanel Name="1">
                             <Divider></Divider>
+                            @if (_alert)
+                            {
+                                <Alert Color="Color.Danger" Visible>
+                                    <AlertMessage>Error</AlertMessage>
+                                    <AlertDescription>Something went wrong. Please try again later.</AlertDescription>
+                                </Alert>
+                            }
                             <h4>Welcome to Our Player Ranking Quiz</h4>
                             <p>This quiz is designed to help us assess your skill level in padel and accurately assign you an initial Elo rating. By understanding your past experience and current abilities, we can ensure that you are paired with other players who are at a similar skill level. This helps make matches more competitive and enjoyable for everyone involved.</p>
                             <p>In the following steps, we will be asking about your padel experience, your experience with other racquet sports, and your specific strengths and weaknesses on the court. All of this information will be used solely for the purpose of determining your initial ranking and will not be shared with third parties.</p>
@@ -125,13 +132,13 @@
 @code{
     private bool _loading = false;
     private Modal _modalRef;
-    private bool _cancelClose;
     [Parameter]
     public bool IsDone { get; set; }
     private Steps _stepsRef;
     private string _selectedStep = "1";
 
     private bool _iAmSureFlag = false;
+    private bool _alert = false;
     
     private InitialLevelFormRequest _initialLevelFormRequest = new();
 
@@ -156,6 +163,7 @@
     
     private async Task SetDone()
     {
+        _alert = false;
         try
         {
             _loading = true;
@@ -164,17 +172,25 @@
             {
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
+                Navigation.NavigateTo("/", forceLoad: true);
             }
             else
             {
                 ToastService.ShowSuccess("You have successfully completed the initial level form.");
-                Navigation.NavigateTo("/", forceLoad: true);
             }
         }
         catch (Exception)
         {
             ToastService.ShowError("Something went wrong while getting user information.");
             _loading = false;
+            _iAmSureFlag = false;
+        }
+        finally
+        {
+            _iAmSureFlag = false;
+            _selectedStep = "1";
+            _loading = false;
+            _alert = true;
         }
     }
 }
