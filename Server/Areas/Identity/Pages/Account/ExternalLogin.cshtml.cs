@@ -203,15 +203,6 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                             Announcements = new Announcements()
                         };
 
-                        newPlayer.EloHistories.Add(new EloHistory
-                        {
-                            Player = newPlayer,
-                            NewElo = 1500,
-                            OldElo = 1500,
-                            ChangeDate = DateTime.Now,
-                            ChangeReason = ChangeEloHistoryReason.InitialElo
-                        });
-
                         _context.Player.Add(newPlayer);
 
                         user.SetRegistrationDate();

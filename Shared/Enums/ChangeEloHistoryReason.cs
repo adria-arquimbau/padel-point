@@ -2,7 +2,6 @@
 
 public enum ChangeEloHistoryReason
 {
-    InitialElo,
     MatchPlayed,
     InitialSkillCalibration
 }

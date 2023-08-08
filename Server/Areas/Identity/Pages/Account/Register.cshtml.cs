@@ -166,15 +166,6 @@ public class RegisterModel : PageModel
                     Announcements = new Announcements()
                 };
 
-                newPlayer.EloHistories.Add(new EloHistory
-                {
-                    Player = newPlayer,
-                    NewElo = 1500,
-                    OldElo = 1500,
-                    ChangeDate = DateTime.Now,
-                    ChangeReason = ChangeEloHistoryReason.InitialElo
-                });
-
                 _context.Player.Add(newPlayer);
 
                 await _context.SaveChangesAsync();

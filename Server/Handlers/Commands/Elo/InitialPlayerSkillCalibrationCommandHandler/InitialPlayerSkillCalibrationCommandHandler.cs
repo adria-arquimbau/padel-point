@@ -32,11 +32,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         {
             throw new InitialSkillCalibrationAlreadyDoneException("Initial skill calibration already done");
         }
-        
-        
-        var initialEloHistory = player.EloHistories.Single(x => x.ChangeReason == ChangeEloHistoryReason.InitialElo);
-        player.EloHistories.Remove(initialEloHistory);
-        
+
         var newElo = CalculateInitialElo(request.Request, player.Elo);
         player.EloHistories.Add(new EloHistory
         {
