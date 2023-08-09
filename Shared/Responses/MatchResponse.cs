@@ -31,4 +31,5 @@ public class MatchResponse
     public double ProbabilityTeamTwoWins { get; set; }  
     public List<PromotionResponse> Promotions { get; set; }
     public MatchLocation Location { get; set; }
+    public int? MinimumLevel { get; set; }
 }

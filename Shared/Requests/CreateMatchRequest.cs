@@ -9,4 +9,5 @@ public class CreateMatchRequest
     public bool IsPrivate { get; set; }
     public double PricePerHour { get; set; }    
     public MatchLocation Location { get; set; }
-}   
+    public int? MinimumLevel { get; set; }
+}       

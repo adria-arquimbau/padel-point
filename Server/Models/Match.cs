@@ -21,5 +21,6 @@ public class Match
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
     public MatchLocation Location { get; set; }
     public bool IsBlocked { get; set; }
+    public int? MinimumLevel { get; set; }
 }
-    
+        

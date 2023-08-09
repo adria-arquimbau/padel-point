@@ -22,6 +22,16 @@
         <DateEdit TValue="DateTime" @bind-Date="@_start" InputMode="DateInputMode.DateTime"/>    
     </div>
     <div class="form-group">
+        <Switch @bind-Checked="@_requiredSpecificLevel" TValue="bool">Required specific level</Switch>
+    </div>
+    @if (_requiredSpecificLevel)
+    {
+        <div class="form-group">
+            <label>Minimum level</label>
+            <NumericPicker @bind-Value="@_minimumLevel" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover" />
+        </div>
+    }
+    <div class="form-group">
         <label>Duration</label>
         <Select @bind-SelectedValue="@_durationSelect" TValue="int">
             <SelectItem Value="1">1 hour</SelectItem>
@@ -52,10 +62,12 @@
 
     private DateTime _start = DateTime.Now;
     private int _durationSelect = 1;
+    private int? _minimumLevel = 1500;
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private double _pricePerHour;
     private bool _isPrivate;
     private bool _loading;
+    private bool _requiredSpecificLevel;
     private HubConnection hubConnection;
     private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
 
@@ -83,13 +95,18 @@
             _ => 1
             };
 
+        if (_requiredSpecificLevel == false)
+        {
+            _minimumLevel = null;
+        }
         var request = new CreateMatchRequest
         {
             StartDate = _start,
             Duration = durationInHours,
             IsPrivate = _isPrivate,
             PricePerHour = _pricePerHour,
-            Location = _location
+            Location = _location,
+            MinimumLevel = _minimumLevel
         };
 
         try

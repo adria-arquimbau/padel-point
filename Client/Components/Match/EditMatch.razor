@@ -18,6 +18,16 @@
                         <DateEdit TValue="DateTime" @bind-Date="@_editMatchRequest.StartDate" InputMode="DateInputMode.DateTime"/>    
                     </div>
                     <div class="form-group">
+                        <Switch @bind-Checked="@_requiredSpecificLevel" TValue="bool">Required specific level</Switch>
+                    </div>
+                    @if (_requiredSpecificLevel)
+                    {
+                        <div class="form-group">
+                            <label>Minimum level</label>
+                            <NumericPicker @bind-Value="@_editMatchRequest.MinimumLevel" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover" />
+                        </div>
+                    }
+                    <div class="form-group">
                         <label>Duration</label>
                         <Select @bind-SelectedValue="@_durationSelect" TValue="int">
                             <SelectItem Value="1">1 hour</SelectItem>
@@ -54,6 +64,8 @@
     CreateMatchRequest _editMatchRequest = new();
     
     private int _durationSelect = 1;
+    
+    private bool _requiredSpecificLevel;
 
     [Parameter]
     public MatchResponse? Match { get; set; }
@@ -68,6 +80,8 @@
             _editMatchRequest.StartDate = Match.StartDateTime;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
             _editMatchRequest.Location = Match.Location;
+            _editMatchRequest.MinimumLevel = Match.MinimumLevel;
+            _requiredSpecificLevel = Match.MinimumLevel != null;
         }
         var duration = Match?.Duration switch
         {

@@ -45,6 +45,7 @@ public class MatchController : ControllerBase
             Duration = request.Duration,
             PricePerHour = request.PricePerHour,
             Location = request.Location,
+            MinimumLevel = request.MinimumLevel,
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -102,6 +103,7 @@ public class MatchController : ControllerBase
         match.Duration = request.Duration;
         match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
+        match.MinimumLevel = request.MinimumLevel;
 
         foreach (var matchPlayer in match.MatchPlayers)
         {

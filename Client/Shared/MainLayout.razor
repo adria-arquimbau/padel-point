@@ -14,7 +14,7 @@
     </div>
 
     <main>
-        <article class="content ">
+        <article class="content">
             <ErrorBoundary>
                 <ChildContent>
                     @Body
@@ -46,7 +46,7 @@
 {
     private InitialLevelIsDoneResponse? _initialLevelResponse;
     
-    private void GoToMainPage()
+    private async Task GoToMainPage()
     {
         NavigationManager.NavigateTo("/", forceLoad: true);
     }
