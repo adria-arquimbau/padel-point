@@ -61,11 +61,11 @@
                  </div>
                  
                 <div class="player-names">
-                    <p style="font-size: 12px; margin: 0;">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
-                    <p style="font-size: 12px; margin: 0;">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
-                    <Divider Style="margin: 0; width: 50%; float: right;"></Divider>
-                    <p style="font-size: 12px; margin: 0;">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
-                    <p style="font-size: 12px; margin: 0;">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
+                    <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
+                    <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
+                    <Divider Style="margin: 0; width: 65%; float: right;"></Divider>
+                    <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
+                    <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
                 </div>
                 <div style="clear: both;"></div>
             </div>
@@ -160,6 +160,15 @@
         
         return playerDto.NickName;
     }
+
+    private string GetStyleForPlayerNames(PlayerDto? player)
+    {
+        if (player != null)
+        {
+            return "font-size: 12px; margin: 0";
+        }
+        return "font-size: 12px; margin: 0; color: grey;";
+    }   
 
 }
 
