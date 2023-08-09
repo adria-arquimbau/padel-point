@@ -78,7 +78,7 @@
     private string GetBackgroundStyle()
     {
         return _player?.ImageUrl == null
-            ? "" 
+            ? $"background-image: url('{NavigationManager.BaseUri}default-avatar.png')" 
             : $"background-image: url('{_player.ImageUrl}')";
     }
 
