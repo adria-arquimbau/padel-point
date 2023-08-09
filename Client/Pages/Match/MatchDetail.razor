@@ -130,7 +130,7 @@
     [Parameter]
     public Guid? MatchId { get; set; }
     
-    private bool _loading;
+    private bool _loading = false;
 
     private string MatchPath => $"match/{MatchId}/detail";
     
@@ -146,6 +146,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = true;
         hubConnection = new HubConnectionBuilder()  
             .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
             .Build();  
@@ -153,6 +154,7 @@
         await hubConnection.StartAsync();  
         
         await GetMatch();
+        
         if (_match != null)
         {
             _matchPrice = _match.PricePerHour * _match.Duration;
@@ -169,7 +171,6 @@
         {
             try
             {
-                _loading = true;
                 HttpResponseMessage? response;
                 var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
                 if (authState.User.Identity?.IsAuthenticated == false)
