@@ -110,6 +110,7 @@
         };
         
         _editMatchRequest.Duration = durationInHours;
+        _editMatchRequest.MinimumLevel = _requiredSpecificLevel ? _editMatchRequest.MinimumLevel : null;
         await ConfirmationChanged.InvokeAsync(_editMatchRequest);
     }
 
