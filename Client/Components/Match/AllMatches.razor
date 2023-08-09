@@ -28,11 +28,11 @@
                  {
                      <div class="finished-stamp">Finished</div>
                  }
-                 @if (match.PlayersCount < 4)
+                 @if (match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2)
                  {
                      <div class="searching-stamp">Open slots</div>
                  }
-                 @if (match.PlayersCount == 4 && !match.Finished)
+                 @if (match.PlayersTeamOne.Count == 2 && match.PlayersTeamTwo.Count == 2 && !match.Finished)
                  {
                      <div class="pending-stamp">Pending</div>
                  }
@@ -60,9 +60,13 @@
                 </div>
                 <div style="width: 40%; float: right; text-align: right;">
                     <p style="font-size: 14px; margin-bottom: 0;"><b></b></p>
-                    @foreach (var player in match.PlayersNames)
+                    @foreach (var player in match.PlayersTeamOne)
                     {
-                        <p style="font-size: 12px; margin: 0;">@player</p>
+                        <p style="font-size: 12px; margin: 0;">@player.NickName</p>
+                    }
+                    @foreach (var player in match.PlayersTeamTwo)
+                    {
+                        <p style="font-size: 12px; margin: 0;">@player.NickName</p>
                     }
                 </div>
                 <div style="clear: both;"></div>

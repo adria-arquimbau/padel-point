@@ -4,6 +4,7 @@ using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Handlers.Queries.Matches.Get;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Exceptions;
 using EventsManager.Shared.Requests;
@@ -237,8 +238,14 @@ public class MatchController : ControllerBase
             ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
             ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
             Duration = x.Duration,
-            PlayersCount = x.MatchPlayers.Count,
-            PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
+            PlayersTeamOne = x.MatchPlayers.Where(mp => mp.Team == Team.Team1).Select(mp => new PlayerDto
+            {
+                NickName = mp.Player.NickName
+            }).ToList(),
+            PlayersTeamTwo = x.MatchPlayers.Where(mp => mp.Team == Team.Team2).Select(mp => new PlayerDto
+            {
+                NickName = mp.Player.NickName
+            }).ToList(),
             AverageElo = x.MatchPlayers.Any() ? 
                 (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
                 : 0,

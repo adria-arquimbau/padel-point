@@ -11,15 +11,14 @@ public class MatchResponse
     public bool IsPrivate { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
     public bool ScoreConfirmedTeamTwo { get; set; }
-    public List<PlayerDto> PlayersTeamOne { get; set; } 
-    public List<PlayerDto> PlayersTeamTwo { get; set; }
+    public List<PlayerDto> PlayersTeamOne { get; set; } = new();
+    public List<PlayerDto> PlayersTeamTwo { get; set; } = new();
     public int AverageElo { get; set; }
     public int AverageEloTeamOne { get; set; }
     public int AverageEloTeamTwo { get; set; }
     public bool RequesterIsTheCreator { get; set; }
     public bool IAmAlreadyRegistered { get; set; }
     public int PlayersCount { get; set; }   
-    public List<string> PlayersNames { get; set; }
     public List<SetDto>? Sets { get; set; }
     public Team? MyTeam { get; set; }
     public bool Finished => ScoreConfirmedTeamTwo && ScoreConfirmedTeamOne;
