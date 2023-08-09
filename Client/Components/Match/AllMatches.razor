@@ -27,15 +27,15 @@
             <div @onclick="() => GoToTheMatch(match.Id)" class="match-card" style="position: relative;">
                  @if (match.Finished)
                  {
-                     <div class="finished-stamp">Finished</div>
+                     <div class="finished-stamp all-matches-stamp">Finished</div>
                  }
                  @if (match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2)
                  {
-                     <div class="searching-stamp">Open slots</div>
+                     <div class="searching-stamp all-matches-stamp">Open slots</div>
                  }
                  @if (match.PlayersTeamOne.Count == 2 && match.PlayersTeamTwo.Count == 2 && !match.Finished)
                  {
-                     <div class="pending-stamp">Pending</div>
+                     <div class="pending-stamp all-matches-stamp">Pending</div>
                  }
                  <div style="font-size: 12px; text-align: center;">
                      @match.StartDateTime.ToLongDateString() /
@@ -54,8 +54,8 @@
                      
                  </div>
                 <FluentDivider></FluentDivider>
-                 <div style="width: 60%; float: left; margin-bottom: 20px;">
-                     <p style="font-size: 14px"><b>Players:</b> @match.PlayersCount / 4</p>
+                 <div style="width: 60%; float: left;">
+                     <p style="font-size: 14px"><b>Level:</b> All</p>
                      <p style="font-size: 14px"><b>Average Elo:</b> @match.AverageElo</p>
                      <p style="font-size: 14px">@GetLocationFullName(match.Location)</p>
                  </div>
@@ -233,55 +233,36 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }   
     
-    .finished-stamp {
+    .all-matches-stamp{
         position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 100px;
+        bottom: 8px;
+        right: 8px;
+        width: 80px;
         height: 20px;
         background-color: transparent;
-        color: limegreen;
-        border: 2px solid limegreen;
+        border-radius: 8px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         display: flex;
-        align-items: center; /* center text vertically */
-        justify-content: center; /* center text horizontally */
+        align-items: center; 
+        justify-content: center;
         overflow: hidden;
         font-weight: bold;
         font-size: 14px;
+}
+    
+    .finished-stamp {
+        color: rgb(0,119,0);
+        border: 2px solid rgb(0,119,0);
     }
     
     .searching-stamp {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 100px;
-        height: 20px;
-        background-color: transparent;
-        color: darkblue;
-        border: 2px solid darkblue;
-        display: flex;
-        align-items: center; /* center text vertically */
-        justify-content: center; /* center text horizontally */
-        overflow: hidden;
-        font-weight: bold;
-        font-size: 14px;
+        color: #0d0daf;
+        border: 2px solid #0d0daf;
     }
     
     .pending-stamp {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        width: 100px;
-        height: 20px;
-        background-color: transparent;
-        color: #ffaf00;
-        border: 2px solid #ffaf00;
-        display: flex;
-        align-items: center; /* center text vertically */
-        justify-content: center; /* center text horizontally */
-        overflow: hidden;
-        font-weight: bold;
-        font-size: 14px;
+        color: #b77f0a;
+        border: 2px solid #b77f0a;
     }    
     
     .promotion {
