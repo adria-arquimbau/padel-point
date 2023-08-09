@@ -101,6 +101,50 @@ public class PlayerController : ControllerBase
     }
 
     
+    [HttpGet("my-detail")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GetMyPlayerDetail(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var response = await _dbContext.Player
+            .Where(x => x.UserId == userId)
+            .Select(x => new PlayerDetailResponse
+            {
+                Id = x.Id,
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl,
+                Elo = x.Elo,
+                Country = x.Country,
+                MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
+                EloHistory = x.EloHistories
+                    .OrderByDescending(eh => eh.ChangeDate)
+                    .Take(5)
+                    .Select(eh => new EloHistoryResponse
+                    {
+                        CurrentElo = eh.NewElo,
+                        ChangeDate = eh.ChangeDate
+                    })
+                    .OrderBy(eh => eh.ChangeDate)
+                    .ToList(),
+                LastEloGained = !x.EloHistories.Any() ? 0 : x.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
+                Rank = 0
+            })  
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        var allPlayers = await _dbContext.EloHistories
+            .Where(x => x.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
+            .Select(x => x.Player)
+            .Distinct()
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        if (response.MatchesPlayed > 0)
+        {
+            response.Rank = allPlayers.Count(p => p.Elo > response.Elo) + 1;
+        }
+    
+        return Ok(response);
+    }
+    
     [HttpGet("ranking")]
     [AllowAnonymous]
     public async Task<IActionResult> GetRanking(CancellationToken cancellationToken)

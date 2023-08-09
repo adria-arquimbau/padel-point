@@ -6,16 +6,18 @@
 <AuthorizeView>
     <Authorized>
         <div class="button-container">
-            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Primary" Clicked="NavigateToProfile">
+            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Info" Clicked="NavigateToProfile">
                 Hello, @context.User.Identity?.Name!
             </Button>
-            <Button Size="Size.Small" Color="Color.Primary" Clicked="BeginLogOut">Log out</Button>
+            <Button Size="Size.Small" Color="Color.Dark" Clicked="BeginLogOut">
+                <Icon Name="Blazorise.Icons.FontAwesome.FontAwesomeIcons.ArrowAltCircleRight"></Icon>
+            </Button>
         </div>
     </Authorized>
     <NotAuthorized>
         <div class="button-container">
-            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Primary" Clicked="NavigateToRegister">Register</Button>
-            <Button Size="Size.Small" Color="Color.Primary" Clicked="NavigateToLogin">Log in</Button>
+            <Button style="margin-right: 5px" Size="Size.Small" Color="Color.Success" Clicked="NavigateToRegister">Register</Button>
+            <Button Size="Size.Small" Color="Color.Info" Clicked="NavigateToLogin">Log in</Button>
         </div>
     </NotAuthorized>
 </AuthorizeView>
@@ -44,7 +46,6 @@
 
 <style>
     .button-container {
-        margin: 5px;
         display: flex;
         justify-content: flex-end;
     }

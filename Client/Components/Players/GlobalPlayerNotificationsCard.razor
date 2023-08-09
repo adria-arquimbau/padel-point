@@ -1,0 +1,172 @@
+﻿@using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Responses
+
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+
+<div class="global-card" style="background-image: url('https://padelpointsblob.blob.core.windows.net/padel-point/padel-court.jpeg')">
+    <div class="global-card-top">
+        <div class="log-in">
+            <LoginDisplay></LoginDisplay>
+        </div>
+        @if (_player != null)
+        {
+            <div class="global-card-player" @onclick="@GoToUserProfile" style="@GetBackgroundStyle()">
+        
+            </div>
+        }
+    </div>
+     @if (_player != null)
+     {
+         <div class="global-card-footer">
+             <div>
+                                 
+             </div>
+             <div class="big-text" style="@GetColourTrend()">
+                 @GetTrendText() / @(_player.Elo)
+             </div>
+         </div>
+     }
+</div>
+
+@code {
+    private bool _loading;
+    private PlayerDetailResponse? _player;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        await GetUserInformation();
+    }
+
+    private async Task GetUserInformation()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                var response = await Http.GetAsync("Player/my-detail");
+                if (response.IsSuccessStatusCode)
+                {
+                    _player = await response.Content.ReadFromJsonAsync<PlayerDetailResponse>();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    
+    private void GoToUserProfile()
+    {
+        NavigationManager.NavigateTo($"player-detail/{_player.Id}");
+    }
+    
+    private string GetBackgroundStyle()
+    {
+        return _player?.ImageUrl == null
+            ? "" 
+            : $"background-image: url('{_player.ImageUrl}')";
+    }
+
+    private string GetTrendText()
+    {
+        if (_player.LastEloGained > 0)
+        {
+            return $"+{_player.LastEloGained}";
+        }
+        else if (_player.LastEloGained < 0)
+        {
+            return $"{_player.LastEloGained}";
+        }
+        else
+        {
+            return "0";
+        }
+    }
+
+    private string GetColourTrend()
+    {
+        if (_player.LastEloGained > 0)
+        {
+            return "color: green";
+        }
+        else if (_player.LastEloGained < 0)
+        {
+            return "color: red";
+        }
+        else
+        {
+            return "color: white";
+        }
+    }
+
+}
+
+<style>
+   .global-card{
+           display: flex;
+           flex-direction: column;
+              justify-content: space-between;
+           width: 100%;
+           height: 150px;
+           border-radius: 8px;
+          padding: 10px;
+          box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+          background-size: cover;
+          background-position: center;
+       }
+       
+         .global-card-top{
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+         }
+         
+            .global-card-footer{
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+       
+       .global-card-player{
+           border-radius: 8px;
+           padding: 10px;
+           background-size: cover;
+           width: 50px;
+           height: 50px;
+           background-color: white;
+           background-position: center;
+           box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
+           margin-right: 5px;
+           position: relative;
+       }
+       
+       .log-in{
+          
+       }
+       
+       .big-text {
+           font-size: 1.2em;
+           color: white;
+           text-shadow: 
+               -1px -1px 0 #fff,  
+               1px -1px 0 #fff,  
+               -1px 1px 0 #fff, 
+               1px 1px 0 #fff;  /* White border around the text */
+           font-weight: bold;
+       }
+</style>

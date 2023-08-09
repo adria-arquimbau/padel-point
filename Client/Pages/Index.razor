@@ -13,12 +13,12 @@
 
 <AuthorizeView>
     <Authorized>
-        <h2>Hello, @context.User.Identity?.Name! <UserImage></UserImage></h2> Welcome to Padel Point.
+        <GlobalPlayerNotificationsCard></GlobalPlayerNotificationsCard>
+        @* <h2>Hello, @context.User.Identity?.Name! <UserImage></UserImage></h2> Welcome to Padel Point. TODO:  If not Used check where UserImage is used, if not used delete *@
         @* <Notifications></Notifications> *@
-        <Divider></Divider>
     </Authorized>
     <NotAuthorized>
-        <LoginDisplay></LoginDisplay>
+        <GlobalPlayerNotificationsCard></GlobalPlayerNotificationsCard>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -30,15 +30,7 @@
         }
     </Authorized>
 </AuthorizeView>
-
-<AuthorizeView>
-    <Authorized>
-        <PlayerEloProgress></PlayerEloProgress>
-    </Authorized>
-</AuthorizeView>
-
-<Divider />
-
+<Divider></Divider>
 <NineTPadelBanner></NineTPadelBanner>
 
 <AllMatches></AllMatches>

@@ -161,7 +161,7 @@ public class RegisterModel : PageModel
                     Id = Guid.Parse(user.Id),
                     User = user,
                     NickName = Input.UserName,
-                    Elo = 1500,
+                    Elo = 0,
                     CreationDate = DateTime.UtcNow,
                     Announcements = new Announcements()
                 };
