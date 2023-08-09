@@ -50,9 +50,10 @@
     color: white;
 }
 
+
 @media (min-width: 641px) {
     .navbar-toggler {
-        display: none;
+        margin-top: 10px;
     }
 
     .collapse {
