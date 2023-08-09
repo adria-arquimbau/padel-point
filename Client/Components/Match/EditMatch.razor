@@ -80,7 +80,7 @@
             _editMatchRequest.StartDate = Match.StartDateTime;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
             _editMatchRequest.Location = Match.Location;
-            _editMatchRequest.MinimumLevel = Match.MinimumLevel;
+            _editMatchRequest.MinimumLevel = Match.MinimumLevel == null ? null : Match.MinimumLevel.Value;
             _requiredSpecificLevel = Match.MinimumLevel != null;
         }
         var duration = Match?.Duration switch

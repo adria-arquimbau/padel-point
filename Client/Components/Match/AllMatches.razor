@@ -55,7 +55,7 @@
                  </div>
                 <FluentDivider></FluentDivider>
                  <div style="width: 60%; float: left;">
-                     <p style="font-size: 14px"><b>Level:</b> All</p>
+                     <p style="font-size: 14px"><b>Level:</b> @GetMinimumLevel(@match.MinimumLevel)</p>
                      <p style="font-size: 14px"><b>Average Elo:</b> @match.AverageElo</p>
                      <p style="font-size: 14px">@GetLocationFullName(match.Location)</p>
                  </div>
@@ -182,6 +182,15 @@
             return "font-size: 12px; margin: 0";
         }
         return "font-size: 12px; margin: 0; color: grey;";
+    }
+
+    private string GetMinimumLevel(int? minimumLevel)
+    {
+        if (minimumLevel == null)
+        {
+            return "Open";
+        }
+        return "<" + minimumLevel.Value;
     }   
 
 }

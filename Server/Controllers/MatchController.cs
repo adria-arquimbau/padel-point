@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.Text;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
@@ -64,8 +65,8 @@ public class MatchController : ControllerBase
         {
             newMatch.Promotions.Add(new Promotion
             {
-                Title = "Akira Bar",
-                Description = "After the match, players get x2 in drinks.",
+                Title = "Akira Bar Promotion",
+                Description = "Winner team gets 2x1 in drinks.",
             });
         }
 
@@ -231,11 +232,12 @@ public class MatchController : ControllerBase
             .Include(x => x.EloHistories)
             .Include(match => match.Promotions)
             .ToListAsync(cancellationToken: cancellationToken);
-
+        
         var matchResponses = matches.Select(x => new MatchResponse
         {
             Id = x.Id,
             Location = x.Location,
+            MinimumLevel = x.MinimumLevel,
             StartDateTime = x.StartDateTime,
             ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
             ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
