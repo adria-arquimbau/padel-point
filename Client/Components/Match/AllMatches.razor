@@ -60,13 +60,27 @@
                      <p style="font-size: 14px">@GetLocationFullName(match.Location)</p>
                  </div>
                  
-                <div class="player-names">
-                    <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
-                    <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
-                    <Divider Style="margin: 0; width: 65%; float: right;"></Divider>
-                    <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
-                    <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
-                </div>
+                 <div class="player-names">
+                     <div class="player-names-team">
+                         <div class="player-names-team1-title">
+                             Team 1
+                         </div>
+                         <div class="player-names-team1-names">
+                             <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
+                             <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
+                         </div>
+                     </div>
+                     <Divider Style="margin: 0; width: 120px; float: right;"></Divider>
+                     <div class="player-names-team">
+                         <div class="player-names-team2-title">
+                             Team 2
+                         </div>
+                         <div class="player-names-team2-names">
+                             <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
+                             <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
+                         </div>
+                     </div>
+                 </div>
                 <div style="clear: both;"></div>
             </div>
         }
@@ -174,6 +188,38 @@
 
 <style>
     .player-names {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+    }
+    
+    .player-names-team1-title {
+        font-size: 8px;
+        font-weight: bold;
+        color: grey;
+        margin-top: auto;
+    }
+    
+    .player-names-team2-title {
+        font-size: 8px;
+        font-weight: bold;
+        color: grey;
+    }
+    
+    .player-names-team1-names {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+    }
+    
+    .player-names-team {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 120px;
+    }
+    
+    .player-names-team2-names{
         display: flex;
         flex-direction: column;
         align-items: end;
