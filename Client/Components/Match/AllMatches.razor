@@ -9,6 +9,7 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationState
 @implements IAsyncDisposable
 
 @if (_loading)
@@ -25,18 +26,7 @@
         @foreach (var match in _matches)
         {
             <div @onclick="() => GoToTheMatch(match.Id)" class="match-card" style="position: relative;">
-                 @if (match.Finished)
-                 {
-                     <div class="finished-stamp all-matches-stamp">Finished</div>
-                 }
-                 @if (match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2)
-                 {
-                     <div class="searching-stamp all-matches-stamp">Open slots</div>
-                 }
-                 @if (match.PlayersTeamOne.Count == 2 && match.PlayersTeamTwo.Count == 2 && !match.Finished)
-                 {
-                     <div class="pending-stamp all-matches-stamp">Pending</div>
-                 }
+                
                  <div style="font-size: 12px; text-align: center;">
                      @match.StartDateTime.ToLongDateString() /
                      @match.StartDateTime.ToShortTimeString() -
@@ -55,7 +45,6 @@
                  </div>
                 <FluentDivider></FluentDivider>
                  <div style="width: 60%; float: left;">
-                     <p style="font-size: 14px"><b>Level:</b> @GetMinimumLevel(@match.MinimumLevel)</p>
                      <p style="font-size: 14px"><b>Average Elo:</b> @match.AverageElo</p>
                      <p style="font-size: 14px">@GetLocationFullName(match.Location)</p>
                  </div>
@@ -81,7 +70,19 @@
                          </div>
                      </div>
                  </div>
-                <div style="clear: both;"></div>
+                 <div style="clear: both;"></div>
+                  @if (match.Finished)
+                  {
+                      <div class="finished-stamp all-matches-stamp">Finished</div>
+                  }
+                  @if (IsOpenSlotsState(match))
+                  {
+                      <div class="searching-stamp all-matches-stamp" style="@GetMinimumLevelColor(match)">@GetMinimumLevel(match.MinimumLevel)</div>
+                  }
+                  @if (match.PlayersTeamOne.Count == 2 && match.PlayersTeamTwo.Count == 2 && !match.Finished)
+                  {
+                      <div class="pending-stamp all-matches-stamp">Pending</div>
+                  }
             </div>
         }
     </div>
@@ -136,8 +137,17 @@
     {
         try
         {
-            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-            var response = await http.GetAsync("match");
+            HttpResponseMessage? response;
+            var authState = await AuthenticationState.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                response = await Http.GetAsync("match");
+            }
+            else
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync("match");
+            }
 
             if (response.IsSuccessStatusCode)
             {
@@ -188,10 +198,29 @@
     {
         if (minimumLevel == null)
         {
-            return "Open";
+            return "Open slots";
         }
-        return "<" + minimumLevel.Value;
-    }   
+        return "Open slots at <" + minimumLevel.Value;
+    }
+
+    private string GetMinimumLevelColor(MatchResponse matchResponse)
+    {
+        if (matchResponse.Finished || matchResponse.RequesterElo == null || !IsOpenSlotsState(matchResponse))
+        {
+            return "";
+        }
+        if (matchResponse.RequesterElo < matchResponse.MinimumLevel)
+        {
+            return "color: red; border: 1px solid red";
+        }
+        
+        return "color: rgb(0,119,0);  border: 1px solid rgb(0,119,0);"; 
+    }
+
+    private static bool IsOpenSlotsState(MatchResponse match)
+    {
+        return match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2;
+    }
 
 }
 
@@ -244,10 +273,9 @@
     }   
     
     .all-matches-stamp{
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        width: 80px;
+        width: 180px;
+        padding-right: 5px;
+        padding-left: 5px;
         height: 20px;
         background-color: transparent;
         border-radius: 8px;
@@ -261,18 +289,13 @@
 }
     
     .finished-stamp {
-        color: rgb(0,119,0);
-        border: 2px solid rgb(0,119,0);
-    }
-    
-    .searching-stamp {
-        color: #0d0daf;
-        border: 2px solid #0d0daf;
+        color: rgb(79,79,79);
+        border: 1px solid rgb(79,79,79);
     }
     
     .pending-stamp {
         color: #b77f0a;
-        border: 2px solid #b77f0a;
+        border: 1px solid #b77f0a;
     }    
     
     .promotion {

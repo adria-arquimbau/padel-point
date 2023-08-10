@@ -26,6 +26,7 @@ public class MatchResponse
     public double PricePerHour { get; set; }
     public Team? TeamWinner { get; set; }
     public bool RequesterIsAPlayer { get; set; }
+    public int? RequesterElo { get; set; }   
     public string CreatorNickName { get; set; }
     public double ProbabilityTeamOneWins { get; set; }  
     public double ProbabilityTeamTwoWins { get; set; }  

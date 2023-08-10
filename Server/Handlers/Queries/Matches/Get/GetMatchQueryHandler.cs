@@ -20,6 +20,16 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
     {
         var userId = request.UserId;
         var matchId = request.MatchId;
+
+        int? requesterElo = null;
+        if (userId == null)
+        {
+            requesterElo = await _context.Player
+                .Where(x => x.UserId == userId)
+                .Select(x => x.Elo)
+                .SingleOrDefaultAsync(cancellationToken: cancellationToken);
+        }
+        
         var match = await _context.Match
             .Where(x => x.Id == matchId)
             .Select(x => new MatchResponse
@@ -27,6 +37,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
                 Id = x.Id,
                 Location = x.Location,
                 IsBlocked = x.IsBlocked,
+                RequesterElo = userId != null ? requesterElo : null,
                 MinimumLevel = x.MinimumLevel,
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
                 RequesterIsTheCreator = userId != null && x.Creator.UserId == userId,

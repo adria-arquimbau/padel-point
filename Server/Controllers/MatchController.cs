@@ -225,6 +225,7 @@ public class MatchController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var matches = await _dbContext.Match
             .Where(x => x.IsPrivate == false || x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo)
             .Include(x => x.MatchPlayers)
@@ -232,12 +233,22 @@ public class MatchController : ControllerBase
             .Include(x => x.EloHistories)
             .Include(match => match.Promotions)
             .ToListAsync(cancellationToken: cancellationToken);
+
+        int? requesterElo = null;
+        if (userId != null)
+        {
+            requesterElo = await _dbContext.Player
+                .Where(x => x.UserId == userId)
+                .Select(x => x.Elo)
+                .SingleOrDefaultAsync(cancellationToken: cancellationToken);
+        }
         
         var matchResponses = matches.Select(x => new MatchResponse
         {
             Id = x.Id,
             Location = x.Location,
             MinimumLevel = x.MinimumLevel,
+            RequesterElo = userId != null ? requesterElo : null,
             StartDateTime = x.StartDateTime,
             ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
             ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
