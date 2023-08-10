@@ -85,7 +85,10 @@ public class Startup {
         
         services.AddHealthChecks().AddDbContextCheck<ApplicationDbContext>("padelpointdb", tags: new []{ FullTag, LiteTag });
 
-        services.AddSignalR();
+        services.AddSignalR(options =>
+        {
+            
+        });
         services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
