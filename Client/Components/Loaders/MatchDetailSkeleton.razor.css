@@ -1,4 +1,5 @@
 ﻿.border {
+    max-width: 641px;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 10px;

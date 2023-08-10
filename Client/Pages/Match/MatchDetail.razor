@@ -140,18 +140,18 @@
     private double _matchPrice;
     private string _hourWord = "hour";   
     
-    private HubConnection hubConnection;
-    private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
-    Task SendMessage() => hubConnection.SendAsync("SendMessage");
+    private HubConnection _hubConnection;
+    private bool IsConnected => _hubConnection.State == HubConnectionState.Connected;
+    Task SendMessage() => _hubConnection.SendAsync("SendMessage");
 
     protected override async Task OnInitializedAsync()
     {
         _loading = true;
-        hubConnection = new HubConnectionBuilder()  
+        _hubConnection = new HubConnectionBuilder()  
             .WithUrl(NavigationManager.ToAbsoluteUri("/allmatcheshub"))  
             .Build();  
   
-        await hubConnection.StartAsync();  
+        await _hubConnection.StartAsync();  
         
         await GetMatch();
         
@@ -291,7 +291,7 @@
 
     public async ValueTask DisposeAsync()
     {
-        await hubConnection.DisposeAsync();
+        await _hubConnection.DisposeAsync();
     }
     
     private string GetMinimumLevel(int? minimumLevel)
@@ -313,6 +313,7 @@
     
     .border-match-detail
     {
+    max-width: 641px;
         position: relative;
         padding: 12px;
         border-radius: 10px;   
@@ -364,6 +365,7 @@
     }
      
     .match-detail-private {
+    max-width: 641px;
         display: flex;
         justify-content: space-around;
         align-items: center;

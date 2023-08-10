@@ -180,11 +180,11 @@
 
     private string? userId;
     private HubConnection hubConnection;
-    private HubConnection hubConnectionMatch;
+    //private HubConnection hubConnectionMatch;
     private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
-    private bool IsConnectedMatch => hubConnectionMatch.State == HubConnectionState.Connected;
+    //private bool IsConnectedMatch => hubConnectionMatch.State == HubConnectionState.Connected;
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
-    Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString(), userId);
+    //Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString(), userId);
 
     protected override async Task OnInitializedAsync()  
     {
@@ -199,7 +199,7 @@
         
         await hubConnection.StartAsync();  
 
-        hubConnectionMatch = new HubConnectionBuilder()
+        /*hubConnectionMatch = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/matchhub"))
             .Build();
 
@@ -210,7 +210,7 @@
         });
 
         await hubConnectionMatch.StartAsync();
-        await hubConnectionMatch.SendAsync("JoinGroup", Match.Id.ToString());
+        await hubConnectionMatch.SendAsync("JoinGroup", Match.Id.ToString());*/
     }  
 
     
@@ -232,14 +232,15 @@
 
             if(response.IsSuccessStatusCode)
             {
-                if (IsConnectedMatch)
+                /*if (IsConnectedMatch)
                 {
                     await SendMessageMatch();
-                }
+                }*/
                 if (IsConnected)
                 {
                     await SendMessage();
                 }
+                await RefreshMatch.InvokeAsync();
                 ToastService.ShowInfo("You have been added to the match.");
             }
             else
@@ -271,14 +272,15 @@
                 var response = await Http.DeleteAsync($"match/{Match.Id}/remove/{playerId}");
                 if (response.IsSuccessStatusCode)
                 {
-                    if (IsConnectedMatch)
+                    /*if (IsConnectedMatch)
                     {
                         await SendMessageMatch();
-                    }
+                    }*/
                     if (IsConnected)
                     {
                         await SendMessage();
                     }
+                    await RefreshMatch.InvokeAsync();
                     ToastService.ShowInfo("Player removed from the match.");
                 }
                 else
@@ -307,7 +309,7 @@
     public async ValueTask DisposeAsync()
     {
         await hubConnection.DisposeAsync();
-        await hubConnectionMatch.DisposeAsync();
+        //await hubConnectionMatch.DisposeAsync();
     }
 
 }
@@ -441,5 +443,6 @@
         border-radius: 10px;        
         background-color: white;
         margin-bottom: 5px;
+        max-width: 641px;
     }
 </style>
