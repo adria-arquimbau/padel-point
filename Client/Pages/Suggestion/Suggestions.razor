@@ -6,24 +6,27 @@
 
 @attribute [Authorize(Roles = "User")]
 
-<h3>Suggestions</h3>
-<p>Thank you for using our app. As we are in alpha version, we would appreciate your feedback. Please let us know how we can improve.</p>
+<div class="suggestions-card">
+    <h3>Suggestions</h3>
+    <p>Thank you for using our app. As we are in alpha version, we would appreciate your feedback. Please let us know how we can improve.</p>
+    
+    @if (!_suggestionSubmitted)
+    {
+        <form id="userSuggestionForm" @onsubmit="HandleValidSubmit">
+            <div class="form-group">
+                <label for="suggestion">Your Suggestion:</label>
+                <textarea id="suggestion" @bind="_userSuggestion.Content" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    
+    }
+    else
+    {
+        <p>Thank you for your suggestion!</p>
+    }
+</div>
 
-@if (!_suggestionSubmitted)
-{
-    <form id="userSuggestionForm" @onsubmit="HandleValidSubmit">
-        <div class="form-group">
-            <label for="suggestion">Your Suggestion:</label>
-            <textarea id="suggestion" @bind="_userSuggestion.Content" class="form-control"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
-
-}
-else
-{
-    <p>Thank you for your suggestion!</p>
-}
 
 @code {
     private SuggestionRequest _userSuggestion = new();
@@ -51,3 +54,10 @@ else
         }
     }
 }
+
+<style>
+    .suggestions-card {
+        max-width: 641px;
+    }
+    
+</style>

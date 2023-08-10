@@ -14,49 +14,52 @@
     <LoadingSpinner></LoadingSpinner>
 }
 
-<h3>Create Match</h3>
 
-<form id="newMatchForm" class="my-form" @onsubmit="HandleValidSubmit">
-    <div class="form-group">
-        <label>Select the date and starting time</label>
-        <DateEdit TValue="DateTime" @bind-Date="@_start" InputMode="DateInputMode.DateTime"/>    
-    </div>
-    <div class="form-group">
-        <Switch @bind-Checked="@_requiredSpecificLevel" TValue="bool">Required specific level</Switch>
-    </div>
-    @if (_requiredSpecificLevel)
-    {
+
+<div class="create-match">
+    <h3>Create Match</h3>
+    <form id="newMatchForm" class="my-form" @onsubmit="HandleValidSubmit">
         <div class="form-group">
-            <label>Minimum level</label>
-            <NumericPicker @bind-Value="@_minimumLevel" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover" />
+            <label>Select the date and starting time</label>
+            <DateEdit TValue="DateTime" @bind-Date="@_start" InputMode="DateInputMode.DateTime"/>
         </div>
-    }
-    <div class="form-group">
-        <label>Duration</label>
-        <Select @bind-SelectedValue="@_durationSelect" TValue="int">
-            <SelectItem Value="1">1 hour</SelectItem>
-            <SelectItem Value="2">1,5 hours</SelectItem>
-            <SelectItem Value="3">2 hours</SelectItem>
-            <SelectItem Value="4">2,5 hours</SelectItem>
-            <SelectItem Value="5">3 hours</SelectItem>
-        </Select>
-    </div>
-    <div class="form-group">
-        <label>Price per hour:</label>
-        <NumericEdit TValue="double" @bind-Value="@_pricePerHour" />    
-    </div>
-    <div class="form-group">
-        <label>Location</label>
-        <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
-            <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
-            <SelectItem Value="MatchLocation.None">-</SelectItem>
-        </Select>
-    </div>
-    <div class="form-group">
-        <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
-    </div>
-    <button type="submit" class="btn btn-primary">Create Match</button>
-</form>
+        <div class="form-group">
+            <Switch @bind-Checked="@_requiredSpecificLevel" TValue="bool">Required specific level</Switch>
+        </div>
+        @if (_requiredSpecificLevel)
+        {
+            <div class="form-group">
+                <label>Minimum level</label>
+                <NumericPicker @bind-Value="@_minimumLevel" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover"/>
+            </div>
+        }
+        <div class="form-group">
+            <label>Duration</label>
+            <Select @bind-SelectedValue="@_durationSelect" TValue="int">
+                <SelectItem Value="1">1 hour</SelectItem>
+                <SelectItem Value="2">1,5 hours</SelectItem>
+                <SelectItem Value="3">2 hours</SelectItem>
+                <SelectItem Value="4">2,5 hours</SelectItem>
+                <SelectItem Value="5">3 hours</SelectItem>
+            </Select>
+        </div>
+        <div class="form-group">
+            <label>Price per hour:</label>
+            <NumericEdit TValue="double" @bind-Value="@_pricePerHour"/>
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
+                <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+                <SelectItem Value="MatchLocation.None">-</SelectItem>
+            </Select>
+        </div>
+        <div class="form-group">
+            <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Match</button>
+    </form>
+</div>
 
 @code {
 
@@ -143,3 +146,12 @@
         await hubConnection.DisposeAsync();
     }
 }
+
+<style>
+    .create-match{
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
