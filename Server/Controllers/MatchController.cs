@@ -176,6 +176,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("This team is already full.");
         }
+
+        if (match.MinimumLevel > player.Elo)
+        {
+            return Conflict($"Your level is too low, only players with {match.MinimumLevel} or more can join this match.");
+        }
         
         match.MatchPlayers.Add(new MatchPlayer
         {
