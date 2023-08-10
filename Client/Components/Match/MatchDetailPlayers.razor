@@ -4,6 +4,7 @@
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
 @using Microsoft.AspNetCore.SignalR.Client
+@using IconSize = Blazorise.IconSize
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject HttpClient Http
@@ -22,7 +23,7 @@
                     if (i < Match.PlayersTeamOne.Count)
                     {
                         var player = Match.PlayersTeamOne[i];
-                        <div class="player">
+                        <div class="player" >
                             <div class="player-avatar">
                                 @if (player.ImageUrl != null)
                                 {
@@ -36,7 +37,7 @@
                                 {
                                     @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
                                     {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button"><Icon IconSize="IconSize.ExtraSmall" Name="IconName.Remove"></Icon></button>
                                     }
                                 }
                                 @if (player.Country != null)
@@ -64,7 +65,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team1"))" class="add-button">+</button>
+                                    <button onclick="@(() => AddPlayer("Team1"))" class="add-button"><Icon Name="IconName.Add"></Icon></button>
                                 }
                             </div>
                         </div>
@@ -116,7 +117,7 @@
                                 {
                                     @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
                                     {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button"><Icon IconSize="IconSize.ExtraSmall" Name="IconName.Remove"></Icon></button>
                                     }
                                 }
                                @if (player.Country != null)
@@ -144,7 +145,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team2"))" class="add-button">+</button>
+                                    <button onclick="@(() => AddPlayer("Team2"))" class="add-button"><Icon Name="IconName.Add"></Icon></button>
                                 }
                             </div>
                         </div>
@@ -394,7 +395,7 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
     
     .player-avatar-img {
@@ -402,7 +403,7 @@
         height: 100%;
         object-fit: cover;
         border-radius: 50%;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
     
     .default-avatar {
@@ -417,7 +418,7 @@
         /* Add other styles for the country flag if necessary */
     }
     
-    .add-button, .remove-button {
+    .remove-button {
         position: absolute;
         top: -5px;
         right: -5px;
@@ -425,10 +426,26 @@
         height: 20px;
         border-radius: 50%;
         border: none;
+        background-color: #c21010;  
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
+        transition: background-color 0.2s ease;  
+    }
+    
+    .add-button{
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
         background-color: white;  
         color: black;
         cursor: pointer;
-        font-size: 12px;
+        font-size: 35px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -436,9 +453,13 @@
         transition: background-color 0.2s ease;  
     }
     
-    .add-button:hover, .remove-button:hover {
-        background-color: gray;  
+    .add-button:hover{
+        background-color: #0a860a;  
     }
+    
+    .remove-button:hover {
+            background-color: red;  
+        }
     
     .match-detail-players {
         display: flex;

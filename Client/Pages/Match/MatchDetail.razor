@@ -26,23 +26,27 @@
     <div class="border-match-detail info">
         <div class="header">
             <div>
-                PADEL
+                <div>
+                    PADEL
+                </div>
+                <div style="font-size: 12px">
+                    @_match.StartDateTime.ToLongDateString() / @_match.StartDateTime.ToShortTimeString()
+                </div>
             </div>
-            <div style="font-size: 12px">
-                @_match.StartDateTime.ToLongDateString() / @_match.StartDateTime.ToShortTimeString()
+            <div>
+                <div class="action-buttons top-right">
+                    @if (_match.RequesterIsTheCreator )
+                    {
+                        @if (!_match.Finished)
+                        {
+                            <Buttons Size="Size.Small">
+                                <Button @onclick="ShowEditModal" Color="Color.Primary" Outline >Edit</Button>
+                                <Button @onclick="ShowRemoveModal" Color="Color.Danger" Outline >Delete</Button>
+                            </Buttons>
+                        }
+                    }
+                </div>
             </div>
-        </div>
-        <div class="action-buttons top-right">
-            @if (_match.RequesterIsTheCreator )
-            {
-                @if (!_match.Finished)
-                {
-                    <Buttons Size="Size.Small">
-                        <Button @onclick="ShowEditModal" Color="Color.Primary" Outline >Edit</Button>
-                        <Button @onclick="ShowRemoveModal" Color="Color.Danger" Outline >Delete</Button>
-                    </Buttons>
-                }
-            }
         </div>
         <Divider />
         @if (_match.IsBlocked)
@@ -325,6 +329,13 @@
 
 <style>
 
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
     .action-buttons{
         display: flex;
         justify-content: space-evenly;
@@ -342,10 +353,7 @@
     }
     
     .top-right {
-        position: absolute;
-        top: -16px;
-        right: -9px;
-        padding: 10px;
+     
     }
     
     .grey-typo
