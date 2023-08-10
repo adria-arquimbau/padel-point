@@ -178,6 +178,7 @@
             {
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
+                _alert = true;
             }
         }
         catch (Exception)
@@ -185,13 +186,13 @@
             ToastService.ShowError("Something went wrong while getting user information.");
             _loading = false;
             _iAmSureFlag = false;
+            _alert = true;
         }
         finally
         {
             _iAmSureFlag = false;
             _selectedStep = "1";
             _loading = false;
-            _alert = true;
         }
     }
 }

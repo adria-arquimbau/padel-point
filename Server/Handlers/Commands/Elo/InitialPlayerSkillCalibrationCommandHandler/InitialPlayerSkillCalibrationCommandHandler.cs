@@ -49,7 +49,7 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         player.InitialLevelForm = new InitialLevelForm
         {
             OtherRacketSportsYearsPlaying = request.Request.OtherRacketSportsYearsPlaying,
-            OtherRacketSportsLevel = request.Request.PlayedOtherRacketSportsBefore == false ? OtherRacketSportsLevel.None : request.Request.OtherRacketSportsLevel,
+            OtherRacketSportsLevel = request.Request.OtherRacketSportsLevel,
             PlayedOtherRacketSportsBefore = request.Request.PlayedOtherRacketSportsBefore,
             SelfAssessedPadelSkillLevel = request.Request.SelfAssessedPadelSkillLevel,
             YearsPlayingPadel = request.Request.YearsPlayingPadel,
@@ -112,6 +112,6 @@ public class InitialPlayerSkillCalibrationCommandHandler : IRequestHandler<Initi
         // Add points based on years playing Padel
         eloPoints += Math.Min(request.YearsPlayingPadel, 5) * 15;  // Add 10 points per year, up to 5 years
         
-        return eloPoints;
+        return eloPoints + 1500;
     }
 }
