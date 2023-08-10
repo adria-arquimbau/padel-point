@@ -22,7 +22,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
         var matchId = request.MatchId;
 
         int? requesterElo = null;
-        if (userId == null)
+        if (userId != null)
         {
             requesterElo = await _context.Player
                 .Where(x => x.UserId == userId)

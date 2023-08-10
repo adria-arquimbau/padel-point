@@ -65,7 +65,7 @@
                 <div class="info-footer-box-content">
                     Level
                 </div>
-                <div class="info-footer-box-content grey-typo">
+                <div class="info-footer-box-content" style="@GetMinimumLevelColor(_match)">
                     @GetMinimumLevel(_match.MinimumLevel)
                 </div>
             </div>
@@ -294,13 +294,32 @@
         await _hubConnection.DisposeAsync();
     }
     
-    private string GetMinimumLevel(int? minimumLevel)
+    private static string GetMinimumLevel(int? minimumLevel)
     {
         if (minimumLevel == null)
         {
             return "Open";
         }
         return "<" + minimumLevel.Value;
+    }
+    
+    private static string GetMinimumLevelColor(MatchResponse matchResponse)
+    {
+        if (matchResponse.Finished || matchResponse.RequesterElo == null || !IsOpenSlotsState(matchResponse))
+        {
+            return "";
+        }
+        if (matchResponse.RequesterElo < matchResponse.MinimumLevel)
+        {
+            return "color: red;";
+        }
+        
+        return "color: rgb(0,119,0);"; 
+    }
+    
+    private static bool IsOpenSlotsState(MatchResponse match)
+    {
+        return match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2;
     }
 }
 
