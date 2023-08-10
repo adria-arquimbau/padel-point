@@ -71,16 +71,19 @@
                     }
                 }
             </div>
-            @if (Match.PlayersTeamOne.Any() && Match.PlayersTeamTwo.Any())
+            @if (Match.PlayersTeamOne.Any())
             {
                 <div class="team-average-elo-info">
                     <div>Avg Elo: @Match.AverageEloTeamOne</div>
-                    <div>
-                        Odds: 
-                        <span class="@(Match.ProbabilityTeamOneWins >= 50 ? "odds-positive" : "odds-negative")">
-                            @Match.ProbabilityTeamOneWins %
-                        </span>
-                    </div>
+                    @if (Match.PlayersTeamTwo.Any())
+                    {
+                        <div>
+                            Odds: 
+                            <span class="@(Match.ProbabilityTeamOneWins >= 50 ? "odds-positive" : "odds-negative")">
+                                @Match.ProbabilityTeamOneWins %
+                            </span>
+                        </div>
+                    }
                 </div>
             }
             @if (Match.ScoreConfirmedTeamOne)
@@ -148,16 +151,19 @@
                     }
                 }
             </div>
-            @if (Match.PlayersTeamOne.Any() && Match.PlayersTeamTwo.Any())
+            @if (Match.PlayersTeamTwo.Any())
             {
                 <div class="team-average-elo-info">
                     <div>Avg Elo: @Match.AverageEloTeamTwo</div>
-                    <div>
-                        Odds: 
-                        <span class="@(Match.ProbabilityTeamTwoWins >= 50 ? "odds-positive" : "odds-negative")">
-                            @Match.ProbabilityTeamTwoWins %
-                        </span>
-                    </div>
+                     @if (Match.PlayersTeamOne.Any())
+                        {
+                            <div>
+                                Odds: 
+                                <span class="@(Match.ProbabilityTeamTwoWins >= 50 ? "odds-positive" : "odds-negative")">
+                                    @Match.ProbabilityTeamTwoWins %
+                                </span>
+                            </div>
+                        }
                 </div>
             }
             @if (Match.ScoreConfirmedTeamTwo)
