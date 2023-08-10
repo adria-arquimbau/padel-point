@@ -148,9 +148,10 @@ public class RegisterModel : PageModel
                 {
                     await _emailService.Execute(Input.Email, "Confirm your email", $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     ModelState.AddModelError(string.Empty, "Email sending failed. Use another email domain or try using Google.");
+                    await _userManager.DeleteAsync(user);
                     return Page();
                 }
 

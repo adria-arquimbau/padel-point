@@ -23,7 +23,7 @@ public class EmailService : IEmailService
             {
                 Html = body
             };
-            var emailMessage = new EmailMessage(_emailSettings.EmailFrom, recipient, emailContent);
+            var emailMessage = new EmailMessage(_emailSettings.EmailFrom, recipient.ToUpper(), emailContent);
             var emailSendOperation = await emailClient.SendAsync(
                 wait: WaitUntil.Completed,
                 message: emailMessage);
