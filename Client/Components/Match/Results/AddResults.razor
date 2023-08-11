@@ -1,6 +1,7 @@
 ﻿@using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
 @using EventsManager.Shared.Dtos
+@using Color = Blazorise.Color
 @inject HttpClient Http
 @inject IToastService ToastService
 
@@ -21,11 +22,11 @@
                                 <div>Team 2</div>
                             </div>
                             <div id="score-sets">
-                                @for (var index = 0; index < Sets.Count; index++)
+                                @foreach (var score in Sets)
                                 {
-                                    var score = Sets[index];
                                     <div class="score-set">
                                         <small class="set-number">Set @score.SetNumber</small>
+
                                         <input class="set-score form-control" type="number" @bind="score.Team1Score" placeholder="Score Team 1">
                                         <input class="set-score form-control" type="number" @bind="score.Team2Score" placeholder="Score Team 2">
                                     </div>
@@ -34,8 +35,11 @@
                         </div>
 
                         <div class="set-buttons">
-                            <button type="button" class="btn btn-primary add-set-button" @onclick="AddSet">Add Set</button>
-                            <button type="button" class="btn btn-secondary remove-set-button" @onclick="RemoveSet">Remove Set</button>
+                            <Button Size="Size.Small" Color="Color.Success" @onclick="AddSet" Outline>Add Set</Button>
+                            @if (Sets.Count != 0)
+                            {
+                                <Button Size="Size.Small" Color="Color.Dark" @onclick="RemoveSet" Outline>Remove Set</Button>
+                            }
                         </div>
                     </form>
                 }

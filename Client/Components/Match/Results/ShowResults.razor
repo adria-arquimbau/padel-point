@@ -221,6 +221,7 @@
                 }
                 else
                 {
+                    Match.Sets = new List<SetDto>();
                     var error = await response.Content.ReadAsStringAsync();
                     ToastService.ShowError(error);
                 }

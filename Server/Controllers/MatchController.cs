@@ -324,8 +324,14 @@ public class MatchController : ControllerBase
             .Include(x => x.Creator)
             .Include(x => x.Sets)
             .Include(x => x.MatchPlayers)
+                .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
 
+        if (match.MatchPlayers.All(x => x.Player.UserId != userId) && match.Creator.UserId != userId)
+        {
+            return Conflict("Only players can set score.");
+        }
+        
         if (match.MatchPlayers.Count != 4)
         {
             return Conflict("Match is not full");
@@ -334,6 +340,16 @@ public class MatchController : ControllerBase
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
             return Conflict("Score is already confirmed");
+        }
+
+        if (request.Sets.Count > 3)
+        {
+            return Conflict("You can't set more than 3 sets");
+        }
+
+        if (request.Sets.All(x => x is { Team1Score: 0, Team2Score: 0 }))
+        {
+            return Conflict("You can't set all sets to 0");
         }
 
         var score = request.Sets.Select(x => new Set
