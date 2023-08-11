@@ -115,7 +115,7 @@
                                     </div>
                                 }
                             </div>
-                            <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
+                            <p>@player.NickName</p>
                             <div class="elo">@player.EloBeforeFinish</div>
                             <div class="gained-elo">
                                 @if(Match.Finished)
@@ -425,7 +425,7 @@
         align-items: center;
         justify-content: center;
         position: relative;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
     .player-avatar-img {
@@ -433,7 +433,7 @@
         height: 100%;
         object-fit: cover;
         border-radius: 50%;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
     .default-avatar {
