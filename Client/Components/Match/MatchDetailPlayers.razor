@@ -65,7 +65,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team1"))" class="add-button"><Icon Name="IconName.Add"></Icon></button>
+                                    <button onclick="@(() => AddPlayer("Team1"))" class="add-button">+</button>
                                 }
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                                 {
                                     @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
                                     {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button"><Icon IconSize="IconSize.ExtraSmall" Name="IconName.Remove"></Icon></button>
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
                                     }
                                 }
                                @if (player.Country != null)
@@ -145,7 +145,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team2"))" class="add-button"><Icon Name="IconName.Add"></Icon></button>
+                                    <button onclick="@(() => AddPlayer("Team2"))" class="add-button">+</button>
                                 }
                             </div>
                         </div>
@@ -442,14 +442,14 @@
         height: 60px;
         border-radius: 50%;
         border: none;
-        background-color: white;  
+      
         color: black;
         cursor: pointer;
         font-size: 35px;
         display: flex;
         justify-content: center;
         align-items: center;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+      
         transition: background-color 0.2s ease;  
     }
     
