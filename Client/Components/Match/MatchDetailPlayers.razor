@@ -37,8 +37,7 @@
                                 {
                                     @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
                                     {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button"><Icon IconSize="IconSize.ExtraSmall" Name="IconName.Remove"></Icon></button>
-                                    }
+                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>                                    }
                                 }
                                 @if (player.Country != null)
                                 {
