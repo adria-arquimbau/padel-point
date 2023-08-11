@@ -424,4 +424,16 @@ public class MatchController : ControllerBase
         
         return Ok(matches);
     }
+    
+    [HttpPost("{MatchId:guid}/invite/{playerId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> InvitePlayer(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+       
+        
+        return Ok();
+    }
+    
 }

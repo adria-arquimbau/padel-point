@@ -30,6 +30,7 @@ public class PlayerController : ControllerBase
             .Where(p => p.NickName.ToLower().Contains(lowerTerm))
             .Select(x => new PlayerDto
             {
+                Id = x.Id,
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl
             })
