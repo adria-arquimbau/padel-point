@@ -1,9 +1,11 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Match.Results
+@using EventsManager.Client.Components.Modals
 @using EventsManager.Shared
 @using EventsManager.Shared.Dtos
 @using EventsManager.Shared.Requests
 @using Microsoft.AspNetCore.SignalR.Client
+@using Color = Blazorise.Color
 @using IconSize = Blazorise.IconSize
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -23,8 +25,8 @@
                     if (i < Match.PlayersTeamOne.Count)
                     {
                         var player = Match.PlayersTeamOne[i];
-                        <div class="player" >
-                            <div class="player-avatar">
+                        <div class="player" @onclick="() => ShowPlayerActionsModal(player)">
+                            <div class="player-avatar" >
                                 @if (player.ImageUrl != null)
                                 {
                                     <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
@@ -33,20 +35,14 @@
                                 {
                                     <img src="/default-avatar.png" alt="Default avatar" class="player-avatar-img"/>
                                 }
-                                @if (player.CanIDeleteIt || Match.RequesterIsTheCreator)
-                                {
-                                    @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
-                                    {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>                                    }
-                                }
                                 @if (player.Country != null)
                                 {
                                     <div class="player-country">
-                                       <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
+                                        <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
                                     </div>
                                 }
                             </div>
-                            <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
+                            <p>@player.NickName</p>
                             <div class="elo">@player.EloBeforeFinish</div>
                             <div class="gained-elo">
                                 @if(Match.Finished)
@@ -64,7 +60,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team1"))" class="add-button">+</button>
+                                    <Button onclick="@(() => AddPlayer("Team1"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
                                 }
                             </div>
                         </div>
@@ -102,7 +98,7 @@
                     if (i < Match.PlayersTeamTwo.Count)
                     {
                         var player = Match.PlayersTeamTwo[i];
-                        <div class="player">
+                        <div class="player" @onclick="() => ShowPlayerActionsModal(player)">
                             <div class="player-avatar">
                                 @if (player.ImageUrl != null)
                                 {
@@ -112,19 +108,12 @@
                                 {
                                     <img src="/default-avatar.png" alt="Default avatar" class="player-avatar-img"/>
                                 }
-                                @if (player.CanIDeleteIt || Match.RequesterIsTheCreator)
+                                @if (player.Country != null)
                                 {
-                                    @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
-                                    {
-                                        <button onclick="@(() => RemovePlayer(player.Id))" class="remove-button">-</button>
-                                    }
+                                    <div class="player-country">
+                                        <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
+                                    </div>
                                 }
-                               @if (player.Country != null)
-                               {
-                                   <div class="player-country">
-                                       <CountryFlag Size="FlagSize.Small" InputType="InputType.ISOA2" ISOA2="@player.Country" IsRounded="true" HasShadow="true"></CountryFlag>
-                                   </div>
-                               }
                             </div>
                             <p @onclick="@(() => NavigateToPlayerProfile(player.Id))">@player.NickName</p>
                             <div class="elo">@player.EloBeforeFinish</div>
@@ -144,7 +133,7 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <button onclick="@(() => AddPlayer("Team2"))" class="add-button">+</button>
+                                    <Button onclick="@(() => AddPlayer("Team2"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
                                 }
                             </div>
                         </div>
@@ -155,15 +144,15 @@
             {
                 <div class="team-average-elo-info">
                     <div>Avg Elo: @Match.AverageEloTeamTwo</div>
-                     @if (Match.PlayersTeamOne.Any())
-                        {
-                            <div>
-                                Odds: 
-                                <span class="@(Match.ProbabilityTeamTwoWins >= 50 ? "odds-positive" : "odds-negative")">
-                                    @Match.ProbabilityTeamTwoWins %
-                                </span>
-                            </div>
-                        }
+                    @if (Match.PlayersTeamOne.Any())
+                    {
+                        <div>
+                            Odds: 
+                            <span class="@(Match.ProbabilityTeamTwoWins >= 50 ? "odds-positive" : "odds-negative")">
+                                @Match.ProbabilityTeamTwoWins %
+                            </span>
+                        </div>
+                    }
                 </div>
             }
             @if (Match.ScoreConfirmedTeamTwo)
@@ -173,6 +162,33 @@
         </div>
     </div>
 </div>
+
+
+
+<Modal @ref="modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>@selectedPlayer?.NickName</ModalTitle>
+            <CloseButton/>
+        </ModalHeader>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="() => NavigateToPlayerProfile(selectedPlayer.Id)">Go to player Profile</Button>
+            @if (selectedPlayer != null)
+            {
+                @if (selectedPlayer.CanIDeleteIt || Match.RequesterIsTheCreator)
+                {
+                    @if (!Match.ScoreConfirmedTeamOne && !Match.ScoreConfirmedTeamTwo)
+                    {
+                        <Button Color="Color.Danger" Clicked="() => RemovePlayer(selectedPlayer.Id)">Remove</Button>
+                    }
+                }
+            }
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+
+
 
 @code {
     [Parameter]
@@ -184,6 +200,8 @@
     [Parameter]
     public string ReturnUrl {get; set;}
 
+    private Modal modalRef;
+    
     private string? userId;
     private HubConnection hubConnection;
     //private HubConnection hubConnectionMatch;
@@ -192,6 +210,18 @@
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
     //Task SendMessageMatch() => hubConnectionMatch.SendAsync("SendMessage", Match.Id.ToString(), userId);
 
+    private PlayerDto? selectedPlayer;
+    private Task ShowPlayerActionsModal(PlayerDto playerDto)
+    {
+        selectedPlayer = playerDto;
+        return modalRef.Show();
+    }
+
+    private Task HidePlayerActionsModal()
+    {
+        return modalRef.Hide();
+    }
+    
     protected override async Task OnInitializedAsync()  
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -288,6 +318,7 @@
                     }
                     await RefreshMatch.InvokeAsync();
                     ToastService.ShowInfo("Player removed from the match.");
+                    await HidePlayerActionsModal();
                 }
                 else
                 {
@@ -317,7 +348,7 @@
         await hubConnection.DisposeAsync();
         //await hubConnectionMatch.DisposeAsync();
     }
-
+ 
 }
 
 <style>
@@ -416,49 +447,6 @@
         left: 24px; /* Adjust this according to your needs */
         /* Add other styles for the country flag if necessary */
     }
-    
-    .remove-button {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        border: none;
-        background-color: rgba(194, 16, 16, 0.3);
-        color: white;
-        cursor: pointer;
-        font-size: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
-        transition: background-color 0.2s ease;  
-    }
-    
-    .add-button{
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        border: none;
-      
-        color: black;
-        cursor: pointer;
-        font-size: 35px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      
-        transition: background-color 0.2s ease;  
-    }
-    
-    .add-button:hover{
-        background-color: #0a860a;  
-    }
-    
-    .remove-button:hover {
-            background-color: red;  
-        }
     
     .match-detail-players {
         display: flex;
