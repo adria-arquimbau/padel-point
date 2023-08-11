@@ -135,6 +135,10 @@
                                 {
                                     <Button onclick="@(() => AddPlayer("Team2"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
                                 }
+                                @if (Match.RequesterIsTheCreator)
+                                {
+                                    <Button Clicked="@ShowSearchPlayerModal" Size="Size.ExtraSmall" Color="Color.Success" Outline>Invite</Button>
+                                }
                             </div>
                         </div>
                     }
@@ -187,8 +191,31 @@
     </ModalContent>
 </Modal>
 
+<Modal @ref="searchPlayerModalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Search Player (Coming soon)</ModalTitle>
+            <CloseButton/>
+        </ModalHeader>
+        <ModalBody>
+            <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch" />
 
-
+            <div class="search-players-list">
+                @foreach (var player in _searchedPlayers)
+                {
+                    <div class="searched-player">
+                        <div>
+                            @player.NickName
+                        </div>
+                        <div>
+                            <Button Color="Color.Success" Outline>Invite</Button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </ModalBody>
+    </ModalContent>
+</Modal>
 
 @code {
     [Parameter]
@@ -199,8 +226,11 @@
 
     [Parameter]
     public string ReturnUrl {get; set;}
+    
+    private List<PlayerDto> _searchedPlayers = new List<PlayerDto>();
 
     private Modal modalRef;
+    private Modal searchPlayerModalRef;
     
     private string? userId;
     private HubConnection hubConnection;
@@ -217,9 +247,19 @@
         return modalRef.Show();
     }
 
+    private Task ShowSearchPlayerModal()
+    {
+        return searchPlayerModalRef.Show();
+    }
+    
     private Task HidePlayerActionsModal()
     {
         return modalRef.Hide();
+    }
+    
+    private Task HideSearchPlayerModal()
+    {
+        return searchPlayerModalRef.Hide();
     }
     
     protected override async Task OnInitializedAsync()  
@@ -348,10 +388,45 @@
         await hubConnection.DisposeAsync();
         //await hubConnectionMatch.DisposeAsync();
     }
- 
+
+    private async Task OnSearch(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString()?.ToLower();
+        if (value == null || value.Length < 3)
+        {
+            return;
+        }
+        
+        try
+        {
+            var response = await Http.GetAsync($"player/search?term={value}");
+            if (response.IsSuccessStatusCode)
+            {
+                _searchedPlayers = await response.Content.ReadFromJsonAsync<List<PlayerDto>>();
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        
+        StateHasChanged();
+    }
+
 }
 
 <style>
+    .search-players-list{
+        margin: 5px;
+    }
+    
+    .searched-player{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        margin-bottom: 5px;
+    }
+    
     .team-average-elo-info {
         display: flex;
         flex-direction: column;
