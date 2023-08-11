@@ -381,6 +381,11 @@ public class MatchController : ControllerBase
             .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
+        if (match.MatchPlayers.All(x => x.Player.UserId != userId) && match.Creator.UserId != userId)
+        {
+            return Conflict("Only players can remove score.");
+        }
+        
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
             return Conflict("Score is already confirmed");
