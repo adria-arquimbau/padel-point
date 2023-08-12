@@ -20,8 +20,11 @@
                 <div>
                     @invitedMatch.CreatorNickname Invited you to a match
                 </div>
-                <Button style="margin-top: 5px" Color="Color.Dark" Clicked="() => GoToMatch(invitedMatch.MatchId)">Go to match</Button>
-                <Button style="margin-top: 5px" Color="Color.Success" Clicked="() => AcceptInvitation(invitedMatch.MatchId)">Accept invitation</Button>
+                <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Dark" Clicked="() => GoToMatch(invitedMatch.MatchId)">Go to match</Button>
+                <div class="accept-decline-buttons">
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Success" Clicked="() => RespondInvitation(invitedMatch.MatchId, true)">Accept invitation</Button>
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Danger" Clicked="() => RespondInvitation(invitedMatch.MatchId, false)">Decline</Button>
+                </div>
             </div>
         }
         <Divider></Divider>
@@ -34,8 +37,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await GetInvitations();
+    }
+
+    private async Task GetInvitations()
+    {
         _loading = true;
-      
+
         try
         {
             var response = await Http.GetAsync($"Notification/invited-matches");
@@ -49,7 +57,7 @@
                 var error = await response.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
             }
-        }   
+        }
         catch (Exception)
         {
             ToastService.ShowError("Something went wrong, please try again later.");
@@ -58,7 +66,6 @@
         {
             _loading = false;
         }
-        
     }
 
     private void GoToMatch(Guid invitedMatchMatchId)
@@ -66,18 +73,24 @@
         NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
     }
 
-    private async Task AcceptInvitation(Guid invitedMatchMatchId)
+    private async Task RespondInvitation(Guid invitedMatchMatchId, bool accept)
     {
-        if (await MessageService.Confirm( "Are you sure want to accept the invitation? You will be re-direct to the match.", "Accept invitation"))
+        var acceptDecline = accept ? "Accept" : "Decline";
+        if (await MessageService.Confirm( $"Are you sure want to {acceptDecline} the invitation?", $"{acceptDecline} invitation"))
         {
             try
             {
-                var response = await Http.GetAsync($"notification/accept-invitation/match/{invitedMatchMatchId}");
+                var response = await Http.PostAsync($"notification/accept-invitation/match/{invitedMatchMatchId}/accept/{accept}", null);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    ToastService.ShowSuccess("Invitation accepted");
-                    NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+                    if (accept)
+                    {
+                        ToastService.ShowSuccess("Invitation accepted");
+                        NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+                    }
+                    await GetInvitations();
+                    ToastService.ShowSuccess("Invitation declined");
                 }
                 else
                 {
@@ -110,4 +123,16 @@
         margin-bottom: 5px;
         max-width: 641px;       
     }
+    
+    .accept-decline-buttons{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .accept-decline-buttons > Button {
+        flex: 1; /* This makes each button take up an equal amount of space within the container */
+        margin: 0 2px; /* This provides a little space between the buttons */
+    }
+
 </style>

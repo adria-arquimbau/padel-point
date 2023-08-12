@@ -102,20 +102,28 @@ public class NotificationController : ControllerBase
         return Ok(invitedMatches);
     }
     
-    [HttpGet("accept-invitation/match/{invitedMatchMatchId:guid}")]
+    [HttpPost("accept-invitation/match/{invitedMatchMatchId:guid}/accept/{accept:bool}")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> GetInvitedMatches([FromRoute] Guid invitedMatchMatchId, CancellationToken cancellationToken)
+    public async Task<IActionResult> AcceptInvitation([FromRoute] Guid invitedMatchMatchId, [FromRoute] bool accept, CancellationToken cancellationToken)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;  
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var matchPlayer = await _dbContext.MatchPlayer
             .Where(x => x.MatchId == invitedMatchMatchId && x.Player.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        matchPlayer.Confirmed = true;
+        if (accept)
+        {
+            matchPlayer.Confirmed = true;
+        }
+       
+        if (!accept)
+        {
+            _dbContext.MatchPlayer.Remove(matchPlayer);
+        }
         
         await _dbContext.SaveChangesAsync(cancellationToken);
-        
+
         return Ok();
     }
 }
