@@ -2,7 +2,7 @@
 
 @inject HttpClient Http
 
-@using EventsManager.Client.Components.User
+@using EventsManager.Client.Components.Notifications
 @using EventsManager.Client.Components.Match
 @using EventsManager.Client.Components.Players
 @using EventsManager.Client.Components
@@ -32,6 +32,12 @@
 </AuthorizeView>
 <Divider></Divider>
 <NineTPadelBanner></NineTPadelBanner>
+
+<AuthorizeView>
+    <Authorized>
+        <InvitedMatchesNotification></InvitedMatchesNotification>
+    </Authorized>
+</AuthorizeView>
 
 <AllMatches></AllMatches>
 

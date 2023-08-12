@@ -1,0 +1,113 @@
+﻿@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IMessageService MessageService
+
+
+@if (!_loading)
+{
+    @if (_invitedMatches.Any())
+    {
+        <Divider></Divider>
+        @foreach (var invitedMatch in _invitedMatches)
+        {
+            <div class="invited-matches">
+                <div>
+                    @invitedMatch.CreatorNickname Invited you to a match
+                </div>
+                <Button style="margin-top: 5px" Color="Color.Dark" Clicked="() => GoToMatch(invitedMatch.MatchId)">Go to match</Button>
+                <Button style="margin-top: 5px" Color="Color.Success" Clicked="() => AcceptInvitation(invitedMatch.MatchId)">Accept invitation</Button>
+            </div>
+        }
+        <Divider></Divider>
+    }
+}
+
+@code {
+    private bool _loading = false;
+    private List<InvitedMatchesResponse> _invitedMatches = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+      
+        try
+        {
+            var response = await Http.GetAsync($"Notification/invited-matches");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _invitedMatches = await response.Content.ReadFromJsonAsync<List<InvitedMatchesResponse>>();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }   
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+        
+    }
+
+    private void GoToMatch(Guid invitedMatchMatchId)
+    {
+        NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+    }
+
+    private async Task AcceptInvitation(Guid invitedMatchMatchId)
+    {
+        if (await MessageService.Confirm( "Are you sure want to accept the invitation? You will be re-direct to the match.", "Accept invitation"))
+        {
+            try
+            {
+                var response = await Http.GetAsync($"notification/accept-invitation/match/{invitedMatchMatchId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowSuccess("Invitation accepted");
+                    NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }   
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+    }
+
+}
+
+<style>
+    .invited-matches{
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        position: relative;
+        padding: 12px;
+        border-radius: 10px;        
+        background-color: white;
+        margin-bottom: 5px;
+        max-width: 641px;       
+    }
+</style>

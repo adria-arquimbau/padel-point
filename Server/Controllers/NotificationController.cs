@@ -82,4 +82,40 @@ public class NotificationController : ControllerBase
         
         return Ok();
     }
+    
+    [HttpGet("invited-matches")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GetInvitedMatches(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var invitedMatches = await _dbContext.MatchPlayer
+            .Where(x => x.Player.UserId == userId && x.Confirmed == false)
+            .Select(x => new InvitedMatchesResponse
+            {
+                MatchId = x.MatchId,
+                CreatorNickname = x.Match.Creator.NickName,
+                MatchDateTime = x.Match.StartDateTime
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        return Ok(invitedMatches);
+    }
+    
+    [HttpGet("accept-invitation/match/{invitedMatchMatchId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GetInvitedMatches([FromRoute] Guid invitedMatchMatchId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;  
+
+        var matchPlayer = await _dbContext.MatchPlayer
+            .Where(x => x.MatchId == invitedMatchMatchId && x.Player.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        matchPlayer.Confirmed = true;
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
 }
