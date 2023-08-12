@@ -30,7 +30,26 @@ public class PlayerController : ControllerBase
             .Where(p => p.NickName.ToLower().Contains(lowerTerm))
             .Select(x => new PlayerDto
             {
+                NickName = x.NickName,
+                ImageUrl = x.ImageUrl
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        return Ok(players);
+    }
+    
+    [HttpGet("search-invite")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> SearchToInvitePlayer([FromQuery] string term, CancellationToken cancellationToken)
+    {
+        var lowerTerm = term.ToLower();
+
+        var players = await _dbContext.Player
+            .Where(p => p.NickName.ToLower().Contains(lowerTerm))
+            .Select(x => new PlayerToInviteResponse
+            {
                 Id = x.Id,
+                Elo = x.Elo,
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl
             })
@@ -233,9 +252,17 @@ public class PlayerController : ControllerBase
             player.Announcements.InitialLevelFormDone = false;
             
             _dbContext.EloHistories.Remove(initialCalibrationHistory);
-        
+            
         await _dbContext.SaveChangesAsync(cancellationToken);
         
         return Ok();
     }
+}
+
+public class PlayerToInviteResponse 
+{
+    public Guid Id { get; set; }    
+    public int Elo { get; set; }
+    public string NickName { get; set; }
+    public Uri ImageUrl { get; set; }
 }

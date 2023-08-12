@@ -3,6 +3,7 @@
 @using EventsManager.Client.Components.Modals
 @using EventsManager.Shared
 @using EventsManager.Shared.Dtos
+@using EventsManager.Shared.Enums
 @using EventsManager.Shared.Requests
 @using Microsoft.AspNetCore.SignalR.Client
 @using Color = Blazorise.Color
@@ -26,7 +27,7 @@
                     {
                         var player = Match.PlayersTeamOne[i];
                         <div class="player" @onclick="() => ShowPlayerActionsModal(player)">
-                            <div class="player-avatar" >
+                            <div class="player-avatar" style="@GetStyleNonConfirmedPlayer(player.IsConfirmed)">
                                 @if (player.ImageUrl != null)
                                 {
                                     <img src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
@@ -64,7 +65,7 @@
                                 }
                                 @if (Match.RequesterIsTheCreator)
                                 {
-                                    <Button Clicked="@ShowSearchPlayerModal" Size="Size.ExtraSmall" Color="Color.Success" Outline>Invite</Button>
+                                    <Button Clicked="() => ShowSearchPlayerModal(Team.Team1)" Size="Size.ExtraSmall" Color="Color.Success" Outline>Invite</Button>
                                 }
                             </div>
                         </div>
@@ -103,7 +104,7 @@
                     {
                         var player = Match.PlayersTeamTwo[i];
                         <div class="player" @onclick="() => ShowPlayerActionsModal(player)">
-                            <div class="player-avatar">
+                            <div class="player-avatar" style="@GetStyleNonConfirmedPlayer(player.IsConfirmed)">
                                 @if (player.ImageUrl != null)
                                 {
                                     <img  src="@player.ImageUrl" alt="Player avatar" class="player-avatar-img"/>
@@ -141,7 +142,7 @@
                                 }
                                 @if (Match.RequesterIsTheCreator)
                                 {
-                                    <Button Clicked="@ShowSearchPlayerModal" Size="Size.ExtraSmall" Color="Color.Success" Outline>Invite</Button>
+                                    <Button Clicked="() => ShowSearchPlayerModal(Team.Team2)" Size="Size.ExtraSmall" Color="Color.Success" Outline>Invite</Button>
                                 }
                             </div>
                         </div>
@@ -198,29 +199,23 @@
 <Modal @ref="searchPlayerModalRef">
     <ModalContent Centered>
         <ModalHeader>
-            <ModalTitle>Search Player (Coming soon, not functional yet)</ModalTitle>
+            <ModalTitle>Search Player</ModalTitle>
             <CloseButton/>
         </ModalHeader>
         <ModalBody>
             <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch" />
-
             <div class="search-players-list">
                 @foreach (var player in _searchedPlayers)
                 {
                     <div class="searched-player">
                         <div>
-                            @player.NickName
+                            @player.NickName (@player.Elo)
                         </div>
                         <div>
                             @if(!_invitingPlayer)
                             {
                                 <Button Color="Color.Success" Clicked="() => InvitePlayer(player.Id, player.NickName)" Outline>Invite</Button>
                             }
-                            else
-                            {
-                                <Button Color="Color.Success" Disabled>Inviting...</Button>
-                            }
-                            
                         </div>
                     </div>
                 }
@@ -254,14 +249,17 @@
 
     private PlayerDto? selectedPlayer;
     private bool _invitingPlayer = false;
+    private Team selectedTeam;
+
     private Task ShowPlayerActionsModal(PlayerDto playerDto)
     {
         selectedPlayer = playerDto;
         return modalRef.Show();
     }
 
-    private Task ShowSearchPlayerModal()
+    private Task ShowSearchPlayerModal(Team team)
     {
+        selectedTeam = team;
         return searchPlayerModalRef.Show();
     }
     
@@ -369,9 +367,9 @@
                     {
                         await SendMessage();
                     }
+                    await HidePlayerActionsModal();
                     await RefreshMatch.InvokeAsync();
                     ToastService.ShowInfo("Player removed from the match.");
-                    await HidePlayerActionsModal();
                 }
                 else
                 {
@@ -412,7 +410,7 @@
         
         try
         {
-            var response = await Http.GetAsync($"player/search?term={value}");
+            var response = await Http.GetAsync($"player/search-invite?term={value}");
             if (response.IsSuccessStatusCode)
             {
                 _searchedPlayers = await response.Content.ReadFromJsonAsync<List<PlayerDto>>();
@@ -432,12 +430,13 @@
         _invitingPlayer = true;
         try
         {
-            var response = await Http.PostAsync($"match/{Match.Id}/invite/{playerId}", null);
+            var response = await Http.PostAsync($"match/{Match.Id}/invite/{playerId}/team/{selectedTeam}", null);
 
             if(response.IsSuccessStatusCode)
             {
                 await searchPlayerModalRef.Hide();
                 ToastService.ShowInfo($"{nickName} has been invited to the match.");
+                await RefreshMatch.InvokeAsync();
             }
             else
             {
@@ -455,6 +454,16 @@
             _invitingPlayer = false;
         }
     }
+
+    private string GetStyleNonConfirmedPlayer(bool playerIsConfirmed)
+    {
+        if (!playerIsConfirmed)
+        {
+            return "border: 2px solid red;";
+        }
+        return "";
+    }
+
 }
 
 <style>

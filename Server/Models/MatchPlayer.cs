@@ -10,4 +10,5 @@ public class MatchPlayer
     public Guid PlayerId { get; set; }
     public Player Player { get; set; }
     public Team Team { get; set; }
+    public bool Confirmed { get; set; }
 }

@@ -64,6 +64,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     Country = p.Player.Country,
+                    IsConfirmed = p.Confirmed,
                     ImageUrl = p.Player.ImageUrl,
                     EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)
@@ -78,6 +79,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
                     Id = p.Player.Id,
                     NickName = p.Player.NickName,
                     Country = p.Player.Country,
+                    IsConfirmed = p.Confirmed,
                     ImageUrl = p.Player.ImageUrl,
                     EloBeforeFinish = p.Player.EloHistories
                         .Where(e => e.MatchId == matchId)

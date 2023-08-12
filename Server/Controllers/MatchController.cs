@@ -185,7 +185,8 @@ public class MatchController : ControllerBase
         match.MatchPlayers.Add(new MatchPlayer
         {
             Player = player,
-            Team = team
+            Team = team,
+            Confirmed = true
         });
         
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -336,7 +337,12 @@ public class MatchController : ControllerBase
         {
             return Conflict("Match is not full");
         }
-        
+
+        if (match.MatchPlayers.Any(x => x.Confirmed == false))
+        {
+            return Conflict("Not all players confirmed their participation.");
+        }
+
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
             return Conflict("Score is already confirmed");
@@ -425,13 +431,37 @@ public class MatchController : ControllerBase
         return Ok(matches);
     }
     
-    [HttpPost("{MatchId:guid}/invite/{playerId:guid}")]
+    [HttpPost("{MatchId:guid}/invite/{playerId:guid}/team/{team}")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> InvitePlayer(CancellationToken cancellationToken)
+    public async Task<IActionResult> InvitePlayer([FromRoute] Guid matchId, [FromRoute] Guid playerId, [FromRoute] Team team, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
-       
+        var player = await _dbContext.Player
+            .Where(x => x.Id == playerId)   
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.MatchPlayers)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.Creator.UserId != userId)
+        {
+            return Conflict("Only creator can invite players.");
+        }
+        
+        var matchPlayer = new MatchPlayer
+        {
+            Player = player,
+            Team = team,
+            Confirmed = false
+        };
+        
+        match.MatchPlayers.Add(matchPlayer);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
         
         return Ok();
     }
