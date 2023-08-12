@@ -52,7 +52,8 @@ public class MatchController : ControllerBase
                 new()
                 {
                     Player = playerCreator,
-                    Team = Team.Team1
+                    Team = Team.Team1,
+                    Confirmed = true
                 }
             },
             IsPrivate = request.IsPrivate,
@@ -211,6 +212,10 @@ public class MatchController : ControllerBase
         catch (MatchIsBlockedException)
         {
             return Conflict("Match is blocked, you can't confirm score. Try again later.");
+        }
+        catch (NotAllPlayersConfirmedException)
+        {
+            return Conflict("Not all players confirmed their participation.");
         }
         
         return Ok();

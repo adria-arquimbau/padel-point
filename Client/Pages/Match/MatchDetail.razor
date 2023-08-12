@@ -56,6 +56,13 @@
                 <AlertDescription>Match Blocked by an Administrator. You can't confirm results.</AlertDescription>
             </Alert>
         }
+        @if (_match.PlayersTeamOne.Any(x => x.IsConfirmed == false) || _match.PlayersTeamTwo.Any(x => x.IsConfirmed == false))
+        {
+            <Alert Color="Color.Warning" Visible>
+                <AlertMessage>Non confirmed players</AlertMessage>
+                <AlertDescription>Match have non confirmed players marked with a red circle.</AlertDescription>
+            </Alert>
+        }
         <div class="info-footer">
             <div class="info-footer-box">
                 <div class="info-footer-box-content">

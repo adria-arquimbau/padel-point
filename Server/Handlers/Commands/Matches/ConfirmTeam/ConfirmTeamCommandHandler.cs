@@ -51,6 +51,11 @@ public class ConfirmTeamCommandHandler : IRequestHandler<ConfirmTeamCommandReque
             throw new MatchIsBlockedException();    
         }
 
+        if (match.MatchPlayers.Any(x => x.Confirmed == false) && !adminRequest)
+        {
+            throw new NotAllPlayersConfirmedException();
+        }
+
         if (!adminRequest)
         {
             var matchPlayer = match.MatchPlayers.Single(x => x.PlayerId == player.Id && x.MatchId == matchId);
