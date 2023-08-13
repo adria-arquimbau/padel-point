@@ -75,37 +75,51 @@
 
     private async Task RespondInvitation(Guid invitedMatchMatchId, bool accept)
     {
-        var acceptDecline = accept ? "Accept" : "Decline";
-        if (await MessageService.Confirm( $"Are you sure want to {acceptDecline} the invitation?", $"{acceptDecline} invitation"))
+        if (accept)
         {
-            try
+            await CallInviteEndpoint(invitedMatchMatchId, accept);
+        }
+        else
+        {
+            if (await MessageService.Confirm( $"Are you sure want to decline the invitation?", $"Decline invitation"))
             {
-                var response = await Http.PostAsync($"notification/accept-invitation/match/{invitedMatchMatchId}/accept/{accept}", null);
+                await CallInviteEndpoint(invitedMatchMatchId, accept);
+            }
+        }
+    }
 
-                if (response.IsSuccessStatusCode)
-                {
-                    if (accept)
-                    {
-                        ToastService.ShowSuccess("Invitation accepted");
-                        NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
-                    }
-                    await GetInvitations();
-                    ToastService.ShowSuccess("Invitation declined");
-                }
-                else
-                {
-                    var error = await response.Content.ReadAsStringAsync();
-                    ToastService.ShowError(error);
-                }
-            }   
-            catch (Exception)
+    private async Task CallInviteEndpoint(Guid invitedMatchMatchId, bool accept)
+    {
+        try
+        {
+            var response =
+                await Http.PostAsync($"notification/accept-invitation/match/{invitedMatchMatchId}/accept/{accept}", null);
+
+            if (response.IsSuccessStatusCode)
             {
-                ToastService.ShowError("Something went wrong, please try again later.");
+                if (accept)
+                {
+                    NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+                    ToastService.ShowSuccess("Invitation accepted");
+                    return;
+                }
+
+                await GetInvitations();
+                ToastService.ShowSuccess("Invitation declined");
             }
-            finally
+            else
             {
-                _loading = false;
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
             }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
         }
     }
 
