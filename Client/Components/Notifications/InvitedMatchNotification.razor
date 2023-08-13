@@ -1,0 +1,120 @@
+﻿@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IMessageService MessageService
+
+
+@if (!_loading)
+{
+    @if (Match.IHaveOpenInvitation)
+    {
+        <Divider></Divider>
+       
+        <div class="invited-matches">
+            <div>
+                @Match.CreatorNickName Invited you to this match
+            </div>
+            <div class="accept-decline-buttons">
+                <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Success" Clicked="() => RespondInvitation(Match.Id, true)">Accept invitation</Button>
+                <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Danger" Clicked="() => RespondInvitation(Match.Id, false)">Decline</Button>
+            </div>
+        </div>
+        
+        <Divider></Divider>
+    }
+}
+
+@code {
+    [Parameter]
+    public MatchResponse? Match { get; set; }
+        
+    [Parameter] 
+    public EventCallback RefreshMatch { get; set; }
+    
+    private bool _loading = false;
+    private List<InvitedMatchesResponse> _invitedMatches = new();
+
+    private void GoToMatch(Guid invitedMatchMatchId)
+    {
+        NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
+    }
+
+    private async Task RespondInvitation(Guid invitedMatchMatchId, bool accept)
+    {
+        if (accept)
+        {
+            await CallInviteEndpoint(invitedMatchMatchId, accept);
+        }
+        else
+        {
+            if (await MessageService.Confirm( $"Are you sure want to decline the invitation?", $"Decline invitation"))
+            {
+                await CallInviteEndpoint(invitedMatchMatchId, accept);
+            }
+        }
+    }
+
+    private async Task CallInviteEndpoint(Guid invitedMatchMatchId, bool accept)
+    {
+        try
+        {
+            var response = await Http.PostAsync($"notification/accept-invitation/match/{invitedMatchMatchId}/accept/{accept}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                if (accept)
+                {
+                    ToastService.ShowSuccess("Invitation accepted");
+                }
+                
+                ToastService.ShowSuccess("Invitation declined");
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+}
+
+<style>
+    .invited-matches{
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        position: relative;
+        padding: 12px;
+        border-radius: 10px;        
+        background-color: white;
+        margin-bottom: 5px;
+        max-width: 641px;       
+    }
+    
+    .accept-decline-buttons{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .accept-decline-buttons > Button {
+        flex: 1; /* This makes each button take up an equal amount of space within the container */
+        margin: 0 2px; /* This provides a little space between the buttons */
+    }
+
+</style>

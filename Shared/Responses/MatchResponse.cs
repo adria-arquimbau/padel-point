@@ -33,4 +33,5 @@ public class MatchResponse
     public List<PromotionResponse> Promotions { get; set; }
     public MatchLocation Location { get; set; }
     public int? MinimumLevel { get; set; }
+    public bool IHaveOpenInvitation { get; set; }
 }   

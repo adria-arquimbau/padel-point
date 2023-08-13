@@ -3,6 +3,7 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Modals
 @using EventsManager.Client.Components.Match
+@using EventsManager.Client.Components.Notifications
 @using EventsManager.Client.Components.Match.Results
 @using EventsManager.Client.Services
 @using EventsManager.Shared.Requests
@@ -127,6 +128,8 @@
     </div>
     
     <MatchDetailPlayers ReturnUrl="@MatchPath" RefreshMatch="GetMatch" Match="_match"></MatchDetailPlayers>
+    
+    <InvitedMatchNotification Match="_match" RefreshMatch="GetMatch"></InvitedMatchNotification>
     
     @if (_match.PlayersCount == 4)
     {

@@ -37,6 +37,7 @@ public class GetMatchQueryHandler : IRequestHandler<GetMatchQueryRequest, MatchR
                 Id = x.Id,
                 Location = x.Location,
                 IsBlocked = x.IsBlocked,
+                IHaveOpenInvitation = x.MatchPlayers.Any(p => p.Player.UserId == userId && !p.Confirmed),
                 RequesterElo = userId != null ? requesterElo : null,
                 MinimumLevel = x.MinimumLevel,
                 IAmAlreadyRegistered = userId != null && x.MatchPlayers.Any(p => p.Player.UserId == userId),
