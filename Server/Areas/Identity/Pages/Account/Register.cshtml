@@ -4,12 +4,9 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
-
 <div class="row">
     <div class="col-md-6 col-md-offset-2">
         <section>
-            <h3 style="margin-top: 10px">Register using:</h3>
             <hr />
             @{
                 if ((Model.ExternalLogins?.Count ?? 0) == 0)
