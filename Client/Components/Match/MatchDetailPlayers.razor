@@ -234,7 +234,7 @@
     [Parameter]
     public string ReturnUrl {get; set;}
     
-    private List<PlayerDto> _searchedPlayers = new();
+    private List<PlayerToInviteResponse> _searchedPlayers = new();
 
     private Modal modalRef;
     private Modal searchPlayerModalRef;
@@ -410,10 +410,10 @@
         
         try
         {
-            var response = await Http.GetAsync($"player/search-invite?term={value}");
+            var response = await Http.GetAsync($"player/{Match.Id}/search-invite?term={value}");
             if (response.IsSuccessStatusCode)
             {
-                _searchedPlayers = await response.Content.ReadFromJsonAsync<List<PlayerDto>>();
+                _searchedPlayers = await response.Content.ReadFromJsonAsync<List<PlayerToInviteResponse>>();
             }
         }
         catch (Exception)

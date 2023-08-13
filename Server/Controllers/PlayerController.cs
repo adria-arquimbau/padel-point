@@ -38,24 +38,35 @@ public class PlayerController : ControllerBase
         return Ok(players);
     }
     
-    [HttpGet("search-invite")]
+    [HttpGet("{matchId:guid}/search-invite")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> SearchToInvitePlayer([FromQuery] string term, CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchToInvitePlayer([FromQuery] string term, [FromRoute] Guid matchId, CancellationToken cancellationToken)
     {
         var lowerTerm = term.ToLower();
 
         var players = await _dbContext.Player
-            .Where(p => p.NickName.ToLower().Contains(lowerTerm))
-            .Select(x => new PlayerToInviteResponse
-            {
-                Id = x.Id,
-                Elo = x.Elo,
-                NickName = x.NickName,
-                ImageUrl = x.ImageUrl
-            })
+            .Where(p => p.NickName.ToLower().Contains(lowerTerm) )
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return Ok(players);
+        var playersToDiscard = await _dbContext.MatchPlayer
+            .Where(mp => mp.MatchId == matchId)
+            .Select(mp => mp.Player)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        foreach (var player in playersToDiscard)
+        {
+            players.Remove(player);
+        }
+
+        var response = players.Select(x => new PlayerToInviteResponse
+        {
+            Id = x.Id,
+            Elo = x.Elo,
+            NickName = x.NickName,
+            ImageUrl = x.ImageUrl
+        }).ToList();
+        
+        return Ok(response);
     }
     
     [HttpGet]
@@ -257,12 +268,4 @@ public class PlayerController : ControllerBase
         
         return Ok();
     }
-}
-
-public class PlayerToInviteResponse 
-{
-    public Guid Id { get; set; }    
-    public int Elo { get; set; }
-    public string NickName { get; set; }
-    public Uri ImageUrl { get; set; }
 }
