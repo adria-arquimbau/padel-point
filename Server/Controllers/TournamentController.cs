@@ -1,4 +1,5 @@
-﻿using EventsManager.Server.Data;
+﻿using EventsManager.Client.Pages.Tournament;
+using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
@@ -65,6 +66,28 @@ public class TournamentController : ControllerBase
         
         await _context.SaveChangesAsync(cancellationToken);
            
-        return Ok();
+        return Ok(new CreateTournamentResponse
+        {
+            Id = tournament.Id
+        });
+    }
+    
+    [HttpGet("{tournamentId:guid}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Get([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .Select(x => new TournamentDetailResponse
+            {
+                Name = x.Name,
+                Description = x.Description,
+                StartDate = x.StartDate,
+                Location = x.Location,
+                MaxTeams = x.MaxTeams
+            })
+            .SingleAsync(cancellationToken: cancellationToken);
+           
+        return Ok(tournament);
     }   
 }

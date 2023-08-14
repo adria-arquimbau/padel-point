@@ -115,6 +115,8 @@
             if (response.IsSuccessStatusCode)
             {
                 await HideModal();
+                var createdTournament = await response.Content.ReadFromJsonAsync<CreateTournamentResponse>();
+                NavigationManager.NavigateTo($"/tournament/{createdTournament.Id}/detail");
             }
             else
             {

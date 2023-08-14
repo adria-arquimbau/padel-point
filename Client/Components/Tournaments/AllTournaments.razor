@@ -17,7 +17,7 @@
 {
     @foreach (var tournament in _tournaments)
     {
-        <div class="tournament-card">
+        <div class="tournament-card" @onclick="() => GoToTheTournament(tournament.Id)">
             <div style="font-size: 10px; text-align: center; color: grey">
                 @tournament.StartDate.ToLongDateString() /
                 @tournament.StartDate.ToShortTimeString() / @tournament.Location
@@ -79,6 +79,12 @@
             _loading = false;
         }
     }
+
+    private void GoToTheTournament(Guid tournamentId)
+    {
+        NavigationManager.NavigateTo($"tournament/{tournamentId}/detail");
+    }   
+
 }
 
 <style>

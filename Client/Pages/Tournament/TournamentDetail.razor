@@ -1,0 +1,66 @@
+﻿@page "/tournament/{TournamentId:guid}/detail"
+@using EventsManager.Shared.Responses
+@using EventsManager.Client.Services
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ClipboardService ClipboardService
+
+<h3>Tournament Detail</h3>
+
+
+@code {
+    [Parameter]
+    public Guid? TournamentId { get; set; }
+    private bool _loading = false;
+    
+    private TournamentDetailResponse? _tournament;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        await GetTournament();
+    }
+    
+    private async Task GetTournament()
+    {
+        if (TournamentId.HasValue)
+        {
+            try
+            {
+                HttpResponseMessage? response;
+                var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+                if (authState.User.Identity?.IsAuthenticated == false)
+                {
+                    var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                    response = await http.GetAsync($"tournament/{TournamentId.Value}");
+                }
+                else
+                {
+                    response = await Http.GetAsync($"tournament/{TournamentId.Value}");
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _tournament = await response.Content.ReadFromJsonAsync<TournamentDetailResponse>();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+    }
+}
