@@ -61,7 +61,10 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <Button onclick="@(() => AddPlayer("Team1"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
+                                    @if (!_joining)
+                                    {
+                                        <Button onclick="@(() => AddPlayer("Team1"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
+                                    }
                                 }
                                 @if (Match.RequesterIsTheCreator)
                                 {
@@ -138,7 +141,10 @@
                             <div class="default-avatar">
                                 @if (!Match.IAmAlreadyRegistered)
                                 {
-                                    <Button onclick="@(() => AddPlayer("Team2"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
+                                    @if (!_joining)
+                                    {
+                                        <Button onclick="@(() => AddPlayer("Team2"))" Size="Size.ExtraSmall" Color="Color.Success" Outline>Join</Button>
+                                    }
                                 }
                                 @if (Match.RequesterIsTheCreator)
                                 {
@@ -249,6 +255,7 @@
 
     private PlayerDto? selectedPlayer;
     private bool _invitingPlayer = false;
+    private bool _joining = false;
     private Team selectedTeam;
 
     private Task ShowPlayerActionsModal(PlayerDto playerDto)
@@ -303,7 +310,7 @@
     
     private async Task AddPlayer(string team)
     {
-       
+       _joining = true;
         StateHasChanged();
         try
         {
@@ -343,7 +350,7 @@
         }
         finally
         {
-            
+            _joining = false;
             StateHasChanged();
         }
     }
