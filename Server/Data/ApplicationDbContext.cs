@@ -15,6 +15,8 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Match> Match { get; set; }
     public DbSet<Set> Set { get; set; }
     public DbSet<MatchPlayer> MatchPlayer { get; set; }
+    public DbSet<Tournament> Tournament { get; set; }
+    public DbSet<Couple> Couple { get; set; }
     public DbSet<EloHistory> EloHistories { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Announcements> Announcements { get; set; }
@@ -37,5 +39,7 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new NotificationConfiguration());
         modelBuilder.ApplyConfiguration(new AnnouncementsConfiguration());
         modelBuilder.ApplyConfiguration(new InitialLevelFormConfiguration());
+        modelBuilder.ApplyConfiguration(new TournamentConfiguration());
+        modelBuilder.ApplyConfiguration(new CoupleConfiguration());
     }
 }

@@ -51,6 +51,34 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     }
 }
 
+public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
+{
+    public void Configure(EntityTypeBuilder<Tournament> builder)
+    {
+        builder.HasKey(m => m.Id);
+    
+    }
+}
+
+public class CoupleConfiguration : IEntityTypeConfiguration<Couple>
+{
+    public void Configure(EntityTypeBuilder<Couple> builder)
+    {
+        builder.HasKey(m => m.Id);
+
+        builder.HasOne(m => m.Player1)
+            .WithMany()
+            .HasForeignKey(m => m.Player1Id)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(m => m.Player2)
+            .WithMany()
+            .HasForeignKey(m => m.Player2Id)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
+}
+
+
 public class InitialLevelFormConfiguration : IEntityTypeConfiguration<InitialLevelForm>
 {
     public void Configure(EntityTypeBuilder<InitialLevelForm> builder)
