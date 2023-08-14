@@ -1,5 +1,6 @@
 ﻿using EventsManager.Server.Data;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -43,14 +44,21 @@ public class TournamentController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Create([FromBody] TournamentRequest request, CancellationToken cancellationToken)
     {
-       var tournament = new Tournament
+        var maxTeams = request.MaxTeams switch
+        {
+            MaxTeams.Eight => 8,
+            MaxTeams.Sixteen => 16,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        var tournament = new Tournament
         {
             Name = request.Name,
             Description = request.Description,
             StartDate = request.StartDate,
             CreationDate = DateTime.UtcNow,
             Location = request.Location,
-            MaxTeams = request.MaxTeams
+            MaxTeams = maxTeams
         };
     
         _context.Tournament.Add(tournament);

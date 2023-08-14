@@ -49,6 +49,20 @@
                 <FieldLabel>Start Time</FieldLabel>
                 <TimePicker @bind-Time="@_startDate" TValue="DateTime" />
             </Field>
+            <Field>
+                <FieldLabel>Location</FieldLabel>
+                <Select @bind-SelectedValue="@_location" TValue="MatchLocation">
+                    <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+                    <SelectItem Value="MatchLocation.None">-</SelectItem>
+                </Select>
+            </Field>
+            <Field>
+                <FieldLabel>Max teams</FieldLabel>
+                <Select @bind-SelectedValue="@_maxTeams" TValue="MaxTeams">
+                    <SelectItem Value="MaxTeams.Eight">8</SelectItem>
+                    <SelectItem Value="MaxTeams.Sixteen">16</SelectItem>
+                </Select>
+            </Field>
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
@@ -63,16 +77,13 @@
     
     [Parameter] 
     public EventCallback DontShow { get; set; }
-    
-    [Parameter] 
-    public EventCallback RefreshTournaments { get; set; }
         
     private DateTime _startDate = DateTime.Now;
     private DateTime _startTime = DateTime.Now;
     private string? _name = null;
     private string? _description = null;
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
-    private int _maxTeams = 8;
+    private MaxTeams _maxTeams;
 
     protected override async Task OnParametersSetAsync()
     {
