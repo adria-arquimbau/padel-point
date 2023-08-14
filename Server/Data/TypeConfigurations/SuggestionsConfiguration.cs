@@ -56,7 +56,9 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
     public void Configure(EntityTypeBuilder<Tournament> builder)
     {
         builder.HasKey(m => m.Id);
-    
+        builder.Property(mp => mp.Location)
+            .HasDefaultValue(MatchLocation.None)
+            .HasConversion<string>();
     }
 }
 
@@ -70,7 +72,7 @@ public class CoupleConfiguration : IEntityTypeConfiguration<Couple>
             .WithMany()
             .HasForeignKey(m => m.Player1Id)
             .OnDelete(DeleteBehavior.NoAction);
-
+     
         builder.HasOne(m => m.Player2)
             .WithMany()
             .HasForeignKey(m => m.Player2Id)
