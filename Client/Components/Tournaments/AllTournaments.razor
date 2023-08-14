@@ -1,9 +1,101 @@
-﻿<h3>AllTournaments</h3>
+﻿@using EventsManager.Shared.Responses
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationState
+
+@if (_loading)
+{
+    
+}
+@if (!_tournaments.Any())
+{
+    <p>No tournaments found.</p>
+}
+@if (_tournaments.Any())
+{
+    @foreach (var tournament in _tournaments)
+    {
+        <div class="tournament-card">
+            <div style="font-size: 10px; text-align: center; color: grey">
+                @tournament.StartDate.ToLongDateString() /
+                @tournament.StartDate.ToShortTimeString() / @tournament.Location
+            </div>
+            <Divider></Divider>
+            <div class="main-tournament-info">
+                <div>
+                    Name: @tournament.Name
+                    Couples: @tournament.TeamsCount / @tournament.MaxTeams
+                </div>
+            </div>
+        </div>
+    }
+}
 
 @code {
-    
+    private List<TournamentResponse> _tournaments = new();
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllTournaments();
+    }
+
+    private async Task GetAllTournaments()
+    {
+        _loading = true;
+        try
+        {
+            HttpResponseMessage? response;
+            var authState = await AuthenticationState.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                response = await Http.GetAsync("tournament");
+            }
+            else
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync("tournament");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                _tournaments = await response.Content.ReadFromJsonAsync<List<TournamentResponse>>();
+                StateHasChanged(); 
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
 }
 
 <style>
-    
+    .tournament-card {
+            border-radius: 8px;
+            padding: 10px;
+            background-color: white;
+            margin-bottom: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            max-width: 641px;
+        }   
+        
+     .main-tournament-info{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+        }
 </style>

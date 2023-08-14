@@ -1,21 +1,41 @@
 ﻿@page "/Tournaments"
 
-<div class="coming-soon">
-    <h3>Coming soon</h3>
-    
-    <img src="https://media.tenor.com/4Of0z2b6ZCEAAAAS/padel-wpt.gif" alt="coming soon" />
+@using EventsManager.Client.Components.Tournaments
+@using EventsManager.Client.Components.Modals
+@using Color = Blazorise.Color
+
+<div class="actions-tournaments">
+    <Button Clicked="OpenCreateTournamentModal" Size="Size.Small" Color="Color.Success">Create a tournament</Button>
 </div>
 
+<Divider></Divider>
+<AllTournaments></AllTournaments>
 
+<CreateTournamentModal Show="_show" DontShow="DontShow"></CreateTournamentModal>
 
 @code {
-    
-}
+    private bool _show;
+
+    private void OpenCreateTournamentModal()
+    {
+        _show = true;
+    }
+
+    private void DontShow()
+    {
+        _show = false;
+    }
+
+    private void RefreshTournaments()
+    {
+        throw new NotImplementedException();
+    }
+
+}   
 
 <style>
-    .coming-soon{
+    .actions-tournaments{
         display: flex;
-        flex-direction: column;
-        justify-content: center;
+        margin-bottom: 10px;
     }
 </style>
