@@ -98,22 +98,30 @@ public class TournamentController : ControllerBase
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
                 IsPlayerTheCreator = userId != null && x.Creator.UserId == userId,
+                IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),
                 Couples = x.Teams.Select(c => new CoupleResponse
                 {
                     Name = c.Name,
-                    Player1 = new PlayerDto
+                    AverageElo = (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
+                    Player1 = new PlayerDetailResponse
                     {
                         Id = c.Player1.Id,
                         NickName = c.Player1.NickName,
                         Elo = c.Player1.Elo,
-                        ImageUrl = c.Player1.ImageUrl
+                        ImageUrl = c.Player1.ImageUrl,
+                        Country = c.Player1.Country,
+                        MatchesPlayed = c.Player1.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
+                        LastEloGained = !c.Player1.EloHistories.Any() ? 0 : c.Player1.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
                     },
-                    Player2 = new PlayerDto
+                    Player2 = new PlayerDetailResponse
                     {
                         Id = c.Player2.Id,
                         NickName = c.Player2.NickName,
                         Elo = c.Player2.Elo,
-                        ImageUrl = c.Player2.ImageUrl
+                        ImageUrl = c.Player2.ImageUrl,
+                        Country = c.Player2.Country,
+                        MatchesPlayed = c.Player2.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
+                        LastEloGained = !c.Player2.EloHistories.Any() ? 0 : c.Player2.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
                     }
                 }).ToList()
             }).SingleAsync(cancellationToken: cancellationToken);
@@ -142,7 +150,24 @@ public class TournamentController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
         
         return Ok();
-    }   
+    }  
+    
+    [HttpDelete("registration")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> RemoveRegistration(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var team = await _context.Couple
+            .Where(x => x.Player1.UserId == userId || x.Player2.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        _context.Couple.Remove(team);
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
     
     [HttpGet("{tournamentId:guid}/search-invite")]
     [Authorize(Roles = "User")]
@@ -169,11 +194,30 @@ public class TournamentController : ControllerBase
     [Authorize(Roles = "User")]
     public async Task<IActionResult> SignIn([FromRoute] Guid tournamentId, [FromBody] TournamentSignInRequest request, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var tournament = await _context.Tournament
             .Where(x => x.Id == tournamentId)
+            .Include(x => x.Teams)
+                .ThenInclude(x => x.Player1)
+            .Include(x => x.Teams)
+                .ThenInclude(x => x.Player2)
             .SingleAsync(cancellationToken: cancellationToken);
+
+        if (tournament.Teams.Any(x => x.Player1Id == request.CoupleId || x.Player2Id == request.CoupleId))
+        {
+            return Conflict("Your couple is already signed in this tournament");
+        }
         
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (tournament.Teams.Any(x => x.Player1.UserId == userId || x.Player2.UserId == userId))
+        {
+            return Conflict("You are already signed in this tournament");
+        }
+
+        if (tournament.MaxTeams == tournament.Teams.Count)
+        {
+            return Conflict("This tournament is full");
+        }
+       
         var player1 = await _context.Player
             .Where(x => x.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);

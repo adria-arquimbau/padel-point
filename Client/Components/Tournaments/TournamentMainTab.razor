@@ -1,5 +1,11 @@
 ﻿@using EventsManager.Shared.Responses
+@using EventsManager.Client.Components.Players
 
+<div class="tournament-card-header">
+    <div class="tournament-card-title">
+        <h3>@Tournament.Name</h3>
+    </div>
+</div>
 <div class="tournament-card">
     <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
         <Items>
@@ -8,9 +14,6 @@
         </Items>
         <Content>
             <TabPanel Name="info">
-                <div class="tournament-card-title">
-                    <h3>@Tournament.Name</h3>
-                </div>
                 <div class="tournament-card-description">
                     <p>@Tournament.Description</p>   
                 </div>
@@ -18,7 +21,19 @@
             <TabPanel Name="teams">
                 @foreach (var couple in Tournament.Couples)
                 {
-                    @couple.Name
+                    <Divider></Divider>
+                    <TeamPlayerCard Player="couple.Player1"></TeamPlayerCard>
+                    <div class="team-info">
+                        <div class="team-info-text">
+                            <div style="color: grey; font-size: 10px">Team -  </div>
+                            <div> @couple.Name</div>
+                        </div>
+                        <div class="team-info-text">
+                            <div style="color: grey; font-size: 10px">Average elo -  </div>
+                            <div>@couple.AverageElo</div>
+                        </div>
+                    </div>
+                    <TeamPlayerCard Player="couple.Player2"></TeamPlayerCard>
                 }
             </TabPanel>
         </Content>
@@ -31,7 +46,7 @@
     
     private string _selectedTab = "info";
 
-    private Task OnSelectedTabChanged( string name )
+    private Task OnSelectedTabChanged(string name)
     {
         _selectedTab = name;
 
@@ -41,21 +56,46 @@
 
 <style>
     .tournament-card{
-                max-width: 641px;
-                padding: 12px;
-                border-radius: 10px;   
-                display: flex;  
-                flex-direction: column;
-                background-color: white;
-                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        }
+            max-width: 641px;
+            padding: 12px;
+            border-radius: 10px;   
+            display: flex;  
+            flex-direction: column;
+            background-color: white;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .tournament-card-header{
+            max-width: 641px;
+            padding: 12px;
+            border-radius: 10px;   
+            display: flex;  
+            margin-bottom: 10px;
+            flex-direction: column;
+            background-color: white;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
         
-        .tournament-card-title{
-            font-size: 14px;
-        }
+    .tournament-card-title{
+        font-size: 14px;
+    }
            
         
-        .tournament-card-description{
-            font-size: 10px;
-        }
+    .tournament-card-description{
+        margin-top: 10px;
+        font-size: 12px;
+    }
+    
+    .team-info{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        margin-bottom: 5px;
+    }
+    .team-info-text{
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+    }
 </style>

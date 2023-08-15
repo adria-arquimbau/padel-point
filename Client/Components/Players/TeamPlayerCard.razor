@@ -1,0 +1,165 @@
+﻿@using EventsManager.Shared.Responses
+@using EventsManager.Shared.Dtos
+
+@inject NavigationManager NavigationManager
+
+<div class="border player-card" @onclick="NavigateToPlayerDetail">
+    <div class="player-avatar">
+            <img src="@GetPlayerAvatarSource()" alt="Player avatar" class="player-avatar-img"/>
+    </div>
+    <div class="player-info">
+        <div class="player-info-header">
+             @* @if (Player?.Rank != 0) *@
+             @*  { *@
+             @*    <div class="player-info-rank"> *@
+             @*        #@Player?.Rank   *@
+             @*    </div> *@
+             @*  } *@
+             @* @if (Player?.Rank == 0) *@
+             @*  { *@
+             @*     <div class="player-info-rank"> *@
+             @*         #X  *@
+             @*     </div> *@
+             @*  } *@
+            <div class="player-info-name">
+                @Player?.NickName
+            </div>
+            <div class="player-info-flag">
+                <CountryFlag IsRounded="true" Country="@_userCountry"></CountryFlag>
+            </div>
+        </div>
+        <div class="player-info-content">
+            <div class="info-box">
+                <div class="info-label">Matches</div>
+                <div>@Player?.MatchesPlayed</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Trend</div>
+                <div>
+                    <span class="@GetTrendClass()">@FormatTrend()</span>
+                </div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Elo</div>
+                <div>@Player?.Elo</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PlayerDetailResponse? Player { get; set; }
+    
+    private Country _userCountry;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Player?.Country))
+        {
+            if (Enum.TryParse(typeof(Country), Player.Country, out var parsedCountry))
+            {
+                _userCountry = (Country)parsedCountry;
+            }
+        }
+    }
+    
+    private string GetPlayerAvatarSource()
+    {
+        return Player?.ImageUrl?.ToString() ?? "/default-avatar.png";
+    }
+
+    private string GetTrendClass()
+    {
+        return Player?.LastEloGained > 0 ? "positive" : "negative";
+    }
+
+    private string FormatTrend()
+    {
+        return $"{(Player?.LastEloGained > 0 ? "+" : "")}{Player?.LastEloGained}";
+    }
+    
+    private void NavigateToPlayerDetail()
+    {
+        NavigationManager.NavigateTo($"/player-detail/{Player?.Id}");
+    }
+}
+
+<style>
+    .border {
+        border-radius: 8px;
+        background-color: white;
+    }
+    
+    .player-card {
+        max-width: 641px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin-bottom: 5px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .player-info-rank{
+        font-size: 20px;
+        color: gray;
+        margin-right: 5px;
+    }
+    
+    .player-avatar{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100px;
+    }
+    
+    .player-avatar-img{
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 50%;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .player-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .player-info-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+    
+    .player-info-flag{
+       
+    }
+    
+    .player-info-content {
+        display: flex;
+        justify-content: flex-end;
+        font-size: 12px;
+    }
+    
+    .info-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0px 12px 5px 12px;
+    }
+    
+    .info-label {
+        font-size: 10px;
+        color: grey;
+    }
+    
+    .positive {
+        color: green;
+    }
+    
+    .negative {
+        color: red;
+    }
+</style>

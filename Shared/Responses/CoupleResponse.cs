@@ -5,6 +5,7 @@ namespace EventsManager.Shared.Responses;
 public class CoupleResponse
 {
     public string Name { get; set; }
-    public PlayerDto Player1 { get; set; }
-    public PlayerDto Player2 { get; set; }
+    public PlayerDetailResponse Player1 { get; set; }
+    public PlayerDetailResponse Player2 { get; set; }
+    public int AverageElo { get; set; }
 }

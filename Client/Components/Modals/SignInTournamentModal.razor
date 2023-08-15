@@ -62,7 +62,10 @@
             </ModalBody>
             <ModalFooter>
                 <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
-                <Button Color="Color.Success" Clicked="SignInTeam">Sign In</Button>
+                @if (_selectedPlayer != null)
+                {
+                    <Button Color="Color.Success" Clicked="SignInTeam">Sign In</Button>
+                }
             </ModalFooter>
         </ModalContent>
     </Modal>
@@ -75,6 +78,9 @@
     [Parameter] 
     public EventCallback DontShow { get; set; }
     
+    [Parameter] 
+    public EventCallback RefreshTournament { get; set; }    
+
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
     private bool _invitingPlayer = false;
@@ -133,6 +139,7 @@
             if(response.IsSuccessStatusCode)
             {
                 ToastService.ShowInfo($"You have successfully signed in to {Tournament.Name}!");
+                await RefreshTournament.InvokeAsync();
                 await HideModal();
             }
             else

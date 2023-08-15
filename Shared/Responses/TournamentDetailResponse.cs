@@ -8,8 +8,9 @@ public class TournamentDetailResponse
     public required string Description { get; set; }
     public required DateTime StartDate { get; set; }
     public required MatchLocation Location { get; set; }
-    public int MaxTeams { get; set; }
+    public int MaxTeams { get; set; }   
     public bool IsPlayerTheCreator { get; set; }
     public required Guid Id { get; set; }
-    public List<CoupleResponse> Couples { get; set; }
+    public List<CoupleResponse> Couples { get; set; } = new();
+    public bool IsPlayerAlreadySignedIn { get; set; }
 }

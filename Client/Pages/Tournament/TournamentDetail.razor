@@ -22,13 +22,16 @@
 {
     <TournamentMainTab Tournament="_tournament"></TournamentMainTab>
     
-    <AuthorizeView>
-        <Authorized>
-            <div class="tournament-card-actions">
-                <Button Size="Size.Small" Color="Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
-            </div>
-        </Authorized>
-    </AuthorizeView>
+    @if (!_tournament.IsPlayerAlreadySignedIn)
+    {
+        <AuthorizeView>
+            <Authorized>
+                <div class="tournament-card-actions">
+                    <Button Size="Size.Small" Color="Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+    }
 
     @if (_tournament.IsPlayerTheCreator)
     {
@@ -37,13 +40,22 @@
             <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
         </div>
     }
+    @if (_tournament.IsPlayerAlreadySignedIn)
+    {
+        <div class="tournament-card-creator-actions">
+            @if (_tournament.IsPlayerTheCreator)
+            {
+                <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Remove registration</Button>
+            }
+        </div>
+    }
 
     <div class="return-card">
         <Button Size="Size.Small" Color="Color.Dark" Clicked="BackToTournaments">Back to tournaments</Button>
     </div>
 }
 
-<SignInTournamentModal Tournament="_tournament" Show="_show" DontShow="DontShow" />
+<SignInTournamentModal RefreshTournament="GetTournament" Tournament="_tournament" Show="_show" DontShow="DontShow" />
 
 @code {
     [Parameter]
@@ -143,6 +155,37 @@
     {
         _show = false;
     }
+
+    private async Task RemoveRegistration()
+    {
+        if (await MessageService.Confirm( "Are you sure you want to remove your registration? Your team will be removed.", "Delete registration"))
+        {
+            try
+            {
+                HttpResponseMessage? response;
+                response = await Http.DeleteAsync($"tournament/registration");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await GetTournament();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+    }
+
 }
 
 <style>
