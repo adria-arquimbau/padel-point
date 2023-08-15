@@ -1,16 +1,49 @@
 ﻿@page "/tournament/{TournamentId:guid}/detail"
 @using EventsManager.Shared.Responses
 @using EventsManager.Client.Services
+@using EventsManager.Client.Components.Tournaments
+@using EventsManager.Client.Components.Modals
+
+@using Color = Blazorise.Color
 
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
 @inject IToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject IMessageService MessageService
 @inject ClipboardService ClipboardService
 
-<h3>Tournament Detail</h3>
+@if (_loading)
+{
+    <MatchDetailSkeleton />
+}
+@if (!_loading && _tournament != null)
+{
+    <TournamentMainTab Tournament="_tournament"></TournamentMainTab>
+    
+    <AuthorizeView>
+        <Authorized>
+            <div class="tournament-card-actions">
+                <Button Size="Size.Small" Color="Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
+            </div>
+        </Authorized>
+    </AuthorizeView>
 
+    @if (_tournament.IsPlayerTheCreator)
+    {
+        <div class="tournament-card-creator-actions">
+            <Button Size="Size.Small" Color="Color.Warning">Edit</Button>
+            <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
+        </div>
+    }
+
+    <div class="return-card">
+        <Button Size="Size.Small" Color="Color.Dark" Clicked="BackToTournaments">Back to tournaments</Button>
+    </div>
+}
+
+<SignInTournamentModal Tournament="_tournament" Show="_show" DontShow="DontShow" />
 
 @code {
     [Parameter]
@@ -63,4 +96,98 @@
             }
         }
     }
+
+    private async Task DeleteTournament()
+    {
+        if (await MessageService.Confirm( "Are you sure you want to delete this tournament?", "Delete tournament"))
+        {
+            try
+            {
+                HttpResponseMessage? response;
+                response = await Http.DeleteAsync($"tournament/{TournamentId.Value}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/tournaments");
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+    }
+
+    private void BackToTournaments()
+    {
+        NavigationManager.NavigateTo("/tournaments");    
+    }
+
+    private bool _show;
+
+    private void OpenSignInTournamentModal()
+    {
+        _show = true;
+    }
+
+    private void DontShow()
+    {
+        _show = false;
+    }
 }
+
+<style>
+    .tournament-card-actions{
+        max-width: 641px;
+       padding: 12px;
+       border-radius: 10px;   
+       display: flex;  
+       margin-top: 10px;
+       flex-direction: row;
+       background-color: white;
+       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .tournament-card-actions > Button {
+            flex: 1; /* This makes each button take up an equal amount of space within the container */
+            margin: 0 2px; /* This provides a little space between the buttons */
+        }
+    
+    .tournament-card-creator-actions{
+       max-width: 641px;
+       padding: 12px;
+       border-radius: 10px;   
+       display: flex;  
+       margin-top: 10px;
+       flex-direction: row;
+       background-color: white;
+       box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+       justify-content: space-between;
+    }
+    
+    .tournament-card-creator-actions > Button {
+        flex: 1; /* This makes each button take up an equal amount of space within the container */
+        margin: 0 2px; /* This provides a little space between the buttons */
+    }
+
+    
+    .return-card{
+        max-width: 641px;
+        padding: 12px;
+        border-radius: 10px;   
+        margin-top: 10px;
+        display: flex;  
+        flex-direction: column;
+        background-color: white;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+</style>

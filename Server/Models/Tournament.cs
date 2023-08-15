@@ -12,4 +12,5 @@ public class Tournament
     public required MatchLocation Location { get; set; }
     public ICollection<Couple> Teams { get; set; } = new List<Couple>();
     public int MaxTeams { get; set; }
+    public Player Creator { get; set; }
 }

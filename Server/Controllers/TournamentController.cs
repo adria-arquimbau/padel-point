@@ -1,4 +1,5 @@
-﻿using EventsManager.Client.Pages.Tournament;
+﻿using System.Security.Claims;
+using EventsManager.Client.Pages.Tournament;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
@@ -42,9 +43,15 @@ public class TournamentController : ControllerBase
     }   
     
     [HttpPost]
-    [AllowAnonymous]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> Create([FromBody] TournamentRequest request, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var player = await _context.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
         var maxTeams = request.MaxTeams switch
         {
             MaxTeams.Eight => 8,
@@ -59,7 +66,8 @@ public class TournamentController : ControllerBase
             StartDate = request.StartDate,
             CreationDate = DateTime.UtcNow,
             Location = request.Location,
-            MaxTeams = maxTeams
+            MaxTeams = maxTeams,
+            Creator = player
         };
     
         _context.Tournament.Add(tournament);
@@ -76,18 +84,66 @@ public class TournamentController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
         var tournament = await _context.Tournament
             .Where(x => x.Id == tournamentId)
             .Select(x => new TournamentDetailResponse
             {
+                Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
                 StartDate = x.StartDate,
                 Location = x.Location,
-                MaxTeams = x.MaxTeams
+                MaxTeams = x.MaxTeams,
+                IsPlayerTheCreator = userId != null && x.Creator.UserId == userId
             })
             .SingleAsync(cancellationToken: cancellationToken);
            
         return Ok(tournament);
     }   
+    
+    [HttpDelete("{tournamentId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> Delete([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (tournament.Creator.UserId != userId)
+        {
+            return Conflict("You are not the creator of this tournament");
+        }
+        
+        _context.Tournament.Remove(tournament);
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }   
+    
+    [HttpGet("{tournamentId:guid}/search-invite")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> SearchToInvitePlayer([FromQuery] string term, [FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var lowerTerm = term.ToLower();
+
+        var players = await _context.Player
+            .Where(p => p.NickName.ToLower().Contains(lowerTerm) )
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        var response = players.Select(x => new PlayerToInviteResponse
+        {
+            Id = x.Id,
+            Elo = x.Elo,
+            NickName = x.NickName,
+            ImageUrl = x.ImageUrl
+        }).ToList();
+        
+        return Ok(response);
+    }
 }

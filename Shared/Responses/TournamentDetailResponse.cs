@@ -9,4 +9,6 @@ public class TournamentDetailResponse
     public required DateTime StartDate { get; set; }
     public required MatchLocation Location { get; set; }
     public int MaxTeams { get; set; }
+    public bool IsPlayerTheCreator { get; set; }
+    public required Guid Id { get; set; }
 }

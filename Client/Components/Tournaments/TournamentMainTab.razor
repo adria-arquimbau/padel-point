@@ -1,0 +1,58 @@
+﻿@using EventsManager.Shared.Responses
+
+<div class="tournament-card">
+    <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+        <Items>
+            <Tab Name="info">Info</Tab>
+            <Tab Name="teams">Teams</Tab>
+        </Items>
+        <Content>
+            <TabPanel Name="info">
+                <div class="tournament-card-title">
+                    <h3>@Tournament.Name</h3>
+                </div>
+                <div class="tournament-card-description">
+                    <p>@Tournament.Description</p>   
+                </div>
+            </TabPanel>
+            <TabPanel Name="teams">
+                Content for profile.
+            </TabPanel>
+        </Content>
+    </Tabs>
+</div>
+
+@code {
+    [Parameter]
+    public TournamentDetailResponse? Tournament { get; set; }
+    
+    private string _selectedTab = "info";
+
+    private Task OnSelectedTabChanged( string name )
+    {
+        _selectedTab = name;
+
+        return Task.CompletedTask;
+    }
+}   
+
+<style>
+    .tournament-card{
+                max-width: 641px;
+                padding: 12px;
+                border-radius: 10px;   
+                display: flex;  
+                flex-direction: column;
+                background-color: white;
+                box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tournament-card-title{
+            font-size: 14px;
+        }
+           
+        
+        .tournament-card-description{
+            font-size: 10px;
+        }
+</style>
