@@ -2,6 +2,7 @@
 using EventsManager.Client.Pages.Tournament;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
@@ -96,9 +97,26 @@ public class TournamentController : ControllerBase
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
-                IsPlayerTheCreator = userId != null && x.Creator.UserId == userId
-            })
-            .SingleAsync(cancellationToken: cancellationToken);
+                IsPlayerTheCreator = userId != null && x.Creator.UserId == userId,
+                Couples = x.Teams.Select(c => new CoupleResponse
+                {
+                    Name = c.Name,
+                    Player1 = new PlayerDto
+                    {
+                        Id = c.Player1.Id,
+                        NickName = c.Player1.NickName,
+                        Elo = c.Player1.Elo,
+                        ImageUrl = c.Player1.ImageUrl
+                    },
+                    Player2 = new PlayerDto
+                    {
+                        Id = c.Player2.Id,
+                        NickName = c.Player2.NickName,
+                        Elo = c.Player2.Elo,
+                        ImageUrl = c.Player2.ImageUrl
+                    }
+                }).ToList()
+            }).SingleAsync(cancellationToken: cancellationToken);
            
         return Ok(tournament);
     }   
@@ -145,5 +163,37 @@ public class TournamentController : ControllerBase
         }).ToList();
         
         return Ok(response);
+    }
+    
+    [HttpPost("{tournamentId:guid}/sign-in")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> SignIn([FromRoute] Guid tournamentId, [FromBody] TournamentSignInRequest request, CancellationToken cancellationToken)
+    {
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var player1 = await _context.Player
+            .Where(x => x.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var player2 = await _context.Player
+            .Where(x => x.Id == request.CoupleId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        var newTeam = new Couple
+        {
+            Name = request.TeamName,
+            Player1 = player1,
+            Player2 = player2,
+            CreationDate = DateTime.UtcNow
+        };
+        
+        tournament.Teams.Add(newTeam);
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
     }
 }

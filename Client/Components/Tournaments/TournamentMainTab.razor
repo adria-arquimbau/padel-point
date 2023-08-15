@@ -16,7 +16,10 @@
                 </div>
             </TabPanel>
             <TabPanel Name="teams">
-                Content for profile.
+                @foreach (var couple in Tournament.Couples)
+                {
+                    @couple.Name
+                }
             </TabPanel>
         </Content>
     </Tabs>

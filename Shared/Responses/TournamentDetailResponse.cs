@@ -11,4 +11,5 @@ public class TournamentDetailResponse
     public int MaxTeams { get; set; }
     public bool IsPlayerTheCreator { get; set; }
     public required Guid Id { get; set; }
+    public List<CoupleResponse> Couples { get; set; }
 }

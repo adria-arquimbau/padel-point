@@ -1,5 +1,6 @@
 ﻿@using Color = Blazorise.Color
 @using EventsManager.Shared.Requests
+@using EventsManager.Client.Components.Players
 @using EventsManager.Shared.Responses
 @using System.Net
 @using EventsManager.Shared.Enums
@@ -20,8 +21,21 @@
             </ModalHeader>
             <ModalBody>
                 <Field>
+                    <FieldLabel>Team name</FieldLabel>
+                    <Validation Validator="ValidationRule.IsNotEmpty">
+                        <TextEdit @bind-Text="@_teamName" Placeholder="Enter tournament name...">
+                            <Feedback>
+                                <ValidationNone>Please enter the name.</ValidationNone>
+                                <ValidationSuccess>Name is good.</ValidationSuccess>
+                                <ValidationError>Enter valid name!</ValidationError>
+                            </Feedback>
+                        </TextEdit>
+                    </Validation>
+                </Field>
+                <Divider></Divider>
+                <Field>
                     <FieldLabel>Search your couple</FieldLabel>
-                    <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch" />
+                    <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch"/>
                     <div class="search-players-list">
                         @foreach (var player in _searchedPlayers)
                         {
@@ -30,19 +44,25 @@
                                     @player.NickName (@player.Elo)
                                 </div>
                                 <div>
-                                    @if(!_invitingPlayer)
+                                    @if (!_invitingPlayer)
                                     {
-                                        <Button Size="Size.Small" Color="Color.Success" Clicked="() => InvitePlayer(player.Id, player.NickName)" Outline>Invite</Button>
+                                        <Button Size="Size.Small" Color="Color.Success" Clicked="() => SelectInvitePlayer(player)" Outline>Invite</Button>
                                     }
                                 </div>
                             </div>
                         }
                     </div>
+                    @if (_selectedPlayer != null)
+                    {
+                        <Divider></Divider>
+                        <PlayerCard Player="@_selectedPlayer"></PlayerCard>
+                        <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteSelectedCouple">Delete selected couple</Button>
+                    }
                 </Field>
             </ModalBody>
             <ModalFooter>
                 <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
-                <Button Color="Color.Success" >Sign In</Button>
+                <Button Color="Color.Success" Clicked="SignInTeam">Sign In</Button>
             </ModalFooter>
         </ModalContent>
     </Modal>
@@ -59,6 +79,8 @@
     public TournamentDetailResponse? Tournament { get; set; }
     private bool _invitingPlayer = false;
     private List<PlayerToInviteResponse> _searchedPlayers = new();
+    private string _teamName = string.Empty;
+    private PlayerDetailResponse? _selectedPlayer;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -96,25 +118,28 @@
         StateHasChanged();
     }
     
-    private async Task InvitePlayer(Guid playerId, string nickName)
+    private async Task SignInTeam()
     {
        
         _invitingPlayer = true;
         try
         {
-            // var response = await Http.PostAsync($"match/{Match.Id}/invite/{playerId}/team/{selectedTeam}", null);
-            //
-            // if(response.IsSuccessStatusCode)
-            // {
-            //     await searchPlayerModalRef.Hide();
-            //     ToastService.ShowInfo($"{nickName} has been invited to the match.");
-            //     await RefreshMatch.InvokeAsync();
-            // }
-            // else
-            // {
-            //     var error = await response.Content.ReadAsStringAsync();
-            //     ToastService.ShowError(error);
-            // }
+            var response = await Http.PostAsJsonAsync($"tournament/{Tournament.Id}/sign-in", new TournamentSignInRequest
+            {
+                TeamName = _teamName, 
+                CoupleId = _selectedPlayer.Id
+            });
+            
+            if(response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo($"You have successfully signed in to {Tournament.Name}!");
+                await HideModal();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
             
         }
         catch (Exception)
@@ -138,6 +163,26 @@
     {
         return _modalRef.Hide();
     }
+
+
+    private void SelectInvitePlayer(PlayerToInviteResponse player)
+    { 
+        
+        _selectedPlayer = new PlayerDetailResponse
+        {
+            NickName = player.NickName, 
+            ImageUrl = player.ImageUrl, 
+            Elo = player.Elo, 
+            MatchesPlayed = 0, 
+            Id = player.Id
+        };
+    }
+
+    private void DeleteSelectedCouple()
+    {
+        _selectedPlayer = null;
+    }
+
 }
 
 <style>
