@@ -21,19 +21,6 @@
             </ModalHeader>
             <ModalBody>
                 <Field>
-                    <FieldLabel>Team name</FieldLabel>
-                    <Validation Validator="ValidationRule.IsNotEmpty">
-                        <TextEdit @bind-Text="@_teamName" Placeholder="Enter tournament name...">
-                            <Feedback>
-                                <ValidationNone>Please enter the name.</ValidationNone>
-                                <ValidationSuccess>Name is good.</ValidationSuccess>
-                                <ValidationError>Enter valid name!</ValidationError>
-                            </Feedback>
-                        </TextEdit>
-                    </Validation>
-                </Field>
-                <Divider></Divider>
-                <Field>
                     <FieldLabel>Search your couple</FieldLabel>
                     <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch"/>
                     <div class="search-players-list">
@@ -46,7 +33,7 @@
                                 <div>
                                     @if (!_invitingPlayer)
                                     {
-                                        <Button Size="Size.Small" Color="Color.Success" Clicked="() => SelectInvitePlayer(player)" Outline>Invite</Button>
+                                        <Button Size="Size.Small" Color="Color.Success" Clicked="() => SelectInvitePlayer(player)" Outline>Select</Button>
                                     }
                                 </div>
                             </div>
@@ -85,7 +72,6 @@
     public TournamentDetailResponse? Tournament { get; set; }
     private bool _invitingPlayer = false;
     private List<PlayerToInviteResponse> _searchedPlayers = new();
-    private string _teamName = string.Empty;
     private PlayerDetailResponse? _selectedPlayer;
 
     protected override async Task OnParametersSetAsync()
@@ -132,7 +118,6 @@
         {
             var response = await Http.PostAsJsonAsync($"tournament/{Tournament.Id}/sign-in", new TournamentSignInRequest
             {
-                TeamName = _teamName, 
                 CoupleId = _selectedPlayer.Id
             });
             

@@ -3,7 +3,6 @@
 public class Couple
 {
     public Guid Id { get; set; }
-    public required string Name { get; set; }
     public required Player Player1 { get; set; }
     public Guid Player1Id { get; set; }
     public required Player Player2 { get; set; }

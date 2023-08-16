@@ -22,18 +22,8 @@
                 @foreach (var couple in Tournament.Couples)
                 {
                     <Divider></Divider>
-                    <TeamPlayerCard Player="couple.Player1"></TeamPlayerCard>
-                    <div class="team-info">
-                        <div class="team-info-text">
-                            <div style="color: grey; font-size: 10px">Team -  </div>
-                            <div> @couple.Name</div>
-                        </div>
-                        <div class="team-info-text">
-                            <div style="color: grey; font-size: 10px">Average elo -  </div>
-                            <div>@couple.AverageElo</div>
-                        </div>
-                    </div>
-                    <TeamPlayerCard Player="couple.Player2"></TeamPlayerCard>
+                    <TeamPlayerCard Couple="couple"></TeamPlayerCard>
+
                 }
             </TabPanel>
         </Content>

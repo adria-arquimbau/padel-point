@@ -101,7 +101,6 @@ public class TournamentController : ControllerBase
                 IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),
                 Couples = x.Teams.Select(c => new CoupleResponse
                 {
-                    Name = c.Name,
                     AverageElo = (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
                     Player1 = new PlayerDetailResponse
                     {
@@ -228,7 +227,6 @@ public class TournamentController : ControllerBase
         
         var newTeam = new Couple
         {
-            Name = request.TeamName,
             Player1 = player1,
             Player2 = player2,
             CreationDate = DateTime.UtcNow

@@ -3,85 +3,82 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="border player-card" @onclick="NavigateToPlayerDetail">
-    <div class="player-avatar">
-            <img src="@GetPlayerAvatarSource()" alt="Player avatar" class="player-avatar-img"/>
-    </div>
-    <div class="player-info">
-        <div class="player-info-header">
-             @* @if (Player?.Rank != 0) *@
-             @*  { *@
-             @*    <div class="player-info-rank"> *@
-             @*        #@Player?.Rank   *@
-             @*    </div> *@
-             @*  } *@
-             @* @if (Player?.Rank == 0) *@
-             @*  { *@
-             @*     <div class="player-info-rank"> *@
-             @*         #X  *@
-             @*     </div> *@
-             @*  } *@
-            <div class="player-info-name">
-                @Player?.NickName
-            </div>
-            <div class="player-info-flag">
-                <CountryFlag IsRounded="true" Country="@_userCountry"></CountryFlag>
-            </div>
+@if (Couple != null)
+{
+    <div class="border player-card" >
+        <div class="player-avatar">
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="player-avatar-img"/>
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img"/>
         </div>
-        <div class="player-info-content">
-            <div class="info-box">
-                <div class="info-label">Matches</div>
-                <div>@Player?.MatchesPlayed</div>
-            </div>
-            <div class="info-box">
-                <div class="info-label">Trend</div>
-                <div>
-                    <span class="@GetTrendClass()">@FormatTrend()</span>
+        <div class="player-info">
+            <div class="player-info-header">
+                <div class="player-info-name">
+                    @Couple.Player1.NickName
+                </div>
+                <div class="player-info-flag">
+                    <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player1Country"></CountryFlag>
+                </div>
+                <div class="player-info-name">
+                    @Couple.Player2.NickName
+                </div>
+                <div class="player-info-flag">
+                    <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player2Country"></CountryFlag>
                 </div>
             </div>
-            <div class="info-box">
-                <div class="info-label">Elo</div>
-                <div>@Player?.Elo</div>
+            <div class="player-info-content">
+                <div class="info-box">
+                    <div class="info-label">Elo</div>
+                    <div>@Couple.Player1.Elo / @Couple.Player2.Elo</div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+}
+
 
 @code {
     [Parameter]
-    public PlayerDetailResponse? Player { get; set; }
+    public CoupleResponse? Couple { get; set; }
     
-    private Country _userCountry;
+    private Country _player1Country;
+    private Country _player2Country;
     
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrWhiteSpace(Player?.Country))
+        if (!string.IsNullOrWhiteSpace(Couple?.Player1.Country))
         {
-            if (Enum.TryParse(typeof(Country), Player.Country, out var parsedCountry))
+            if (Enum.TryParse(typeof(Country), Couple.Player1.Country, out var parsedCountry))
             {
-                _userCountry = (Country)parsedCountry;
+                _player1Country = (Country)parsedCountry;
+            }
+        }
+        if (!string.IsNullOrWhiteSpace(Couple?.Player2.Country))
+        {
+            if (Enum.TryParse(typeof(Country), Couple.Player2.Country, out var parsedCountry))
+            {
+                _player2Country = (Country)parsedCountry;
             }
         }
     }
     
-    private string GetPlayerAvatarSource()
+    private string GetPlayerAvatarSource(PlayerDetailResponse player)
     {
-        return Player?.ImageUrl?.ToString() ?? "/default-avatar.png";
+        return player.ImageUrl?.ToString() ?? "/default-avatar.png";
     }
 
     private string GetTrendClass()
     {
-        return Player?.LastEloGained > 0 ? "positive" : "negative";
+        return Couple.Player1?.LastEloGained > 0 ? "positive" : "negative";
     }
 
     private string FormatTrend()
     {
-        return $"{(Player?.LastEloGained > 0 ? "+" : "")}{Player?.LastEloGained}";
+        return $"{(Couple.Player1?.LastEloGained > 0 ? "+" : "")}{Couple.Player1?.LastEloGained}";
     }
     
-    private void NavigateToPlayerDetail()
+    private void NavigateToPlayerDetail(PlayerDetailResponse player)
     {
-        NavigationManager.NavigateTo($"/player-detail/{Player?.Id}");
+        NavigationManager.NavigateTo($"/player-detail/{player.Id}");
     }
 }
 
@@ -100,17 +97,14 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
-    .player-info-rank{
-        font-size: 20px;
-        color: gray;
-        margin-right: 5px;
-    }
-    
     .player-avatar{
         display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100px;
+        justify-content: start;
+    }
+    
+    .player-avatar img {
+        margin-right: 3px;
+      
     }
     
     .player-avatar-img{
@@ -126,15 +120,15 @@
         flex-direction: column;
     }
     
+    .player-info-name {
+        font-size: 12px;
+    }
+    
     .player-info-header {
         display: flex;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
-    }
-    
-    .player-info-flag{
-       
     }
     
     .player-info-content {
@@ -155,6 +149,9 @@
         color: grey;
     }
     
+    .player-info-flag{
+        margin: 0px 5px 0px 5px; 
+    }
     .positive {
         color: green;
     }
