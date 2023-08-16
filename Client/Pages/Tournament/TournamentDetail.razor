@@ -20,7 +20,7 @@
 }
 @if (!_loading && _tournament != null)
 {
-    <TournamentMainTab Tournament="_tournament"></TournamentMainTab>
+    <TournamentMainTab OnChangeTab="OnChangeTab" Tournament="_tournament"></TournamentMainTab>
     
     @if (!_tournament.IsPlayerAlreadySignedIn)
     {
@@ -33,23 +33,26 @@
         </AuthorizeView>
     }
 
-    @if (_tournament.IsPlayerTheCreator)
+    @if (_showFooterOptions)
     {
-        <div class="tournament-card-creator-actions">
-            <Button Size="Size.Small" Color="Color.Warning">Edit</Button>
-            <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
-        </div>
+        @if (_tournament.IsPlayerTheCreator)
+        {
+            <div class="tournament-card-creator-actions">
+                <Button Size="Size.Small" Color="Color.Warning">Edit</Button>
+                <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
+            </div>
+        }
+        @if (_tournament.IsPlayerAlreadySignedIn)
+        {
+            <div class="tournament-card-creator-actions">
+                @if (_tournament.IsPlayerTheCreator)
+                {
+                    <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Remove registration</Button>
+                }
+            </div>
+        }
     }
-    @if (_tournament.IsPlayerAlreadySignedIn)
-    {
-        <div class="tournament-card-creator-actions">
-            @if (_tournament.IsPlayerTheCreator)
-            {
-                <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Remove registration</Button>
-            }
-        </div>
-    }
-
+    
     <div class="return-card">
         <Button Size="Size.Small" Color="Color.Dark" Clicked="BackToTournaments">Back to tournaments</Button>
     </div>
@@ -61,6 +64,8 @@
     [Parameter]
     public Guid? TournamentId { get; set; }
     private bool _loading = false;
+    
+    private bool _showFooterOptions = true;
     
     private TournamentDetailResponse? _tournament;
     
@@ -184,6 +189,11 @@
                 _loading = false;
             }
         }
+    }
+
+    private void OnChangeTab(bool show)
+    {
+        _showFooterOptions = show;
     }
 
 }

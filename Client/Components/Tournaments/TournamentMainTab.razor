@@ -44,13 +44,23 @@
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
     
+    [Parameter]
+    public EventCallback<bool> OnChangeTab { get; set; }
+    
     private string _selectedTab = "info";
 
-    private Task OnSelectedTabChanged(string name)
+    private async Task OnSelectedTabChanged(string name)
     {
         _selectedTab = name;
 
-        return Task.CompletedTask;
+        if (_selectedTab == "info")
+        {
+            await OnChangeTab.InvokeAsync(true);
+        }
+        if (_selectedTab != "info")
+        {
+            await OnChangeTab.InvokeAsync(false);
+        }
     }
 }   
 
