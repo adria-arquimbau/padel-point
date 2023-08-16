@@ -22,7 +22,7 @@
             <ModalBody>
                 <Field>
                     <FieldLabel>Search your couple</FieldLabel>
-                    <input type="text" class="form-control" placeholder="Search..." @oninput="OnSearch"/>
+                    <input type="text" class="form-control" placeholder="Search your couple..." @oninput="OnSearch" />
                     <div class="search-players-list">
                         @foreach (var player in _searchedPlayers)
                         {
@@ -71,6 +71,7 @@
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
     private bool _invitingPlayer = false;
+
     private List<PlayerToInviteResponse> _searchedPlayers = new();
     private PlayerDetailResponse? _selectedPlayer;
 
@@ -124,8 +125,8 @@
             if(response.IsSuccessStatusCode)
             {
                 ToastService.ShowInfo($"You have successfully signed in to {Tournament.Name}!");
+                await DontShow.InvokeAsync();
                 await RefreshTournament.InvokeAsync();
-                await HideModal();
             }
             else
             {

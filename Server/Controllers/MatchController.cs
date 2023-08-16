@@ -1,7 +1,5 @@
 using System.Security.Claims;
-using System.Text;
 using EventsManager.Server.Data;
-using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Handlers.Queries.Matches.Get;
 using EventsManager.Server.Models;

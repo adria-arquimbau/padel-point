@@ -11,4 +11,5 @@ public class TournamentResponse
     public required MatchLocation Location { get; set; }
     public int MaxTeams { get; set; }
     public int TeamsCount { get; set; }
+    public decimal Price { get; set; }
 }

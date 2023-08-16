@@ -63,6 +63,16 @@
                     <SelectItem Value="MaxTeams.Sixteen">16</SelectItem>
                 </Select>
             </Field>
+             <div class="form-group">
+                <Switch @bind-Checked="@_isFree" TValue="bool">Is free</Switch>
+            </div>
+            @if (!_isFree)
+            {
+                <div class="form-group">
+                    <label>Price</label>
+                    <NumericPicker @bind-Value="@_price" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover"/>
+                </div>
+            }
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
@@ -84,6 +94,9 @@
     private string? _description = null;
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private MaxTeams _maxTeams;
+    
+    private bool _isFree = true;
+    private decimal _price;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -105,7 +118,8 @@
             Description = _description,
             StartDate = _startDate,
             Location = _location,
-            MaxTeams = _maxTeams
+            MaxTeams = _maxTeams,
+            Price = _price
         };
         
         try

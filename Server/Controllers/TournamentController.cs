@@ -1,8 +1,6 @@
 ﻿using System.Security.Claims;
-using EventsManager.Client.Pages.Tournament;
 using EventsManager.Server.Data;
 using EventsManager.Server.Models;
-using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
@@ -33,6 +31,7 @@ public class TournamentController : ControllerBase
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
+                Price = x.Price,
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
@@ -68,7 +67,8 @@ public class TournamentController : ControllerBase
             CreationDate = DateTime.UtcNow,
             Location = request.Location,
             MaxTeams = maxTeams,
-            Creator = player
+            Creator = player,
+            Price = request.Price
         };
     
         _context.Tournament.Add(tournament);
@@ -97,6 +97,7 @@ public class TournamentController : ControllerBase
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
+                Price = x.Price,
                 IsPlayerTheCreator = userId != null && x.Creator.UserId == userId,
                 IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),
                 Couples = x.Teams.Select(c => new CoupleResponse

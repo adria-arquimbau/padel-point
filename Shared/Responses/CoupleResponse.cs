@@ -1,6 +1,4 @@
-﻿using EventsManager.Shared.Dtos;
-
-namespace EventsManager.Shared.Responses;
+﻿namespace EventsManager.Shared.Responses;
 
 public class CoupleResponse
 {

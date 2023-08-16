@@ -9,4 +9,5 @@ public class TournamentRequest
     public required DateTime StartDate { get; set; }
     public required MatchLocation Location { get; set; }
     public required MaxTeams MaxTeams { get; set; }
+    public decimal Price { get; set; }
 }   

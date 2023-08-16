@@ -13,4 +13,5 @@ public class TournamentDetailResponse
     public required Guid Id { get; set; }
     public List<CoupleResponse> Couples { get; set; } = new();
     public bool IsPlayerAlreadySignedIn { get; set; }
+    public decimal Price { get; set; }
 }

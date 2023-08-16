@@ -13,4 +13,5 @@ public class Tournament
     public ICollection<Couple> Teams { get; set; } = new List<Couple>();
     public int MaxTeams { get; set; }
     public Player Creator { get; set; }
+    public decimal Price { get; set; }
 }
