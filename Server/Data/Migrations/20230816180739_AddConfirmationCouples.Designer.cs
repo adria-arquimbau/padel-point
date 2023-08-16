@@ -4,6 +4,7 @@ using EventsManager.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsManager.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230816180739_AddConfirmationCouples")]
+    partial class AddConfirmationCouples
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,7 +281,7 @@ namespace EventsManager.Server.Data.Migrations
                     b.Property<Guid>("Player2Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("TournamentId")
+                    b.Property<Guid?>("TournamentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -783,17 +786,13 @@ namespace EventsManager.Server.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("EventsManager.Server.Models.Tournament", "Tournament")
+                    b.HasOne("EventsManager.Server.Models.Tournament", null)
                         .WithMany("Teams")
-                        .HasForeignKey("TournamentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TournamentId");
 
                     b.Navigation("Player1");
 
                     b.Navigation("Player2");
-
-                    b.Navigation("Tournament");
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.EloHistory", b =>

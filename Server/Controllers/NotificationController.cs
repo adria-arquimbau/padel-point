@@ -102,9 +102,27 @@ public class NotificationController : ControllerBase
         return Ok(invitedMatches);
     }
     
+    [HttpGet("invited-tournaments")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GetInvitedTournaments(CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var invitedMatches = await _dbContext.Couple
+            .Where(x => x.Player1.UserId == userId && x.Player1Confirmed == false || x.Player2.UserId == userId && x.Player2Confirmed == false)
+            .Select(x => new InvitedTournamentResponse
+            {
+                TournamentId = x.Tournament.Id,
+                CoupleName = x.Player1.NickName,
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+        
+        return Ok(invitedMatches);
+    }
+    
     [HttpPost("accept-invitation/match/{invitedMatchMatchId:guid}/accept/{accept:bool}")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> AcceptInvitation([FromRoute] Guid invitedMatchMatchId, [FromRoute] bool accept, CancellationToken cancellationToken)
+    public async Task<IActionResult> AcceptMatchInvitation([FromRoute] Guid invitedMatchMatchId, [FromRoute] bool accept, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -120,6 +138,31 @@ public class NotificationController : ControllerBase
         if (!accept)
         {
             _dbContext.MatchPlayer.Remove(matchPlayer);
+        }
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Ok();
+    }
+    
+    [HttpPost("accept-invitation/tournament/{tournamentId:guid}/accept/{accept:bool}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> AcceptTournamentInvitation([FromRoute] Guid tournamentId, [FromRoute] bool accept, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var couple = await _dbContext.Couple
+            .Where(x => x.Tournament.Id == tournamentId && x.Player2.UserId == userId)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        if (accept)
+        {
+            couple.Player2Confirmed = true;
+        }
+       
+        if (!accept)
+        {
+            _dbContext.Couple.Remove(couple);
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);

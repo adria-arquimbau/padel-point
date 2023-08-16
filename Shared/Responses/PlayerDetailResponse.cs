@@ -10,5 +10,6 @@ public class PlayerDetailResponse
     public int Rank { get; set; }
     public string? Country { get; set; }    
     public Guid Id { get; set; }
-    public List<EloHistoryResponse> EloHistory { get; set; } = new List<EloHistoryResponse>();
+    public List<EloHistoryResponse> EloHistory { get; set; } = new();
+    public bool IsConfirmed { get; set; }
 }   

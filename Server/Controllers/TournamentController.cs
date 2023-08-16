@@ -109,6 +109,7 @@ public class TournamentController : ControllerBase
                         NickName = c.Player1.NickName,
                         Elo = c.Player1.Elo,
                         ImageUrl = c.Player1.ImageUrl,
+                        IsConfirmed = c.Player1Confirmed,
                         Country = c.Player1.Country,
                         MatchesPlayed = c.Player1.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                         LastEloGained = !c.Player1.EloHistories.Any() ? 0 : c.Player1.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
@@ -119,6 +120,7 @@ public class TournamentController : ControllerBase
                         NickName = c.Player2.NickName,
                         Elo = c.Player2.Elo,
                         ImageUrl = c.Player2.ImageUrl,
+                        IsConfirmed = c.Player2Confirmed,
                         Country = c.Player2.Country,
                         MatchesPlayed = c.Player2.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                         LastEloGained = !c.Player2.EloHistories.Any() ? 0 : c.Player2.EloHistories.OrderByDescending(eh => eh.ChangeDate).First().EloChange,
@@ -254,6 +256,7 @@ public class TournamentController : ControllerBase
         var newTeam = new Couple
         {
             Player1 = player1,
+            Player1Confirmed = true,
             Player2 = player2,
             CreationDate = DateTime.UtcNow
         };

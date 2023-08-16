@@ -22,8 +22,25 @@
                 </div>
                 <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Dark" Clicked="() => GoToMatch(invitedMatch.MatchId)">Go to match</Button>
                 <div class="accept-decline-buttons">
-                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Success" Clicked="() => RespondInvitation(invitedMatch.MatchId, true)">Accept invitation</Button>
-                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Danger" Clicked="() => RespondInvitation(invitedMatch.MatchId, false)">Decline</Button>
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Success" Clicked="() => RespondMatchInvitation(invitedMatch.MatchId, true)">Accept invitation</Button>
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Danger" Clicked="() => RespondMatchInvitation(invitedMatch.MatchId, false)">Decline</Button>
+                </div>
+            </div>
+        }
+        <Divider></Divider>
+    }
+    @if (_invitedTournaments.Any())
+    {
+        @foreach (var invitedTournament in _invitedTournaments)
+        {
+            <div class="invited-matches">
+                <div>
+                    @invitedTournament.CoupleName Invited you to play a tournament together
+                </div>
+                <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Dark" Clicked="() => GoToTournament(invitedTournament.TournamentId)">Go to tournament</Button>
+                <div class="accept-decline-buttons">
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Success" Clicked="() => RespondTournamentInvitation(invitedTournament.TournamentId, true)">Accept invitation</Button>
+                    <Button Size="Size.Small" style="margin-top: 5px" Color="Color.Danger" Clicked="() => RespondTournamentInvitation(invitedTournament.TournamentId, false)">Decline</Button>
                 </div>
             </div>
         }
@@ -34,6 +51,7 @@
 @code {
     private bool _loading = false;
     private List<InvitedMatchesResponse> _invitedMatches = new();
+    private List<InvitedTournamentResponse> _invitedTournaments = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,15 +64,26 @@
 
         try
         {
-            var response = await Http.GetAsync($"Notification/invited-matches");
+            var responseMatches = await Http.GetAsync($"Notification/invited-matches");
+            var responseTournaments = await Http.GetAsync($"Notification/invited-tournaments");
 
-            if (response.IsSuccessStatusCode)
+            if (responseMatches.IsSuccessStatusCode)      
             {
-                _invitedMatches = await response.Content.ReadFromJsonAsync<List<InvitedMatchesResponse>>();
+                _invitedMatches = await responseMatches.Content.ReadFromJsonAsync<List<InvitedMatchesResponse>>();
             }
             else
             {
-                var error = await response.Content.ReadAsStringAsync();
+                var error = await responseMatches.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+            
+            if (responseTournaments.IsSuccessStatusCode)      
+            {
+                _invitedTournaments = await responseTournaments.Content.ReadFromJsonAsync<List<InvitedTournamentResponse>>();
+            }
+            else
+            {
+                var error = await responseMatches.Content.ReadAsStringAsync();
                 ToastService.ShowError(error);
             }
         }
@@ -72,23 +101,43 @@
     {
         NavigationManager.NavigateTo($"match/{invitedMatchMatchId}/detail");
     }
+    
+    private void GoToTournament(Guid tournamentId)
+    {
+        NavigationManager.NavigateTo($"tournament/{tournamentId}/detail");
+    }
 
-    private async Task RespondInvitation(Guid invitedMatchMatchId, bool accept)
+    private async Task RespondMatchInvitation(Guid invitedMatchMatchId, bool accept)
     {
         if (accept)
         {
-            await CallInviteEndpoint(invitedMatchMatchId, accept);
+            await CallInviteMatchEndpoint(invitedMatchMatchId, accept);
         }
         else
         {
             if (await MessageService.Confirm( $"Are you sure want to decline the invitation?", $"Decline invitation"))
             {
-                await CallInviteEndpoint(invitedMatchMatchId, accept);
+                await CallInviteMatchEndpoint(invitedMatchMatchId, accept);
+            }
+        }
+    }
+    
+    private async Task RespondTournamentInvitation(Guid tournamentId, bool accept)
+    {
+        if (accept)
+        {
+            await CallInviteTournamentEndpoint(tournamentId, accept);
+        }
+        else
+        {
+            if (await MessageService.Confirm( $"Are you sure want to decline the invitation?", $"Decline invitation"))
+            {
+                await CallInviteTournamentEndpoint(tournamentId, accept);
             }
         }
     }
 
-    private async Task CallInviteEndpoint(Guid invitedMatchMatchId, bool accept)
+    private async Task CallInviteMatchEndpoint(Guid invitedMatchMatchId, bool accept)
     {
         try
         {
@@ -106,6 +155,41 @@
 
                 await GetInvitations();
                 ToastService.ShowSuccess("Invitation declined");
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    
+    private async Task CallInviteTournamentEndpoint(Guid tournamentId, bool accept)
+    {
+        try
+        {
+            var response =
+                await Http.PostAsync($"notification/accept-invitation/tournament/{tournamentId}/accept/{accept}", null);
+
+            if (response.IsSuccessStatusCode)
+            {
+                if (accept)
+                {
+                    NavigationManager.NavigateTo($"tournament/{tournamentId}/detail");
+                    ToastService.ShowSuccess("Invitation accepted");
+                    return;
+                }
+
+                await GetInvitations();
+                ToastService.ShowSuccess("Invitation declined, the couple was deleted.");
             }
             else
             {

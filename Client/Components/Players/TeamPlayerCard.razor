@@ -7,8 +7,8 @@
 {
     <div class="player-card" >
         <div class="player-avatar">
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="player-avatar-img"/>
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img second-image"/>
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="player-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
         </div>
         <div class="player-info">
             <div class="player-info-header">
@@ -74,6 +74,15 @@
     private string FormatTrend()
     {
         return $"{(Couple.Player1?.LastEloGained > 0 ? "+" : "")}{Couple.Player1?.LastEloGained}";
+    }
+    
+    private string GetStyleNonConfirmedPlayer(bool playerIsConfirmed)
+    {
+        if (!playerIsConfirmed)
+        {
+            return "border: 2px solid red;";
+        }
+        return "";
     }
     
     private void NavigateToPlayerDetail(PlayerDetailResponse player)
