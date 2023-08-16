@@ -119,7 +119,7 @@
             StartDate = _startDate,
             Location = _location,
             MaxTeams = _maxTeams,
-            Price = _price
+            Price = _isFree ? 0 : _price
         };
         
         try

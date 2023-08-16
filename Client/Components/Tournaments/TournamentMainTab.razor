@@ -27,6 +27,9 @@
                 </div>
             </TabPanel>
             <TabPanel Name="teams">
+                <Alert Color="Color.Warning">
+                    <AlertMessage></AlertMessage>
+                </Alert>
                 @foreach (var couple in Tournament.Couples)
                 {
                     <Divider></Divider>
