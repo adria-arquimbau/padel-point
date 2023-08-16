@@ -1,5 +1,12 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Client.Components.Players
+@using Color = Blazorise.Color
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMessageService MessageService
 
 <div class="tournament-card-header">
     <div class="tournament-card-title">
@@ -11,6 +18,7 @@
         <Items>
             <Tab Name="info">Info</Tab>
             <Tab Name="teams">Teams</Tab>
+            <Tab Name="competition">Competition</Tab>
         </Items>
         <Content>
             <TabPanel Name="info">
@@ -23,7 +31,16 @@
                 {
                     <Divider></Divider>
                     <TeamPlayerCard Couple="couple"></TeamPlayerCard>
+                    @if (Tournament.IsPlayerTheCreator)
+                    {
+                        <div>
+                            <Button Clicked="() => DeleteTeam(couple.Id)" Color="Color.Danger" Size="Size.ExtraSmall">Delete Team</Button>
+                        </div>
+                    }
                 }
+            </TabPanel>
+            <TabPanel Name="competition">
+                Coming soon...
             </TabPanel>
         </Content>
     </Tabs>
@@ -36,7 +53,11 @@
     [Parameter]
     public EventCallback<bool> OnChangeTab { get; set; }
     
+    [Parameter]
+    public EventCallback RefreshTournament { get; set; }
+        
     private string _selectedTab = "info";
+    private bool _loading = false;
 
     private async Task OnSelectedTabChanged(string name)
     {
@@ -51,6 +72,37 @@
             await OnChangeTab.InvokeAsync(false);
         }
     }
+
+    private async Task DeleteTeam(Guid coupleId)
+    {
+        _loading = true;
+        if (await MessageService.Confirm( "Are you sure you want to delete this couple?", "Delete couple"))
+        {
+            try
+            {
+                var response = await Http.DeleteAsync($"tournament/{Tournament.Id}/couple/{coupleId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await RefreshTournament.InvokeAsync();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+    }
+
 }   
 
 <style>

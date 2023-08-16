@@ -20,7 +20,7 @@
 }
 @if (!_loading && _tournament != null)
 {
-    <TournamentMainTab OnChangeTab="OnChangeTab" Tournament="_tournament"></TournamentMainTab>
+    <TournamentMainTab RefreshTournament="GetTournament" OnChangeTab="OnChangeTab" Tournament="_tournament"></TournamentMainTab>
     
     @if (!_tournament.IsPlayerAlreadySignedIn)
     {

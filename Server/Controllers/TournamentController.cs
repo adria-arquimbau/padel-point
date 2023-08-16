@@ -101,6 +101,7 @@ public class TournamentController : ControllerBase
                 IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),
                 Couples = x.Teams.Select(c => new CoupleResponse
                 {
+                    Id = c.Id,
                     AverageElo = (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
                     Player1 = new PlayerDetailResponse
                     {
@@ -161,6 +162,31 @@ public class TournamentController : ControllerBase
             .Where(x => x.Player1.UserId == userId || x.Player2.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
+        _context.Couple.Remove(team);
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
+    [HttpDelete("{tournamentId:guid}/couple/{coupleId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> RemoveCouple([FromRoute] Guid coupleId, [FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .Include(x => x.Teams)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (tournament.Creator.UserId != userId)
+        {
+            return Conflict("You are not the creator of this tournament");
+        }
+        
+        var team = tournament.Teams.Single(x => x.Id == coupleId);
         _context.Couple.Remove(team);
         
         await _context.SaveChangesAsync(cancellationToken);
