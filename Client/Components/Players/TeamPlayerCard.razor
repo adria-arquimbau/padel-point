@@ -5,10 +5,10 @@
 
 @if (Couple != null)
 {
-    <div class="border player-card" >
+    <div class="player-card" >
         <div class="player-avatar">
             <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="player-avatar-img"/>
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img"/>
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img second-image"/>
         </div>
         <div class="player-info">
             <div class="player-info-header">
@@ -82,18 +82,16 @@
     }
 }
 
-<style>
-    .border {
+<style>  
+    .player-card {
         border-radius: 8px;
         background-color: white;
-    }
-    
-    .player-card {
         max-width: 641px;
         display: flex;
         align-items: center;
-        justify-content: space-around;
+        justify-content: space-between;
         margin-bottom: 5px;
+        padding: 5px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
@@ -102,9 +100,9 @@
         justify-content: start;
     }
     
-    .player-avatar img {
-        margin-right: 3px;
-      
+    .second-image {
+        position: relative;
+        left: -20px;
     }
     
     .player-avatar-img{
@@ -112,7 +110,7 @@
         height: 60px;
         object-fit: cover;
         border-radius: 50%;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
     }
     
     .player-info {
@@ -121,7 +119,7 @@
     }
     
     .player-info-name {
-        font-size: 12px;
+        font-size: 14px;
     }
     
     .player-info-header {
@@ -134,7 +132,7 @@
     .player-info-content {
         display: flex;
         justify-content: flex-end;
-        font-size: 12px;
+        font-size: 13px;
     }
     
     .info-box {
