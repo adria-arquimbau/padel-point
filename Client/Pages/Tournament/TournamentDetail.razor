@@ -36,7 +36,7 @@
         @if (_tournament.IsPlayerTheCreator)
         {
             <div class="tournament-card-creator-actions">
-                <Button Size="Size.Small" Color="Color.Warning">Edit</Button>
+                <Button Size="Size.Small" Color="Color.Warning" Clicked="OpenEditModal">Edit</Button>
                 <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
             </div>
         }
@@ -56,7 +56,8 @@
     </div>
 }
 
-<SignInTournamentModal RefreshTournament="GetTournament" Tournament="_tournament" Show="_show" DontShow="DontShow" />
+<EditTournamentModal Tournament="_tournament" Show="_showEdit" DontShow="DontShowEdit"></EditTournamentModal>
+<SignInTournamentModal RefreshTournament="GetTournament" Tournament="_tournament" Show="_showSignIn" DontShow="DontShowSignIn" />
 
 @code {
     [Parameter]
@@ -147,16 +148,28 @@
         NavigationManager.NavigateTo("/tournaments");    
     }
 
-    private bool _show;
+    private bool _showSignIn;
 
     private void OpenSignInTournamentModal()
     {
-        _show = true;
+        _showSignIn = true;
     }
 
-    private void DontShow()
+    private void DontShowSignIn()
     {
-        _show = false;
+        _showSignIn = false;
+    }
+    
+    private bool _showEdit;
+
+    private void OpenEditModal()
+    {
+        _showEdit = true;
+    }
+
+    private void DontShowEdit()
+    {
+        _showEdit = false;
     }
 
     private async Task RemoveRegistration()

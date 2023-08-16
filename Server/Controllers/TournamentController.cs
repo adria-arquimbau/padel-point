@@ -81,6 +81,47 @@ public class TournamentController : ControllerBase
         });
     }
     
+    [HttpPut("{tournamentId:guid}")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> Edit([FromRoute] Guid tournamentId, [FromBody] TournamentRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .Include(x => x.Creator)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        if (tournament.Creator.UserId != userId)
+        {
+            return Conflict("You are not the creator of this tournament");
+        }
+        
+        tournament.Name = request.Name;
+        tournament.Description = request.Description;
+        tournament.StartDate = request.StartDate;
+        tournament.Location = request.Location;
+        tournament.MaxTeams = request.MaxTeams switch
+        {
+            MaxTeams.Eight => 8,
+            MaxTeams.Sixteen => 16,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        tournament.Price = request.Price;
+        
+        
+        // var maxTeams = request.MaxTeams switch
+        // {
+        //     MaxTeams.Eight => 8,
+        //     MaxTeams.Sixteen => 16,
+        //     _ => throw new ArgumentOutOfRangeException()
+        // };
+        
+        await _context.SaveChangesAsync(cancellationToken);
+           
+        return Ok();
+    }
+    
     [HttpGet("{tournamentId:guid}")]
     [AllowAnonymous]
     public async Task<IActionResult> Get([FromRoute] Guid tournamentId, CancellationToken cancellationToken)

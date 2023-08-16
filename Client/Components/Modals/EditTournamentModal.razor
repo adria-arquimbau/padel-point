@@ -1,0 +1,168 @@
+﻿@using Color = Blazorise.Color
+@using EventsManager.Shared.Requests
+@using EventsManager.Shared.Responses
+@using System.Net
+@using EventsManager.Shared.Enums
+
+@inject HttpClient Http
+@inject IToastService ToastService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationState
+
+
+@if (Tournament != null)
+{
+    <Modal @ref="_modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Edit the tournament</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Name</FieldLabel>
+                <Validation Validator="ValidationRule.IsNotEmpty">
+                    <TextEdit @bind-Text="@Tournament.Name" Placeholder="Enter tournament name...">
+                        <Feedback>
+                            <ValidationNone>Please enter the name.</ValidationNone>
+                            <ValidationSuccess>Name is good.</ValidationSuccess>
+                            <ValidationError>Enter valid name!</ValidationError>
+                        </Feedback>
+                    </TextEdit>
+                </Validation>
+            </Field>
+            <Field>
+                <FieldLabel>Description</FieldLabel>
+                <Validation Validator="ValidationRule.IsNotEmpty">
+                    <TextEdit @bind-Text="@Tournament.Description" Placeholder="Enter tournament description...">
+                        <Feedback>
+                            <ValidationNone>Please enter the name.</ValidationNone>
+                            <ValidationSuccess>Description is good.</ValidationSuccess>
+                            <ValidationError>Enter valid name!</ValidationError>
+                        </Feedback>
+                    </TextEdit>
+                </Validation>
+            </Field>
+            <Field>
+                <FieldLabel>Start Date</FieldLabel>
+                <DatePicker @bind-Date="@Tournament.StartDate" TValue="DateTime" />
+            </Field>
+            <Field>
+                <FieldLabel>Start Time</FieldLabel>
+                <TimePicker @bind-Time="@Tournament.StartDate" TValue="DateTime" />
+            </Field>
+            <Field>
+                <FieldLabel>Location</FieldLabel>
+                <Select @bind-SelectedValue="@Tournament.Location" TValue="MatchLocation">
+                    <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
+                    <SelectItem Value="MatchLocation.None">-</SelectItem>
+                </Select>
+            </Field>
+            <Field>
+                <FieldLabel>Max teams</FieldLabel>
+                <Select @bind-SelectedValue="@Tournament.MaxTeams" TValue="int">
+                    <SelectItem Value="8">8</SelectItem>
+                    <SelectItem Value="16">16</SelectItem>
+                </Select>
+            </Field>
+             <div class="form-group">
+                <Switch @bind-Checked="@_isFree" TValue="bool">Is free</Switch>
+            </div>
+            @if (!_isFree)
+            {
+                <div class="form-group">
+                    <label>Price</label>
+                    <NumericPicker @bind-Value="@Tournament.Price" ModifyValueOnWheel WheelOn="NumericWheelOn.Hover"/>
+                </div>
+            }
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+            <Button Color="Color.Success" Clicked="@CreateTournament">Create</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; }
+    
+    [Parameter] 
+    public EventCallback DontShow { get; set; }
+    
+    [Parameter]
+    public TournamentDetailResponse? Tournament { get; set; }
+    
+    private bool _isFree = true;
+
+    protected override void OnInitialized()
+    {
+        if (Tournament?.Price != 0)
+        {
+            _isFree = false;
+        }
+        base.OnInitialized();   
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Show)
+        {
+            await ShowModal();
+        }
+        else
+        {
+            await HideModal();
+        }
+    }
+    
+    private async Task CreateTournament()
+    {
+        var tournamentRequest = new TournamentRequest
+        {
+            Name = Tournament.Name,
+            Description = Tournament.Description,
+            StartDate = Tournament.StartDate,
+            Location = Tournament.Location,
+            MaxTeams = Tournament.MaxTeams == 8 ? MaxTeams.Eight : MaxTeams.Sixteen,
+            Price = _isFree ? 0 : Tournament.Price
+        };
+        
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"tournament/{Tournament.Id}", tournamentRequest);
+
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowSuccess("Tournament successfully updated.");
+                await DontShow.InvokeAsync();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong. Please try again later.");
+        }
+        finally
+        {
+            
+        }
+    }
+    
+    private Modal _modalRef = new();
+
+    private Task ShowModal()
+    {
+        return _modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return _modalRef.Hide();
+    }
+}
