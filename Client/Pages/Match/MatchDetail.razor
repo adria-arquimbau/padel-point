@@ -64,6 +64,18 @@
                 <AlertDescription>Match have non confirmed players marked with a red circle.</AlertDescription>
             </Alert>
         }
+        @if (_match.IsCompetitive)
+        {
+            <div style="font-size: 12px; margin-bottom: 5px; color: grey">
+                **This match is competitive and will affect your ELO.
+            </div>
+        }
+        @if (!_match.IsCompetitive)
+        {
+            <div style="font-size: 12px; margin-bottom: 5px; color: grey">
+                **This match is NOT competitive and will not affect your ELO.
+            </div>
+        }
         <div class="info-footer">
             <div class="info-footer-box">
                 <div class="info-footer-box-content">

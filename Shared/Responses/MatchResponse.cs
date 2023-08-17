@@ -34,4 +34,5 @@ public class MatchResponse
     public MatchLocation Location { get; set; }
     public int? MinimumLevel { get; set; }
     public bool IHaveOpenInvitation { get; set; }
+    public bool IsCompetitive { get; set; }
 }   
