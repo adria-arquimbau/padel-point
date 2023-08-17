@@ -35,4 +35,5 @@ public class MatchResponse
     public int? MinimumLevel { get; set; }
     public bool IHaveOpenInvitation { get; set; }
     public bool IsCompetitive { get; set; }
+    public int? CourtNumber { get; set; }
 }   
