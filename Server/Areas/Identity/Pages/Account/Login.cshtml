@@ -108,23 +108,40 @@
     <script>
     // On load
     window.addEventListener('load', function() {
+        var loginForm = document.getElementById('account');
         var loginSubmitButton = document.getElementById('login-submit');
         var googleLoginButton = document.getElementById('googleLoginButton');
     
-        // On Login Submit Button Click
-        loginSubmitButton.addEventListener('click', function() {
-            document.getElementById('loginText').style.display = 'none';
-            document.getElementById('spinner').style.display = 'block';
+        // Reset button states
+        function resetButtons() {
+            document.getElementById('loginText').style.display = 'block';
+            document.getElementById('spinner').style.display = 'none';
+    
+            googleLoginButton.style.pointerEvents = '';
+            document.getElementById('googleLoginText').style.display = 'block';
+            document.getElementById('googleSpinner').style.display = 'none';
+        }
+    
+        // On Login Form Submit
+        loginForm.addEventListener('submit', function(e) {
+            // Check if form is valid (this depends on the client-side validation library you're using)
+            if (!loginForm.checkValidity()) {
+                e.preventDefault();  // Prevent form from submitting
+                resetButtons();     // Reset the button states
+            } else {
+                // Show loading spinner
+                document.getElementById('loginText').style.display = 'none';
+                document.getElementById('spinner').style.display = 'block';
+            }
         });
     
         // On Google Login Button Click
-       
         googleLoginButton.addEventListener('click', function() {
             googleLoginButton.style.pointerEvents = 'none';
             document.getElementById('googleLoginText').style.display = 'none';
             document.getElementById('googleSpinner').style.display = 'block';
         });
-
     });
+
     </script>
 }

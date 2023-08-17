@@ -44,6 +44,11 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
+    <Folder Include="IdentityUtils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="IdentityUtils\BlazorCookieLoginMiddleware.cs" />
   </ItemGroup>
 
 </Project>

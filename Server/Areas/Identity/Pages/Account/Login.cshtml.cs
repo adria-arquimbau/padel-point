@@ -16,7 +16,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-
+        public bool IsLoading { get; set; } = false;
         public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager; 
@@ -102,7 +102,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
+            IsLoading = true;
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout
@@ -136,6 +136,8 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                     return Page();
                 }
             }
+            
+            IsLoading = false;
 
             // If we got this far, something failed, redisplay form
             return Page();
