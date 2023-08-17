@@ -39,6 +39,10 @@
                         </Select>
                     </div>
                     <div class="form-group">
+                        <label>Price per hour:</label>
+                        <NumericEdit TValue="double" @bind-Value="@_editMatchRequest.PricePerHour"/>
+                    </div>
+                    <div class="form-group">
                         <label>Location</label>
                         <Select @bind-SelectedValue="@_editMatchRequest.Location" TValue="MatchLocation">
                             <SelectItem Value="MatchLocation.PadelBaseSalzburg">Padel Base Salzburg</SelectItem>
@@ -104,6 +108,7 @@
             _editMatchRequest.StartDate = Match.StartDateTime;
             _editMatchRequest.IsPrivate = Match.IsPrivate;
             _editMatchRequest.Location = Match.Location;
+            _editMatchRequest.PricePerHour = Match.PricePerHour;
             _editMatchRequest.MinimumLevel = Match.MinimumLevel == null ? null : Match.RequesterElo;
             _requiredSpecificLevel = Match.MinimumLevel != null;
         }
