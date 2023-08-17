@@ -45,6 +45,8 @@ public class MatchController : ControllerBase
             PricePerHour = request.PricePerHour,
             Location = request.Location,
             MinimumLevel = request.MinimumLevel,
+            IsCompetitive = request.CompetitiveMatch,
+            CourtNumber = request.Location == MatchLocation.PadelBaseSalzburg ? request.CourtNumber : null,
             MatchPlayers = new List<MatchPlayer>
             {
                 new()
@@ -104,6 +106,8 @@ public class MatchController : ControllerBase
         match.Location = request.Location;
         match.IsPrivate = request.IsPrivate;
         match.MinimumLevel = request.MinimumLevel;
+        match.IsCompetitive = request.CompetitiveMatch;
+        match.CourtNumber = request.Location == MatchLocation.PadelBaseSalzburg ? request.CourtNumber : null;
 
         foreach (var matchPlayer in match.MatchPlayers)
         {

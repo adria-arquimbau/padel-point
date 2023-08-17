@@ -4,6 +4,7 @@
 @using EventsManager.Shared.Responses
 @using EventsManager.Shared.Enums
 @using Microsoft.AspNetCore.SignalR.Client
+@using Color = Blazorise.Color
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @inject IToastService ToastService
@@ -52,6 +53,29 @@
                 <SelectItem Value="MatchLocation.None">-</SelectItem>
             </Select>
         </div>
+        @if (_location == MatchLocation.PadelBaseSalzburg)
+        {
+            <div class="form-group">
+                <label>Court number</label>
+                <Select @bind-SelectedValue="@_courtNumber" TValue="int?">
+                    <SelectItem Value="1">1</SelectItem>
+                    <SelectItem Value="2">2</SelectItem>
+                    <SelectItem Value="3">3</SelectItem>
+                    <SelectItem Value="4">4</SelectItem>
+                </Select>
+            </div>
+        }
+        <div class="form-group">
+            <Switch @bind-Checked="@_competitiveMatch" TValue="bool">Competitive match</Switch>
+        </div>
+        @if (_competitiveMatch)
+        {
+            <Alert Color="Color.Info" Visible>
+                <Paragraph>
+                    This mage will rank you up or down depending on the result.
+                </Paragraph>
+            </Alert>
+        }
         <div class="form-group">
             <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
         </div>
@@ -67,7 +91,9 @@
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private double _pricePerHour;
     private bool _isPrivate;
+    private bool _competitiveMatch = true;
     private bool _loading;
+    private int? _courtNumber;
     private bool _requiredSpecificLevel;
     private HubConnection hubConnection;
     private bool IsConnected => hubConnection.State == HubConnectionState.Connected;
@@ -107,7 +133,9 @@
             IsPrivate = _isPrivate,
             PricePerHour = _pricePerHour,
             Location = _location,
-            MinimumLevel = _minimumLevel
+            MinimumLevel = _minimumLevel,
+            CompetitiveMatch = _competitiveMatch,
+            CourtNumber = _location == MatchLocation.PadelBaseSalzburg ? _courtNumber : null
         };
 
         try

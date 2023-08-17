@@ -10,4 +10,6 @@ public class CreateMatchRequest
     public double PricePerHour { get; set; }    
     public MatchLocation Location { get; set; }
     public int? MinimumLevel { get; set; }
+    public int? CourtNumber { get; set; }
+    public bool CompetitiveMatch { get; set; }
 }       

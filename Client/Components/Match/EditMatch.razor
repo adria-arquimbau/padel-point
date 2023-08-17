@@ -1,6 +1,7 @@
 @using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
 @using EventsManager.Shared.Enums
+@using Color = Blazorise.Color
 @inject HttpClient Http
 @inject IToastService ToastService
 
@@ -44,6 +45,29 @@
                             <SelectItem Value="MatchLocation.None">-</SelectItem>
                         </Select>
                     </div>
+                     @if (_editMatchRequest.Location == MatchLocation.PadelBaseSalzburg)
+                    {
+                        <div class="form-group">
+                            <label>Court number</label>
+                            <Select @bind-SelectedValue="@_editMatchRequest.CourtNumber" TValue="int?">
+                                <SelectItem Value="1">1</SelectItem>
+                                <SelectItem Value="2">2</SelectItem>
+                                <SelectItem Value="3">3</SelectItem>
+                                <SelectItem Value="4">4</SelectItem>
+                            </Select>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <Switch @bind-Checked="@_editMatchRequest.CompetitiveMatch" TValue="bool">Competitive match</Switch>
+                    </div>
+                    @if (_editMatchRequest.CompetitiveMatch)
+                    {
+                        <Alert Color="Color.Info" Visible>
+                            <Paragraph>
+                                This mage will rank you up or down depending on the result.
+                            </Paragraph>
+                        </Alert>
+                    }
                     <div class="form-group form-check">
                         <Switch TValue="bool" @bind-Checked="@_editMatchRequest.IsPrivate">Is Private?</Switch>
                     </div>

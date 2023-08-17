@@ -22,5 +22,7 @@ public class Match
     public MatchLocation Location { get; set; }
     public bool IsBlocked { get; set; }
     public int? MinimumLevel { get; set; }
+    public bool IsCompetitive { get; set; }
+    public int? CourtNumber { get; set; }
 }
-        
+            
