@@ -99,9 +99,6 @@ public class MatchManagerController : ControllerBase
                         NickName = mp.Player.NickName,
                     }).ToList(),
                 PlayersNames = x.MatchPlayers.Select(p => p.Player.NickName).ToList(),
-                AverageElo = x.MatchPlayers.Any() ? 
-                    (x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo) ? (int)Math.Round(x.EloHistories.Average(eh => eh.OldElo)) : (int)Math.Round(x.MatchPlayers.Average(mp => mp.Player.Elo))
-                    : 0,
                 Promotions = x.Promotions.Select(p => new PromotionResponse
                 {
                     Title = p.Title,
