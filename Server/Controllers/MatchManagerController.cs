@@ -81,6 +81,7 @@ public class MatchManagerController : ControllerBase
                 Id = x.Id,
                 IsBlocked = x.IsBlocked,
                 CreationDate = x.CreationDate,
+                AnyPlayerNotConfirmed = x.MatchPlayers.Any(mp => !mp.Confirmed),
                 CreatorNickName = x.Creator.NickName,
                 StartDateTime = x.StartDateTime,
                 IsPrivate = x.IsPrivate,

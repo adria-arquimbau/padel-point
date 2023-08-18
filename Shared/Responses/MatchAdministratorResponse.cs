@@ -32,4 +32,5 @@ public class MatchAdministratorResponse
     public List<PromotionResponse> Promotions { get; set; }
     public DateTime CreationDate { get; set; }
     public bool IsBlocked { get; set; }
+    public bool AnyPlayerNotConfirmed { get; set; }
 }

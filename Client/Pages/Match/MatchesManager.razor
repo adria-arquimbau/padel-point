@@ -55,6 +55,10 @@
             </div>
             <Button Size="Size.Small" Clicked="() => DeleteMatch(match.Id)" Color="Color.Danger">Delete Match</Button>
             <Button Size="Size.Small" Clicked="() => ConfirmResults(match.Id)" Color="Color.Warning">Confirm results</Button>
+            @if (match.AnyPlayerNotConfirmed)
+            {
+                <Button Size="Size.Small" Clicked="() => ConfirmAllPlayers(match.Id)" Color="Color.Info">Confirm all players</Button>
+            }
             @if (match.Finished)
             {
                 <Button Size="Size.Small" Clicked="() => DeletePunctuation(match.Id)" Color="Color.Warning">Delete Punctuation</Button>
@@ -225,4 +229,29 @@
        
     }
 
+    private async Task ConfirmAllPlayers(Guid matchId)
+    {
+        if (await MessageService.Confirm("Are you sure?", "Confirm all players"))
+        {
+            try
+            {
+                var response = await Http.PostAsync($"MatchManager/{matchId}/confirm-all-players", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowSuccess("Confirmed all players successfully.");
+                    await GetAll();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        }
+    }
 }
