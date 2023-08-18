@@ -55,6 +55,11 @@ public class ConfirmTeamCommandHandler : IRequestHandler<ConfirmTeamCommandReque
         {
             throw new NotAllPlayersConfirmedException();
         }
+        
+        if (match.MatchPlayers.Any(x => x.Confirmed == false))
+        {
+            throw new OneOrMorePlayersAreNotConfirmedInTheMatchException();
+        }
 
         if (!adminRequest)
         {
