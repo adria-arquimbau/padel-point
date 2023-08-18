@@ -65,6 +65,9 @@
                     <SelectItem Value="16">16</SelectItem>
                 </Select>
             </Field>
+            <div class="form-group">
+                <Switch @bind-Checked="@Tournament.RegistrationsOpen" TValue="bool">Open registrations</Switch>
+            </div>
              <div class="form-group">
                 <Switch @bind-Checked="@_isFree" TValue="bool">Is free</Switch>
             </div>
@@ -99,7 +102,7 @@
     protected override void OnInitialized()
     {
         if (Tournament?.Price != 0)
-        {
+        {   
             _isFree = false;
         }
         base.OnInitialized();   
@@ -123,6 +126,7 @@
         {
             Name = Tournament.Name,
             Description = Tournament.Description,
+            OpenRegistrations = Tournament.RegistrationsOpen,
             StartDate = Tournament.StartDate,
             Location = Tournament.Location,
             MaxTeams = Tournament.MaxTeams == 8 ? MaxTeams.Eight : MaxTeams.Sixteen,

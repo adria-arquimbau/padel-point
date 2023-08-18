@@ -30,6 +30,7 @@ public class TournamentController : ControllerBase
             {
                 Id = x.Id,
                 Name = x.Name,
+                RegistrationsOpen = x.RegistrationOpen,
                 Description = x.Description,
                 Price = x.Price,
                 StartDate = x.StartDate,
@@ -62,6 +63,7 @@ public class TournamentController : ControllerBase
         var tournament = new Tournament
         {
             Name = request.Name,
+            RegistrationOpen = request.OpenRegistrations,
             Description = request.Description,
             StartDate = request.StartDate,
             CreationDate = DateTime.UtcNow,
@@ -98,6 +100,7 @@ public class TournamentController : ControllerBase
         }
         
         tournament.Name = request.Name;
+        tournament.RegistrationOpen = request.OpenRegistrations;
         tournament.Description = request.Description;
         tournament.StartDate = request.StartDate;
         tournament.Location = request.Location;
@@ -135,6 +138,7 @@ public class TournamentController : ControllerBase
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
+                RegistrationsOpen = x.RegistrationOpen,
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,

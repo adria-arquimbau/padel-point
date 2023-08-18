@@ -27,8 +27,18 @@
                 <div class="main-tournament-info">
                     <b><p>@tournament.Name</p></b>
                 </div>
-                Teams: @tournament.TeamsCount / @tournament.MaxTeams
-                Price: @tournament.Price €
+                <div class="tournament-specs">
+                    <p>@tournament.TeamsCount / @tournament.MaxTeams</p> 
+                    <p>Price: @tournament.Price €</p>
+                    @if (tournament.RegistrationsOpen)
+                    {
+                        <p>Open registrations</p>
+                    }
+                    else
+                    {
+                        <p>Closed registrations</p>
+                    }
+                </div>
             </div>
         </div>
     }

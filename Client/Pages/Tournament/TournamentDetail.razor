@@ -20,12 +20,12 @@
 {
     <TournamentMainTab RefreshTournament="GetTournament" OnChangeTab="OnChangeTab" Tournament="_tournament"></TournamentMainTab>
     
-    @if (!_tournament.IsPlayerAlreadySignedIn)
+    @if (_tournament is { IsPlayerAlreadySignedIn: false, RegistrationsOpen: true })
     {
         <AuthorizeView>
             <Authorized>
                 <div class="tournament-card-actions">
-                    <Button Size="Size.Small" Color="Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
+                    <Button Size="@Size.Small" Color="@Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
                 </div>
             </Authorized>
         </AuthorizeView>

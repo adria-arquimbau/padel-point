@@ -63,6 +63,9 @@
                     <SelectItem Value="MaxTeams.Sixteen">16</SelectItem>
                 </Select>
             </Field>
+            <div class="form-group">
+                <Switch @bind-Checked="@_openRegistrations" TValue="bool">Open registrations</Switch>
+            </div>
              <div class="form-group">
                 <Switch @bind-Checked="@_isFree" TValue="bool">Is free</Switch>
             </div>
@@ -96,6 +99,7 @@
     private MaxTeams _maxTeams;
     
     private bool _isFree = true;
+    private bool _openRegistrations;
     private decimal _price;
 
     protected override async Task OnParametersSetAsync()
@@ -119,6 +123,7 @@
             StartDate = _startDate,
             Location = _location,
             MaxTeams = _maxTeams,
+            OpenRegistrations = _openRegistrations,
             Price = _isFree ? 0 : _price
         };
         

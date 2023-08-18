@@ -12,4 +12,5 @@ public class TournamentResponse
     public int MaxTeams { get; set; }
     public int TeamsCount { get; set; }
     public decimal Price { get; set; }
+    public bool RegistrationsOpen { get; set; }
 }
