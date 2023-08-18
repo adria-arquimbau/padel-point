@@ -173,6 +173,25 @@ public class MatchManagerController : ControllerBase
         return Ok();
     }
     
+    [HttpPost("{matchId:guid}/confirm-all-players")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<IActionResult> ConfirmAllPlayersMatch([FromRoute] Guid matchId, CancellationToken cancellationToken)
+    {
+        var match = await _dbContext.Match
+            .Where(x => x.Id == matchId)
+            .Include(x => x.MatchPlayers)
+            .SingleAsync(cancellationToken: cancellationToken);
+
+        foreach (var matchPlayer in match.MatchPlayers)
+        {
+            matchPlayer.Confirmed = true;
+        }
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
     [HttpPost("simulate")]
     [Authorize(Roles = "Administrator")]
     public async Task<IActionResult> Simulate(CancellationToken cancellationToken)

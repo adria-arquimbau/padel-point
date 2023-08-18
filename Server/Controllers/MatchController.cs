@@ -219,7 +219,7 @@ public class MatchController : ControllerBase
         {
             return Conflict("Not all players confirmed their participation.");
         }
-        catch (OneOrMorePlayersAreNotConfirmedInTheMatchException)
+        catch (OneOrMorePlayersAreNotConfirmedInTheMatchException)  
         {
             return Conflict("One or more players are not confirmed in the match.");
         }
