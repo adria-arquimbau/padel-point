@@ -68,7 +68,10 @@
             <div class="form-group">
                 <Switch @bind-Checked="@Tournament.RegistrationsOpen" TValue="bool">Open registrations</Switch>
             </div>
-             <div class="form-group">
+            <div class="form-group">
+                <Switch @bind-Checked="@Tournament.ShowBrackets" TValue="bool">Show brackets</Switch>
+            </div>
+            <div class="form-group">
                 <Switch @bind-Checked="@_isFree" TValue="bool">Is free</Switch>
             </div>
             @if (!_isFree)
@@ -130,7 +133,8 @@
             StartDate = Tournament.StartDate,
             Location = Tournament.Location,
             MaxTeams = Tournament.MaxTeams == 8 ? MaxTeams.Eight : MaxTeams.Sixteen,
-            Price = _isFree ? 0 : Tournament.Price
+            Price = _isFree ? 0 : Tournament.Price,
+            ShowBrackets = Tournament.ShowBrackets
         };
         
         try

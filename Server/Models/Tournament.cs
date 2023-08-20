@@ -15,4 +15,5 @@ public class Tournament
     public Player Creator { get; set; }
     public decimal Price { get; set; }
     public bool RegistrationOpen { get; set; }
+    public bool ShowBrackets { get; set; }
 }

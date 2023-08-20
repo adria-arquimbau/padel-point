@@ -104,6 +104,7 @@ public class TournamentController : ControllerBase
         tournament.Description = request.Description;
         tournament.StartDate = request.StartDate;
         tournament.Location = request.Location;
+        tournament.ShowBrackets = request.ShowBrackets;
         tournament.MaxTeams = request.MaxTeams switch
         {
             MaxTeams.Eight => 8,
@@ -142,6 +143,7 @@ public class TournamentController : ControllerBase
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
+                ShowBrackets = x.ShowBrackets,
                 Price = x.Price,
                 IsPlayerTheCreator = userId != null && x.Creator.UserId == userId,
                 IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),

@@ -11,4 +11,5 @@ public class TournamentRequest
     public required MaxTeams MaxTeams { get; set; }
     public decimal Price { get; set; }
     public bool OpenRegistrations { get; set; }
+    public bool ShowBrackets { get; set; }
 }   

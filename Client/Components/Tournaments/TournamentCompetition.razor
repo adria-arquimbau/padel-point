@@ -1,6 +1,17 @@
 ﻿@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
 
-<h3>TournamentCompetition</h3>
+@if (!Tournament.ShowBrackets)
+{
+    <Alert Style="margin-top: 10px" Color="Color.Info" Visible>
+        <AlertMessage>Competition view disabled</AlertMessage>
+        <AlertDescription>Right now the competition view is disabled by an admin, will be enabled soon.</AlertDescription>
+    </Alert>
+}
+else
+{
+    
+}
 
 @code {
     [Parameter]
