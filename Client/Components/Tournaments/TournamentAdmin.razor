@@ -1,0 +1,74 @@
+﻿@using EventsManager.Client.Components.Modals
+@using EventsManager.Shared.Responses
+@using Color = Blazorise.Color
+
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMessageService MessageService
+@inject NavigationManager NavigationManager
+
+<div class="tournament-card-creator-actions">
+    <Button Size="Size.Small" Color="Color.Warning" Clicked="OpenEditModal">Edit</Button>
+    <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete tournament</Button>
+</div>
+
+<EditTournamentModal Tournament="Tournament" Show="_showEdit" DontShow="DontShowEdit"></EditTournamentModal>
+
+@code {
+    [Parameter]
+    public TournamentDetailResponse? Tournament { get; set; }
+    
+    private bool _showEdit;
+
+    private void OpenEditModal()
+    {
+        _showEdit = true;
+    }
+
+    private void DontShowEdit()
+    {
+        _showEdit = false;
+    }
+    
+    private async Task DeleteTournament()
+    {
+        if (await MessageService.Confirm( "Are you sure you want to delete this tournament?", "Delete tournament"))
+        {
+            try
+            {
+                HttpResponseMessage? response;
+                response = await Http.DeleteAsync($"tournament/{Tournament.Id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    NavigationManager.NavigateTo("/tournaments");
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+            finally
+            {
+                
+            }
+        }
+    }
+}
+
+<style>
+       .tournament-card-creator-actions{
+           padding: 12px;
+           display: flex;  
+           margin-top: 10px;
+           flex-direction: row;
+           justify-content: space-between;
+        }
+</style>
