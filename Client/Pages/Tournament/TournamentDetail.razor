@@ -43,9 +43,9 @@
         @if (_tournament.IsPlayerAlreadySignedIn)
         {
             <div class="tournament-card-creator-actions">
-                @if (_tournament.IsPlayerTheCreator)
+                @if (_tournament.IsPlayerAlreadySignedIn)
                 {
-                    <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Remove registration</Button>
+                    <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Sign out</Button>
                 }
             </div>
         }
@@ -179,12 +179,13 @@
             try
             {
                 HttpResponseMessage? response;
-                response = await Http.DeleteAsync($"tournament/registration");
+                response = await Http.DeleteAsync($"tournament/registration/{TournamentId}");
 
                 if (response.IsSuccessStatusCode)
                 {
+                    ToastService.ShowSuccess("Registration removed successfully.");
                     await GetTournament();
-                }
+                }   
                 else
                 {
                     var error = await response.Content.ReadAsStringAsync();

@@ -200,14 +200,14 @@ public class TournamentController : ControllerBase
         return Ok();
     }  
     
-    [HttpDelete("registration")]
+    [HttpDelete("registration/{tournamentId:guid}")]
     [Authorize(Roles = "User")]
-    public async Task<IActionResult> RemoveRegistration(CancellationToken cancellationToken)
+    public async Task<IActionResult> RemoveRegistration([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
         var team = await _context.Couple
-            .Where(x => x.Player1.UserId == userId || x.Player2.UserId == userId)
+            .Where(x => x.Tournament.Id == tournamentId && (x.Player1.UserId == userId || x.Player2.UserId == userId))
             .SingleAsync(cancellationToken: cancellationToken);
         
         _context.Couple.Remove(team);
