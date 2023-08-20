@@ -7,7 +7,10 @@
 
 @if (_loading)
 {
-    <AllMatchesSkeleton />
+    for (var i = 0; i < 5; i++)
+    {
+        <AllMatchesSkeleton />
+    }
 }
 @if (!_loading && !_tournaments.Any())
 {
@@ -18,25 +21,43 @@
     @foreach (var tournament in _tournaments)
     {
         <div class="tournament-card" @onclick="() => GoToTheTournament(tournament.Id)">
-            <div style="font-size: 10px; text-align: center; color: grey">
-                @tournament.StartDate.ToLongDateString() /
-                @tournament.StartDate.ToShortTimeString() / @tournament.Location
+            <div class="date-time-location">
+                <span>@tournament.StartDate.ToLongDateString()</span> 
+                <span>@tournament.StartDate.ToShortTimeString()</span>
+                <span>@tournament.Location</span>
             </div>
             <Divider></Divider>
             <div class="main-tournament-info">
-                <div class="main-tournament-info">
-                    <b><p>@tournament.Name</p></b>
+                <div class="tournament-title">
+                    <p>@tournament.Name</p>
                 </div>
-                <div class="tournament-specs">
-                    <p>@tournament.TeamsCount / @tournament.MaxTeams</p> 
-                    <p>Price: @tournament.Price €</p>
+                  <div class="tournament-specs">
+                      <div class="tournament-specs-box">
+                          <div class="tournament-specs-content">
+                              Couples
+                          </div>
+                          <div class="tournament-specs-content grey-typo">
+                              @tournament.TeamsCount / @tournament.MaxTeams
+                          </div>
+                      </div>
+                      <div class="tournament-specs-box">
+                          <div class="tournament-specs-content">
+                              Price
+                          </div>
+                          <div class="tournament-specs-content grey-typo">
+                              @tournament.Price €
+                          </div>
+                      </div>
+                  </div>
+
+                <div class="registration-status">
                     @if (tournament.RegistrationsOpen)
                     {
-                        <p>Open registrations</p>
+                        <p class="open-registrations">Open registrations</p>
                     }
                     else
                     {
-                        <p>Closed registrations</p>
+                        <p class="closed-registrations">Closed registrations</p>
                     }
                 </div>
             </div>
@@ -100,18 +121,85 @@
 
 <style>
     .tournament-card {
-            border-radius: 8px;
-            padding: 10px;
-            background-color: white;
-            margin-bottom: 10px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-            max-width: 641px;
-        }   
-        
-     .main-tournament-info{
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-           
-        }
+        border-radius: 10px;
+        padding: 15px;
+        background-color: #f7f9fc;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        max-width: 650px;
+    }
+
+    .tournament-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .date-time-location {
+        font-size: 10px;
+        text-align: center;
+        color: #888;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .main-tournament-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .tournament-title p {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .grey-typo
+    {
+        color: grey;
+    }
+    
+    .tournament-specs-content{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tournament-specs{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    
+    .tournament-specs-box {
+        min-width: 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .registration-status{
+        margin-top: 10px;
+    }
+
+    .open-registrations {
+        color: white;
+        background-color: #4CAF50;
+        font-weight: bold;
+        padding: 2px 10px;
+        border-radius: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        display: inline-block;
+    }
+    
+    .closed-registrations {
+        color: white;
+        background-color: #F44336;
+        font-weight: bold;
+        padding: 2px 10px;
+        border-radius: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        display: inline-block;
+    }
 </style>
