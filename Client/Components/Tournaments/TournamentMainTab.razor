@@ -20,11 +20,15 @@
     </Alert>
 }
 <div class="tournament-card">
-    <Tabs SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
+    <Tabs FullWidth="true" SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
         <Items>
             <Tab Name="info">Info</Tab>
             <Tab Name="teams">Teams</Tab>
             <Tab Name="competition">Competition</Tab>
+            @if (Tournament.IsPlayerTheCreator)
+            {
+                <Tab Name="admin">Admin</Tab>
+            }
         </Items>
         <Content>
             <TabPanel Name="info">
@@ -49,8 +53,14 @@
                 }
             </TabPanel>
             <TabPanel Name="competition">
-                Coming soon...
+                <TournamentCompetition Tournament="@Tournament"></TournamentCompetition>
             </TabPanel>
+            @if (Tournament.IsPlayerTheCreator)
+            {
+                <TabPanel Name="admin">
+                    Coming soon...
+                </TabPanel>
+            }
         </Content>
     </Tabs>
 </div>
@@ -60,7 +70,7 @@
     public TournamentDetailResponse? Tournament { get; set; }
     
     [Parameter]
-    public EventCallback<bool> OnChangeTab { get; set; }
+    public EventCallback<string> OnChangeTab { get; set; }
     
     [Parameter]
     public EventCallback RefreshTournament { get; set; }
@@ -74,11 +84,11 @@
 
         if (_selectedTab == "info")
         {
-            await OnChangeTab.InvokeAsync(true);
+            await OnChangeTab.InvokeAsync("info");
         }
-        if (_selectedTab != "info")
+        if (_selectedTab == "admin")
         {
-            await OnChangeTab.InvokeAsync(false);
+            await OnChangeTab.InvokeAsync("admin");
         }
     }
 
@@ -111,7 +121,6 @@
             }
         }
     }
-
 }   
 
 <style>

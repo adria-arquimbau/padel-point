@@ -31,15 +31,18 @@
         </AuthorizeView>
     }
 
-    @if (_showFooterOptions)
+    @if (_showAdminOptions)
     {
         @if (_tournament.IsPlayerTheCreator)
         {
             <div class="tournament-card-creator-actions">
                 <Button Size="Size.Small" Color="Color.Warning" Clicked="OpenEditModal">Edit</Button>
-                <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete</Button>
+                <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteTournament">Delete tournament</Button>
             </div>
         }
+    }
+    @if (_showFooterOptions)
+    {
         @if (_tournament.IsPlayerAlreadySignedIn)
         {
             <div class="tournament-card-creator-actions">
@@ -62,9 +65,10 @@
 @code {
     [Parameter]
     public Guid? TournamentId { get; set; }
-    private bool _loading = false;
+    private bool _loading;
     
     private bool _showFooterOptions = true;
+    private bool _showAdminOptions = false;
     
     private TournamentDetailResponse? _tournament;
     
@@ -203,12 +207,15 @@
         }
     }
 
-    private void OnChangeTab(bool show)
+    private void OnChangeTab(string selectedTab)
     {
-        _showFooterOptions = show;
+        _showFooterOptions = false;
+        _showAdminOptions = false;
+        _showFooterOptions = selectedTab == "info";
+        _showAdminOptions = selectedTab == "admin";
     }
 
-}
+}   
 
 <style>
     .tournament-card-actions{
