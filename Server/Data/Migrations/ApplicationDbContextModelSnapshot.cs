@@ -183,7 +183,7 @@ namespace EventsManager.Server.Data.Migrations
                     b.HasIndex("PlayerId")
                         .IsUnique();
 
-                    b.ToTable("Announcements");
+                    b.ToTable("Announcements", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.ApplicationUser", b =>
@@ -289,7 +289,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("TournamentId");
 
-                    b.ToTable("Couple");
+                    b.ToTable("Couple", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.EloHistory", b =>
@@ -326,7 +326,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("EloHistories");
+                    b.ToTable("EloHistories", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.InitialLevelForm", b =>
@@ -360,7 +360,7 @@ namespace EventsManager.Server.Data.Migrations
                     b.HasIndex("PlayerId")
                         .IsUnique();
 
-                    b.ToTable("InitialLevelForms");
+                    b.ToTable("InitialLevelForms", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Match", b =>
@@ -418,7 +418,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Match");
+                    b.ToTable("Match", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.MatchPlayer", b =>
@@ -446,7 +446,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("MatchPlayer");
+                    b.ToTable("MatchPlayer", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Notification", b =>
@@ -479,7 +479,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Player", b =>
@@ -513,7 +513,7 @@ namespace EventsManager.Server.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Player");
+                    b.ToTable("Player", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Promotion", b =>
@@ -537,7 +537,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("MatchId");
 
-                    b.ToTable("Promotion");
+                    b.ToTable("Promotion", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Set", b =>
@@ -562,7 +562,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("MatchId");
 
-                    b.ToTable("Set");
+                    b.ToTable("Set", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Suggestion", b =>
@@ -585,7 +585,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Suggestions");
+                    b.ToTable("Suggestions", (string)null);
                 });
 
             modelBuilder.Entity("EventsManager.Server.Models.Tournament", b =>
@@ -633,7 +633,7 @@ namespace EventsManager.Server.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.ToTable("Tournament");
+                    b.ToTable("Tournament", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

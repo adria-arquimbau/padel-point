@@ -41,5 +41,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new InitialLevelFormConfiguration());
         modelBuilder.ApplyConfiguration(new TournamentConfiguration());
         modelBuilder.ApplyConfiguration(new CoupleConfiguration());
+       
     }
 }
