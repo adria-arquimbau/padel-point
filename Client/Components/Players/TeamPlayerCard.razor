@@ -5,10 +5,10 @@
 
 @if (Couple != null)
 {
-    <div class="player-card" >
-        <div class="player-avatar">
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="player-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="player-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
+    <div class="couple-card" >
+        <div class="couple-avatar">
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="couple-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
+            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="couple-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
         </div>
         <div class="player-info">
             <div class="player-info-header">
@@ -43,7 +43,7 @@
     private Country _player1Country;
     private Country _player2Country;
     
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         if (!string.IsNullOrWhiteSpace(Couple?.Player1.Country))
         {
@@ -59,21 +59,13 @@
                 _player2Country = (Country)parsedCountry;
             }
         }
+        
+        return base.OnInitializedAsync();
     }
     
     private string GetPlayerAvatarSource(PlayerDetailResponse player)
     {
         return player.ImageUrl?.ToString() ?? "/default-avatar.png";
-    }
-
-    private string GetTrendClass()
-    {
-        return Couple.Player1?.LastEloGained > 0 ? "positive" : "negative";
-    }
-
-    private string FormatTrend()
-    {
-        return $"{(Couple.Player1?.LastEloGained > 0 ? "+" : "")}{Couple.Player1?.LastEloGained}";
     }
     
     private string GetStyleNonConfirmedPlayer(bool playerIsConfirmed)
@@ -92,7 +84,7 @@
 }
 
 <style>  
-    .player-card {
+    .couple-card {
         border-radius: 8px;
         background-color: white;
         max-width: 641px;
@@ -104,7 +96,7 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
-    .player-avatar{
+    .couple-avatar{
         display: flex;
         justify-content: start;
     }
@@ -114,7 +106,7 @@
         left: -20px;
     }
     
-    .player-avatar-img{
+    .couple-avatar-img{
         width: 60px;
         height: 60px;
         object-fit: cover;
@@ -158,12 +150,5 @@
     
     .player-info-flag{
         margin: 0px 5px 0px 5px; 
-    }
-    .positive {
-        color: green;
-    }
-    
-    .negative {
-        color: red;
     }
 </style>
