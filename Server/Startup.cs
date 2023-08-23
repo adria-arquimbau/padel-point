@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using EventsManager.Server.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.IdentityModel.Tokens;
 
 namespace EventsManager.Server;
 
@@ -55,7 +56,7 @@ public class Startup {
         
         var issuer = configuration.GetSection("IdentityServer")["IssuerUri"];
         services.AddIdentityServer(options =>
-        { 
+        {
             options.IssuerUri = issuer;
         })
         .AddApiAuthorization<ApplicationUser, ApplicationDbContext>(opt => 
@@ -72,6 +73,15 @@ public class Startup {
         
         var googleAuthSection = configuration.GetSection("GoogleAuth");
         services.AddAuthentication()
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateLifetime = false
+                };
+            })
             .AddGoogle(options =>
             {
                 options.ClientId = googleAuthSection["Settings:ClientId"] ?? throw new NullReferenceException();
