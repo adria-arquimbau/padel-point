@@ -35,7 +35,7 @@
     {
         @if (_tournament.IsPlayerAlreadySignedIn)
         {
-            <div class="tournament-card-creator-actions">
+            <div class="tournament-card-actions">
                 @if (_tournament.IsPlayerAlreadySignedIn)
                 {
                     <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Sign out</Button>
@@ -171,7 +171,7 @@
 
 <style>
     .tournament-card-actions{
-        max-width: 641px;
+       max-width: 641px;
        padding: 12px;
        border-radius: 10px;   
        display: flex;  

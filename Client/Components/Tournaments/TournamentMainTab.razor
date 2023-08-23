@@ -12,13 +12,14 @@
     <div class="tournament-card-title">
         <h3>@Tournament.Name</h3>
     </div>
+    @if (!Tournament.RegistrationsOpen)
+    {
+        <Alert Color="Color.Warning" Visible>
+            <AlertMessage>Currently the inscriptions are closed.</AlertMessage>
+        </Alert>
+    }
 </div>
-@if (!Tournament.RegistrationsOpen)
-{
-    <Alert Color="Color.Warning" Visible>
-        <AlertMessage>Currently the inscriptions are closed.</AlertMessage>
-    </Alert>
-}
+
 <div class="tournament-card">
     <Tabs FullWidth="true" SelectedTab="@_selectedTab" SelectedTabChanged="@OnSelectedTabChanged">
         <Items>

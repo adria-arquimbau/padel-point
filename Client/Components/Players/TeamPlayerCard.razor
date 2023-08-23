@@ -1,11 +1,12 @@
 ﻿@using EventsManager.Shared.Responses
 @using EventsManager.Shared.Dtos
+@using Color = Blazorise.Color
 
 @inject NavigationManager NavigationManager
 
 @if (Couple != null)
 {
-    <div class="couple-card" >
+    <div class="couple-card">
         <div class="couple-avatar">
             <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="couple-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
             <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="couple-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
@@ -89,10 +90,11 @@
         background-color: white;
         max-width: 641px;
         display: flex;
+        flex-direction: row;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 5px;
-        padding: 5px;
+        padding: 5px 15px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
     
