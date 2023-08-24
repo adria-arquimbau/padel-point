@@ -18,7 +18,7 @@
 }
 @if (!_loading && _tournament != null)
 {
-    <TournamentMainTab RefreshTournament="GetTournament" OnChangeTab="OnChangeTab" Tournament="_tournament"></TournamentMainTab>
+    <TournamentMainTab RefreshTournament="GetTournament" Tournament="_tournament"></TournamentMainTab>
     
     @if (_tournament is { IsPlayerAlreadySignedIn: false, RegistrationsOpen: true })
     {
@@ -163,14 +163,6 @@
                 _loading = false;
             }
         }
-    }
-
-    private void OnChangeTab(string selectedTab)
-    {
-        _showFooterOptions = false;
-        _showAdminOptions = false;
-        _showFooterOptions = selectedTab == "info";
-        _showAdminOptions = selectedTab == "admin";
     }
     
     private void NavigateToLogIn()
