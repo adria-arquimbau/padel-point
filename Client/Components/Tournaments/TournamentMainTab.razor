@@ -42,15 +42,22 @@
                 <Alert Color="Color.Warning">
                     <AlertMessage></AlertMessage>
                 </Alert>
-                @foreach (var couple in Tournament.Couples)
+                @if (!Tournament.Couples.Any())
                 {
-                    <Divider></Divider>
-                    <TeamPlayerCard Couple="couple"></TeamPlayerCard>
-                    @if (Tournament.IsPlayerTheCreator)
+                    <p>There are not couples registered yet.</p>
+                }
+                else
+                {
+                    @foreach (var couple in Tournament.Couples)
                     {
-                        <div>
-                            <Button Clicked="() => DeleteTeam(couple.Id)" Color="Color.Danger" Size="Size.ExtraSmall">Delete Team</Button>
-                        </div>
+                        <Divider></Divider>
+                        <TeamPlayerCard Couple="couple"></TeamPlayerCard>
+                        @if (Tournament.IsPlayerTheCreator)
+                        {
+                            <div>
+                                <Button Clicked="() => DeleteTeam(couple.Id)" Color="Color.Danger" Size="Size.ExtraSmall">Delete Team</Button>
+                            </div>
+                        }
                     }
                 }
             </TabPanel>
