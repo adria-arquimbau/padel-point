@@ -4,14 +4,14 @@
 @using EventsManager.Client.Components.Modals
 @using Color = Blazorise.Color
 
-<AuthorizeView>
+@*<AuthorizeView>
     <Authorized>
         <CreateTournamentModal Show="_show" DontShow="DontShow"></CreateTournamentModal>
         <div class="actions-tournaments">
             <Button Clicked="OpenCreateTournamentModal" Size="Size.Small" Color="Color.Success">Create a tournament</Button>
         </div>
     </Authorized>
-</AuthorizeView>
+</AuthorizeView> //TODO: Temporarlly disabled*@
 
 <Divider></Divider>
 <AllTournaments></AllTournaments>

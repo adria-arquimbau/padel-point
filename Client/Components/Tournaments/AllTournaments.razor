@@ -27,6 +27,7 @@
                 <span>@tournament.Location</span>
             </div>
             <Divider></Divider>
+            <img src="https://padelpointsblob.blob.core.windows.net/tournament-images/Screenshot%202023-08-24%20at%2012.52.33.png" alt="header"/>
             <div class="main-tournament-info">
                 <div class="tournament-title">
                     <p>@tournament.Name</p>
@@ -207,4 +208,14 @@
         border: 2px solid rgba(255, 255, 255, 0.8);
         display: inline-block;
     }
+    
+    .tournament-card img {
+        width: 100%;  /* Takes up the full width of the parent container */
+        height: auto; /* Auto height ensures the aspect ratio is maintained */
+        object-fit: cover; /* Ensures the image covers the container without being stretched */
+        display: block; /* Eliminates any potential space below the image */
+        max-height: 200px;  /* Set a maximum height if needed */
+        border-radius: 8px; /* Optional, if you want rounded corners for the image */
+    }
+
 </style>

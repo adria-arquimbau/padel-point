@@ -10,6 +10,7 @@
 
 <div class="tournament-card-header">
     <div class="tournament-card-title">
+        <img src="https://padelpointsblob.blob.core.windows.net/tournament-images/Screenshot%202023-08-24%20at%2012.52.33.png" alt="header"/>
         <h3>@Tournament.Name</h3>
     </div>
     @if (!Tournament.RegistrationsOpen)
@@ -155,17 +156,23 @@
         font-size: 12px;
     }
     
-    .team-info{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        margin-bottom: 5px;
+    .tournament-card-header img {
+        width: 100%;  /* Takes up the full width of the parent container */
+        height: auto; /* Auto height ensures the aspect ratio is maintained */
+        object-fit: cover; /* Ensures the image covers the container without being stretched */
+        display: block; /* Eliminates any potential space below the image */
+        max-height: 250px;  /* Set a maximum height if needed */
+        border-radius: 8px; /* Optional, if you want rounded corners for the image */
     }
-    .team-info-text{
-        display: flex;
-        flex-direction: row;
-        align-content: center;
-        align-items: center;
-        justify-content: center;
+
+    .tournament-card-header {
+        display: flex;  /* Converts the container to a flex container */
+        align-items: center;  /* Centrally aligns the flex children vertically */
+        flex-direction: column;  /* Stacks the flex children vertically */
     }
+    
+    .tournament-card-title h3 {
+        margin-top: 10px;  /* Adds space between the image and the title */
+    }
+
 </style>
