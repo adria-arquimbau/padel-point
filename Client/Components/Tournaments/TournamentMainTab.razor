@@ -35,7 +35,7 @@
         <Content>
             <TabPanel Name="info">
                 <div class="tournament-card-description">
-                    <p>@Tournament.Description</p>   
+                    @RenderHtml(Tournament.Description  )
                 </div>
             </TabPanel>
             <TabPanel Name="teams">
@@ -93,7 +93,16 @@
             await OnChangeTab.InvokeAsync("admin");
         }
     }
+    
+    RenderFragment RenderHtml(string rawHtml)
+    {
+        return builder =>
+        {
+            builder.AddContent(0, new MarkupString(rawHtml));
+        };
+    }
 
+    
     private async Task DeleteTeam(Guid coupleId)
     {
         _loading = true;

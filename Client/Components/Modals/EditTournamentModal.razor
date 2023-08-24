@@ -8,7 +8,7 @@
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationState
-
+@inject IJSRuntime Js
 
 @if (Tournament != null)
 {
@@ -31,7 +31,9 @@
                     </TextEdit>
                 </Validation>
             </Field>
-            <Field>
+            <div id="quill-editor" @ref="editorContainer" style="height: 400px;"></div>
+
+            @*<Field>
                 <FieldLabel>Description</FieldLabel>
                 <Validation Validator="ValidationRule.IsNotEmpty">
                     <TextEdit @bind-Text="@Tournament.Description" Placeholder="Enter tournament description...">
@@ -42,7 +44,7 @@
                         </Feedback>
                     </TextEdit>
                 </Validation>
-            </Field>
+            </Field>*@
             <Field>
                 <FieldLabel>Start Date</FieldLabel>
                 <DatePicker @bind-Date="@Tournament.StartDate" TValue="DateTime" />
@@ -100,16 +102,39 @@
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
     
+    private ElementReference editorContainer;
+
     private bool _isFree = true;
 
     protected override void OnInitialized()
     {
         if (Tournament?.Price != 0)
-        {   
+        {
             _isFree = false;
         }
-        base.OnInitialized();   
+        base.OnInitialized();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) 
+        {
+            if (Tournament != null)
+            {
+                await Js.InvokeVoidAsync("initializeQuill", "quill-editor");
+                if (!string.IsNullOrEmpty(Tournament.Description))
+                {
+                    await Js.InvokeVoidAsync("setQuillContent", Tournament.Description);
+                }
+            }
+        }
+    }
+
+    private async Task<string> GetQuillContent()
+    {
+        return await Js.InvokeAsync<string>("getQuillContent");
+    }
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -125,6 +150,7 @@
     
     private async Task CreateTournament()
     {
+        Tournament.Description = await GetQuillContent();
         var tournamentRequest = new TournamentRequest
         {
             Name = Tournament.Name,

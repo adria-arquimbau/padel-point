@@ -25,10 +25,14 @@ builder.Services.AddApiAuthorization()
     .AddAccountClaimsPrincipalFactory<CustomUserFactory>();
 builder.Services.AddFluentUIComponents();
 builder.Services.AddScoped<ClipboardService>();
-builder.Services.AddBlazorise( options =>
+
+builder.Services
+    .AddBlazorise( options =>
     {
         options.Immediate = true;
     }).AddBootstrapProviders()
     .AddFontAwesomeIcons();
+
+
 
 await builder.Build().RunAsync();
