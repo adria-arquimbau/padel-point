@@ -46,12 +46,8 @@
                 </Validation>
             </Field>*@
             <Field>
-                <FieldLabel>Start Date</FieldLabel>
-                <DatePicker @bind-Date="@Tournament.StartDate" TValue="DateTime" />
-            </Field>
-            <Field>
-                <FieldLabel>Start Time</FieldLabel>
-                <TimePicker @bind-Time="@Tournament.StartDate" TValue="DateTime" />
+                <FieldLabel>Start date and time</FieldLabel>
+                <DateEdit TValue="DateTime" @bind-Date="@Tournament.StartDate" InputMode="DateInputMode.DateTime"/>
             </Field>
             <Field>
                 <FieldLabel>Location</FieldLabel>

@@ -42,12 +42,8 @@
                 </Validation>
             </Field>
             <Field>
-                <FieldLabel>Start Date</FieldLabel>
-                <DatePicker @bind-Date="@_startDate" TValue="DateTime" />
-            </Field>
-            <Field>
-                <FieldLabel>Start Time</FieldLabel>
-                <TimePicker @bind-Time="@_startDate" TValue="DateTime" />
+                <FieldLabel>Start date and time</FieldLabel>
+                <DateEdit TValue="DateTime" @bind-Date="@_startDate" InputMode="DateInputMode.DateTime"/>
             </Field>
             <Field>
                 <FieldLabel>Location</FieldLabel>
