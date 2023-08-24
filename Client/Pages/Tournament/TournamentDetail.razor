@@ -28,7 +28,13 @@
                     <Button Size="@Size.Small" Color="@Color.Success" Clicked="OpenSignInTournamentModal">Sign In</Button>
                 </div>
             </Authorized>
+            <NotAuthorized>
+                <div class="tournament-card-actions">
+                    <Button Size="@Size.Small" Color="@Color.Success" Clicked="NavigateToLogIn">Log in to Sign In</Button>
+                </div>
+            </NotAuthorized>
         </AuthorizeView>
+        
     }
     
     @if (_showFooterOptions)
@@ -165,6 +171,12 @@
         _showAdminOptions = false;
         _showFooterOptions = selectedTab == "info";
         _showAdminOptions = selectedTab == "admin";
+    }
+    
+    private void NavigateToLogIn()
+    {
+        var returnUrl = $"/tournament/{TournamentId}/detail";
+        NavigationManager.NavigateTo($"Identity/Account/Login?returnUrl={returnUrl}", forceLoad: true);
     }
 
 }   
