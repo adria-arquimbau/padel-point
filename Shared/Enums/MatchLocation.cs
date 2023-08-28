@@ -3,5 +3,6 @@
 public enum MatchLocation
 {
     None,
-    PadelBaseSalzburg
+    PadelBaseSalzburg,
+    PuntoDeOroClub
 }
