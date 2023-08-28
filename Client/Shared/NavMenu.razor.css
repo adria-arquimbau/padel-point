@@ -51,7 +51,7 @@
 }
 
 
-@media (min-width: 641px) {
+@media (min-width: 800px) {
     .navbar-toggler {
         margin-top: 10px;
     }

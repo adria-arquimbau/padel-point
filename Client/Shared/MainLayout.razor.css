@@ -52,7 +52,7 @@ main {
     }
 }
 
-@media (min-width: 641px) {
+@media (min-width: 800px) {
     .page {
         flex-direction: row;
     }
