@@ -7,32 +7,43 @@
 @if (Couple != null)
 {
     <div class="couple-card">
-        <div class="couple-avatar">
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="couple-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
-            <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="couple-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
-        </div>
-        <div class="player-info">
-            <div class="player-info-header">
-                <div class="player-info-name">
-                    @Couple.Player1.NickName
+        <div class="couple-card-main">
+            <div class="couple-avatar">
+                <img @onclick="() => NavigateToPlayerDetail(Couple.Player1)" src="@GetPlayerAvatarSource(Couple.Player1)" alt="Player avatar" class="couple-avatar-img" style="@GetStyleNonConfirmedPlayer(Couple.Player1.IsConfirmed)"/>
+                <img @onclick="() => NavigateToPlayerDetail(Couple.Player2)" src="@GetPlayerAvatarSource(Couple.Player2)" alt="Player avatar" class="couple-avatar-img second-image" style="@GetStyleNonConfirmedPlayer(Couple.Player2.IsConfirmed)"/>
+            </div>
+            <div class="player-info">
+                <div class="player-info-header">
+                    <div class="player-info-name">
+                        @Couple.Player1.NickName
+                    </div>
+                    <div class="player-info-flag">
+                        <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player1Country"></CountryFlag>
+                    </div>
+                    <div class="player-info-name">
+                        @Couple.Player2.NickName
+                    </div>
+                    <div class="player-info-flag">
+                        <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player2Country"></CountryFlag>
+                    </div>
                 </div>
-                <div class="player-info-flag">
-                    <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player1Country"></CountryFlag>
-                </div>
-                <div class="player-info-name">
-                    @Couple.Player2.NickName
-                </div>
-                <div class="player-info-flag">
-                    <CountryFlag Size="FlagSize.Small" IsRounded="true" Country="@_player2Country"></CountryFlag>
+                <div class="player-info-content">
+                    <div class="info-box">
+                        <div class="info-label">Elo</div>
+                        <div>@Couple.Player1.Elo / @Couple.Player2.Elo</div>
+                    </div>
                 </div>
             </div>
-            <div class="player-info-content">
-                <div class="info-box">
-                    <div class="info-label">Elo</div>
-                    <div>@Couple.Player1.Elo / @Couple.Player2.Elo</div>
-                </div>
-            </div>
         </div>
+        @if (!Couple.Player1.IsConfirmed || !Couple.Player2.IsConfirmed)
+        {
+            <div class="couple-warning">
+                <Alert Style="margin: 0; font-size: 10px; padding: 2px; display: flex; flex-direction: row" Color="Color.Danger" Visible>
+                    <AlertMessage>WARNING!</AlertMessage>
+                    <p style="margin: 0;">&nbsp; Player <b>@Couple.Player2.NickName</b> must confirm the couple to formalize the registration.</p>
+                </Alert>
+            </div>
+        }
     </div>
 }
 
@@ -90,12 +101,17 @@
         background-color: white;
         max-width: 800px;
         display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
         margin-bottom: 5px;
         padding: 5px 15px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .couple-card-main {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
     
     .couple-avatar{
