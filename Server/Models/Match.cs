@@ -17,7 +17,7 @@ public class Match
     public Player Creator { get; set; }
     public bool ScoreConfirmedTeamOne { get; set; }
     public bool ScoreConfirmedTeamTwo { get; set; } 
-    public Team? Winner { get; set; }
+    public Shared.Enums.Team? Winner { get; set; }
     public ICollection<EloHistory> EloHistories { get; set; } = new List<EloHistory>();
     public MatchLocation Location { get; set; }
     public bool IsBlocked { get; set; }

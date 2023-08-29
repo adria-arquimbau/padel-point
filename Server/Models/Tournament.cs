@@ -11,7 +11,7 @@ public class Tournament
     public required DateTime StartDate { get; set; }
     public required DateTime CreationDate { get; set; }
     public required MatchLocation Location { get; set; }
-    public ICollection<Couple> Teams { get; set; } = new List<Couple>();
+    public ICollection<Team> Teams { get; set; } = new List<Team>();
     public int MaxTeams { get; set; }
     public Player Creator { get; set; }
     public decimal Price { get; set; }

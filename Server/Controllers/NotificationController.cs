@@ -108,7 +108,7 @@ public class NotificationController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        var invitedMatches = await _dbContext.Couple
+        var invitedMatches = await _dbContext.Team
             .Where(x => x.Player1.UserId == userId && x.Player1Confirmed == false || x.Player2.UserId == userId && x.Player2Confirmed == false)
             .Select(x => new InvitedTournamentResponse
             {
@@ -151,7 +151,7 @@ public class NotificationController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        var couple = await _dbContext.Couple
+        var couple = await _dbContext.Team
             .Where(x => x.Tournament.Id == tournamentId && x.Player2.UserId == userId)
             .SingleAsync(cancellationToken: cancellationToken);
         
@@ -162,7 +162,7 @@ public class NotificationController : ControllerBase
        
         if (!accept)
         {
-            _dbContext.Couple.Remove(couple);
+            _dbContext.Team.Remove(couple);
         }
         
         await _dbContext.SaveChangesAsync(cancellationToken);

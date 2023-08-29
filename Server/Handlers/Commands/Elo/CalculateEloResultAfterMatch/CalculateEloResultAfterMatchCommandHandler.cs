@@ -3,6 +3,7 @@ using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Team = EventsManager.Shared.Enums.Team;
 
 namespace EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 

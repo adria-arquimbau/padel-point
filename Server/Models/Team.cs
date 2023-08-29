@@ -1,6 +1,6 @@
 ﻿namespace EventsManager.Server.Models;
 
-public class Couple
+public class Team
 {
     public Guid Id { get; set; }
     public required Player Player1 { get; set; }

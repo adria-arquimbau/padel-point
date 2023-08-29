@@ -5,6 +5,7 @@ using EventsManager.Shared.Enums;
 using EventsManager.Shared.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Team = EventsManager.Shared.Enums.Team;
 
 namespace EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 

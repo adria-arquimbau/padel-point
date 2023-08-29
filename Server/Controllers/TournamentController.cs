@@ -7,6 +7,7 @@ using EventsManager.Shared.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Team = EventsManager.Server.Models.Team;
 
 namespace EventsManager.Server.Controllers;
 
@@ -208,11 +209,11 @@ public class TournamentController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         
-        var team = await _context.Couple
+        var team = await _context.Team
             .Where(x => x.Tournament.Id == tournamentId && (x.Player1.UserId == userId || x.Player2.UserId == userId))
             .SingleAsync(cancellationToken: cancellationToken);
         
-        _context.Couple.Remove(team);
+        _context.Team.Remove(team);
         
         await _context.SaveChangesAsync(cancellationToken);
         
@@ -237,7 +238,7 @@ public class TournamentController : ControllerBase
         }
         
         var team = tournament.Teams.Single(x => x.Id == coupleId);
-        _context.Couple.Remove(team);
+        _context.Team.Remove(team);
         
         await _context.SaveChangesAsync(cancellationToken);
         
@@ -303,7 +304,7 @@ public class TournamentController : ControllerBase
             .Where(x => x.Id == request.CoupleId)
             .SingleAsync(cancellationToken: cancellationToken);
         
-        var newTeam = new Couple
+        var newTeam = new Team
         {
             Player1 = player1,
             Player1Confirmed = true,

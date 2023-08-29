@@ -2,6 +2,7 @@
 using EventsManager.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Team = EventsManager.Server.Models.Team;
 
 namespace EventsManager.Server.Data.TypeConfigurations;
 
@@ -62,9 +63,9 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
     }
 }
 
-public class CoupleConfiguration : IEntityTypeConfiguration<Couple>
+public class TeamConfiguration : IEntityTypeConfiguration<Team>
 {
-    public void Configure(EntityTypeBuilder<Couple> builder)
+    public void Configure(EntityTypeBuilder<Team> builder)
     {
         builder.HasKey(m => m.Id);
 
