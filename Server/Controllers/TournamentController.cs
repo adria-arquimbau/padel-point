@@ -248,10 +248,12 @@ public class TournamentController : ControllerBase
     [Authorize(Roles = "User")]
     public async Task<IActionResult> SearchToInvitePlayer([FromQuery] string term, [FromRoute] Guid tournamentId, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
         var lowerTerm = term.ToLower();
 
         var players = await _context.Player
-            .Where(p => p.NickName.ToLower().Contains(lowerTerm) )
+            .Where(p => p.NickName.ToLower().Contains(lowerTerm) && p.UserId != userId)
             .ToListAsync(cancellationToken: cancellationToken);
 
         var response = players.Select(x => new PlayerToInviteResponse
