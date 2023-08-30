@@ -67,7 +67,7 @@
             @if (Tournament.IsPlayerTheCreator)
             {
                 <TabPanel Name="admin">
-                    <TournamentAdmin Tournament="@Tournament"></TournamentAdmin>
+                    <TournamentAdmin RefreshTournament="Refresh" Tournament="@Tournament"></TournamentAdmin>
                 </TabPanel>
             }
         </Content>
@@ -99,6 +99,11 @@
         {
             await OnChangeTab.InvokeAsync("admin");
         }
+    }
+    
+    public void Refresh()
+    {
+        RefreshTournament.InvokeAsync();
     }
     
     RenderFragment RenderHtml(string rawHtml)

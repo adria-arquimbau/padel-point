@@ -42,7 +42,7 @@
         @if (_tournament.IsPlayerAlreadySignedIn)
         {
             <div class="tournament-card-actions">
-                @if (_tournament.IsPlayerAlreadySignedIn)
+                @if (_tournament.IsPlayerAlreadySignedIn && _tournament.RegistrationsOpen)
                 {
                     <Button Size="Size.Small" Color="Color.Danger" Clicked="RemoveRegistration">Sign out</Button>
                 }

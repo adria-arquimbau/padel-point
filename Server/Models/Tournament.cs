@@ -17,4 +17,5 @@ public class Tournament
     public decimal Price { get; set; }
     public bool RegistrationOpen { get; set; }
     public bool ShowBrackets { get; set; }
+    public ICollection<Match> RoundRobinMatches { get; set; } = new List<Match>();
 }

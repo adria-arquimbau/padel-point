@@ -1,9 +1,11 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
+using EventsManager.Server.Handlers.Commands.Tournaments.RobinPhase;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +18,12 @@ namespace EventsManager.Server.Controllers;
 public class TournamentController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IMediator _mediator;
 
-    public TournamentController(ApplicationDbContext context)
+    public TournamentController(ApplicationDbContext context, IMediator mediator)
     {
         _context = context;
+        _mediator = mediator;
     }
     
     [HttpGet]
@@ -31,7 +35,7 @@ public class TournamentController : ControllerBase
             {
                 Id = x.Id,
                 Name = x.Name,
-                RegistrationsOpen = x.RegistrationOpen,
+                RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 Description = x.Description,
                 Price = x.Price,
                 StartDate = x.StartDate,
@@ -140,7 +144,11 @@ public class TournamentController : ControllerBase
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                RegistrationsOpen = x.RegistrationOpen,
+                RoundRobinPhase = x.RoundRobinMatches.Select(x => new RoundRobinMatch
+                {
+                    
+                }).ToList(),
+                RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 StartDate = x.StartDate,
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
@@ -314,6 +322,47 @@ public class TournamentController : ControllerBase
         
         tournament.Teams.Add(newTeam);
         
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+    
+    [HttpPost("{tournamentId:guid}/generate-round-robin-phase")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> GenerateRoundRobinPhase([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        try
+        {
+            await _mediator.Send(new GenerateRoundRobinPhaseCommandRequest(tournamentId, userId), cancellationToken);
+        }
+        catch (Exception e)
+        {
+            return Conflict(e.Message);
+        }
+        
+        return Ok();
+    }
+    
+    [HttpDelete("{tournamentId:guid}/round-robin-phase")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> DeleteRoundRobinPhase([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
+            .Include(x => x.Creator)
+            .Include(x => x.RoundRobinMatches)
+            .SingleAsync(cancellationToken: cancellationToken);
+        
+        if (tournament.Creator.UserId != userId)
+        {
+            return Conflict("You are not the creator of this tournament");
+        }
+        
+        _context.Match.RemoveRange(tournament.RoundRobinMatches);
         await _context.SaveChangesAsync(cancellationToken);
         
         return Ok();

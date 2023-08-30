@@ -120,6 +120,10 @@ public class MatchConfiguration : IEntityTypeConfiguration<Match>
         builder.HasMany(m => m.Promotions)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(m => m.Tournament)
+            .WithMany(x => x.RoundRobinMatches)
+            .HasForeignKey(x => x.TournamentId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 

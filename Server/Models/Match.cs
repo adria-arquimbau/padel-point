@@ -24,5 +24,7 @@ public class Match
     public int? MinimumLevel { get; set; }
     public bool IsCompetitive { get; set; }
     public int? CourtNumber { get; set; }
+    public Guid? TournamentId { get; set; } 
+    public Tournament? Tournament { get; set; }
 }
             
