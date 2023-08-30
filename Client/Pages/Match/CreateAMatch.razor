@@ -5,10 +5,12 @@
 @using EventsManager.Shared.Enums
 @using Microsoft.AspNetCore.SignalR.Client
 @using Color = Blazorise.Color
+
 @inject HttpClient Http
 @inject NavigationManager NavManager
 @inject IToastService ToastService
 @implements IAsyncDisposable
+@inject IMessageService MessageService
 
 @if (_loading)
 {
@@ -80,7 +82,7 @@
         <div class="form-group">
             <Switch @bind-Checked="@_isPrivate" TValue="bool">Private match</Switch>
         </div>
-        <button type="submit" class="btn btn-primary">Create Match</button>
+        <button type="submit" class="btn btn-primary" @onclick="MessageBeforeCreate">Create Match</button>
     </form>
 </div>
 
@@ -110,62 +112,69 @@
     
     Task SendMessage() => hubConnection.SendAsync("SendMessage");
 
+    private async Task MessageBeforeCreate()
+    {
+        await MessageService.Info("We highly recommend confirming all players and conditions before starting the match. This proactive measure helps prevent incomplete matches or situations where players, who may not be content with the match outcome, attempt to disassociate themselves post-match. Ensuring pre-match alignment not only avoids confusion but also upholds the integrity of the scheduling process. Clear communication and commitment enhance gameplay quality and participant experience. Confirming players in advance remains a vital step for a successful and satisfying match.", "Pre-match Player Confirmation: Ensuring Clarity and Completion");
+    }
+
     private async Task HandleValidSubmit()
     {
-        _loading = true;
-        var durationInHours = _durationSelect switch
-        {
-            1 => 1,
-            2 => 1.5,
-            3 => 2,
-            4 => 2.5,
-            5 => 3,
-            _ => 1
+        
+            _loading = true;
+            var durationInHours = _durationSelect switch
+            {
+                1 => 1,
+                2 => 1.5,
+                3 => 2,
+                4 => 2.5,
+                5 => 3,
+                _ => 1
+                };
+
+            if (_requiredSpecificLevel == false)
+            {
+                _minimumLevel = null;
+            }
+            var request = new CreateMatchRequest
+            {
+                StartDate = _start,
+                Duration = durationInHours,
+                IsPrivate = _isPrivate,
+                PricePerHour = _pricePerHour,
+                Location = _location,
+                MinimumLevel = _minimumLevel,
+                CompetitiveMatch = _competitiveMatch,
+                CourtNumber = _location == MatchLocation.PadelBaseSalzburg ? _courtNumber : null
             };
 
-        if (_requiredSpecificLevel == false)
-        {
-            _minimumLevel = null;
-        }
-        var request = new CreateMatchRequest
-        {
-            StartDate = _start,
-            Duration = durationInHours,
-            IsPrivate = _isPrivate,
-            PricePerHour = _pricePerHour,
-            Location = _location,
-            MinimumLevel = _minimumLevel,
-            CompetitiveMatch = _competitiveMatch,
-            CourtNumber = _location == MatchLocation.PadelBaseSalzburg ? _courtNumber : null
-        };
-
-        try
-        {
-            var response = await Http.PostAsJsonAsync("match", request);
-        
-            if(response.IsSuccessStatusCode)
+            try
             {
-                if (IsConnected)
+                var response = await Http.PostAsJsonAsync("match", request);
+        
+                if(response.IsSuccessStatusCode)
                 {
-                    await SendMessage();
+                    if (IsConnected)
+                    {
+                        await SendMessage();
+                    }
+                    var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
+                    NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
+                    ToastService.ShowSuccess("Match created successfully.");
                 }
-                var createdMatch = await response.Content.ReadFromJsonAsync<CreateMatchResponse>();
-                NavManager.NavigateTo($"/match/{createdMatch?.Id}/detail");
-                ToastService.ShowSuccess("Match created successfully.");
+                else
+                {
+                    ToastService.ShowError("Something went wrong. Please try again later.");
+                }
             }
-            else
+            catch (Exception)
             {
                 ToastService.ShowError("Something went wrong. Please try again later.");
             }
-        }
-        catch (Exception)
-        {
-            ToastService.ShowError("Something went wrong. Please try again later.");
-        }
-        finally
-        {
-            _loading = false;
-        }
+            finally
+            {
+                _loading = false;
+            }
+        
     }
     
     public async ValueTask DisposeAsync()
