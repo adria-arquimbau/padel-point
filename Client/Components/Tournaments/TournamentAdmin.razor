@@ -15,11 +15,11 @@
 </div>
 
 <div class="tournament-card-creator-actions">
-    @if (!Tournament.RoundRobinPhase.Any())
+    @if (!Tournament.RoundRobinPhaseMatches.Any())
     {
         <Button Size="Size.Small" Color="Color.Info" Clicked="GenerateRoundRobinPhase">Generate round robin phase</Button>
     }
-    @if (Tournament.RoundRobinPhase.Any())
+    @if (Tournament.RoundRobinPhaseMatches.Any())
     {
         <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteRoundRobinPhase">Delete round robin phase</Button>
     }

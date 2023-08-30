@@ -16,5 +16,5 @@ public class TournamentDetailResponse
     public decimal Price { get; set; }
     public bool RegistrationsOpen { get; set; } 
     public bool ShowBrackets { get; set; }
-    public List<RoundRobinMatch> RoundRobinPhase { get; set; } = new();
+    public List<RoundRobinMatchResponse> RoundRobinPhaseMatches { get; set; } = new();
 }

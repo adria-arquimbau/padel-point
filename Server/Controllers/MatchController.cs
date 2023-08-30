@@ -245,14 +245,14 @@ public class MatchController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var matches = await _dbContext.Match
-            .Where(x => x.IsPrivate == false || x.ScoreConfirmedTeamOne && x.ScoreConfirmedTeamTwo)
-            .Include(x => x.MatchPlayers)
+            .Where(match => (match.IsPrivate == false || (match.ScoreConfirmedTeamOne && match.ScoreConfirmedTeamTwo)) &&  match.Tournament == null || match.Tournament.ShowBrackets)
+            .Include(match => match.MatchPlayers)
             .ThenInclude(matchPlayer => matchPlayer.Player)
-            .Include(x => x.EloHistories)
+            .Include(match => match.EloHistories)
             .Include(match => match.Promotions)
             .Include(match => match.Tournament)
             .ToListAsync(cancellationToken: cancellationToken);
-
+        
         int? requesterElo = null;
         if (userId != null)
         {

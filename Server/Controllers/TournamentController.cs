@@ -2,6 +2,7 @@
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Tournaments.RobinPhase;
 using EventsManager.Server.Models;
+using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
 using EventsManager.Shared.Requests;
 using EventsManager.Shared.Responses;
@@ -141,13 +142,27 @@ public class TournamentController : ControllerBase
         var tournament = await _context.Tournament
             .Where(x => x.Id == tournamentId)
             .Select(x => new TournamentDetailResponse
-            {
+            {   
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description,
-                RoundRobinPhase = x.RoundRobinMatches.Select(x => new RoundRobinMatch
-                {
-                    
+                RoundRobinPhaseMatches = x.RoundRobinMatches.Select(rrm => new RoundRobinMatchResponse
+                {   
+                    Id = rrm.Id,
+                    PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
+                    {
+                        Id = mp.Player.Id,
+                        NickName = mp.Player.NickName,
+                        ImageUrl = mp.Player.ImageUrl,
+                        Elo = mp.Player.Elo
+                    }).ToList(),
+                    PlayersTeamTwo = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team2).Select(mp => new PlayerDto
+                    {
+                        Id = mp.Player.Id,
+                        NickName = mp.Player.NickName,
+                        ImageUrl = mp.Player.ImageUrl,
+                        Elo = mp.Player.Elo
+                    }).ToList(),
                 }).ToList(),
                 RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 StartDate = x.StartDate,
