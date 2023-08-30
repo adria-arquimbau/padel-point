@@ -51,7 +51,7 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
             var playersTeam1 = new List<Player> { pair.Team1.Player1, pair.Team1.Player2 };
             var playersTeam2 = new List<Player> { pair.Team2.Player1, pair.Team2.Player2 };
 
-            var match = matchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament);
+            var match = RoundRobinMatchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament);
         
            _context.Match.Add(match);
         }
@@ -62,19 +62,19 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
 
 public class RoundRobinMatchGenerator
 {
-    public Match CreateMatch(List<Player> team1Players, List<Player> team2Players, DateTime matchStartTime, double matchDuration, Tournament tournament)
+    public static Match CreateMatch(List<Player> team1Players, List<Player> team2Players, DateTime matchStartTime, double matchDuration, Tournament tournament)
     {
-        Match match = new Match
+        var match = new Match
         {
             Id = Guid.NewGuid(),
             CreationDate = DateTime.Now,
             Creator = tournament.Creator,
             MatchPlayers = new List<MatchPlayer>
             {
-                new MatchPlayer { Player = team1Players[0], PlayerId = team1Players[0].Id, Team = Team.Team1},
-                new MatchPlayer { Player = team1Players[1], PlayerId = team1Players[1].Id, Team = Team.Team1},
-                new MatchPlayer { Player = team2Players[0], PlayerId = team2Players[0].Id, Team = Team.Team2},
-                new MatchPlayer { Player = team2Players[1], PlayerId = team2Players[1].Id, Team = Team.Team2}
+                new() { Player = team1Players[0], PlayerId = team1Players[0].Id, Team = Team.Team1, Confirmed = true},
+                new() { Player = team1Players[1], PlayerId = team1Players[1].Id, Team = Team.Team1, Confirmed = true},
+                new() { Player = team2Players[0], PlayerId = team2Players[0].Id, Team = Team.Team2, Confirmed = true},
+                new() { Player = team2Players[1], PlayerId = team2Players[1].Id, Team = Team.Team2, Confirmed = true}
             },
             StartDateTime = matchStartTime,
             Duration = matchDuration,

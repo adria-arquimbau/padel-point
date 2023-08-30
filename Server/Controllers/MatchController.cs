@@ -308,6 +308,11 @@ public class MatchController : ControllerBase
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
+
+        if (match.TournamentId != null)
+        {
+            return Conflict("You can't remove players from a tournament match.");
+        }
         
         if (userId != player.UserId && userId != match.Creator.UserId)
         {
