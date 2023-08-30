@@ -35,6 +35,7 @@ public class TournamentController : ControllerBase
             {
                 Id = x.Id,
                 Name = x.Name,
+                EloAverage = x.Teams.Count == 0 ? 0 : (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
                 RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 Description = x.Description,
                 Price = x.Price,

@@ -13,4 +13,5 @@ public class TournamentResponse
     public int TeamsCount { get; set; }
     public decimal Price { get; set; }
     public bool RegistrationsOpen { get; set; }
-}
+    public int EloAverage { get; set; }
+}   
