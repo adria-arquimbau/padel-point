@@ -250,6 +250,7 @@ public class MatchController : ControllerBase
             .ThenInclude(matchPlayer => matchPlayer.Player)
             .Include(x => x.EloHistories)
             .Include(match => match.Promotions)
+            .Include(match => match.Tournament)
             .ToListAsync(cancellationToken: cancellationToken);
 
         int? requesterElo = null;
@@ -264,6 +265,7 @@ public class MatchController : ControllerBase
         var matchResponses = matches.Select(x => new MatchResponse
         {
             Id = x.Id,
+            TournamentName = x.Tournament?.Name,
             Location = x.Location,
             MinimumLevel = x.MinimumLevel,
             RequesterElo = userId != null ? requesterElo : null,

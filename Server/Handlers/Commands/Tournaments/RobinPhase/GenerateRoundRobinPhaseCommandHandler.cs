@@ -42,7 +42,7 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
             .ToList();
 
         var matchStartTime = tournament.StartDate; // Set the desired start time
-        var matchDuration = 120.0; // Set the desired match duration
+        const int matchDuration = 1; // Set the desired match duration
 
         var matchGenerator = new RoundRobinMatchGenerator();
     
@@ -79,6 +79,7 @@ public class RoundRobinMatchGenerator
             StartDateTime = matchStartTime,
             Duration = matchDuration,
             TournamentId = tournament.Id,
+            Location = tournament.Location
             // Set other properties as needed
         };
         
