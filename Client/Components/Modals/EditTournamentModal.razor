@@ -65,6 +65,13 @@
                     <SelectItem Value="16">16</SelectItem>
                 </Select>
             </Field>
+            <Field>
+                <FieldLabel>Round robin phase groups</FieldLabel>
+                <Select @bind-SelectedValue="@Tournament.RoundRobinPhaseGroups" TValue="int">
+                    <SelectItem Value="1">1</SelectItem>
+                    <SelectItem Value="2">2</SelectItem>
+                </Select>
+            </Field>
             <div class="form-group">
                 <Switch @bind-Checked="@Tournament.RegistrationsOpen" TValue="bool">Open registrations</Switch>
             </div>
@@ -158,7 +165,8 @@
             Location = Tournament.Location,
             MaxTeams = Tournament.MaxTeams == 8 ? MaxTeams.Eight : MaxTeams.Sixteen,
             Price = _isFree ? 0 : Tournament.Price,
-            ShowBrackets = Tournament.ShowBrackets
+            ShowBrackets = Tournament.ShowBrackets,
+            RoundRobinPhaseGroups = Tournament.RoundRobinPhaseGroups
         };
         
         try

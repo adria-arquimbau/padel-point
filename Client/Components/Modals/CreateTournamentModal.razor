@@ -1,7 +1,6 @@
 ﻿@using Color = Blazorise.Color
 @using EventsManager.Shared.Requests
 @using EventsManager.Shared.Responses
-@using System.Net
 @using EventsManager.Shared.Enums
 
 @inject HttpClient Http
@@ -61,6 +60,13 @@
                     <SelectItem Value="MaxTeams.Sixteen">16</SelectItem>
                 </Select>
             </Field>
+            <Field>
+                <FieldLabel>Round robin phase groups</FieldLabel>
+                <Select @bind-SelectedValue="@_roundRobinPhaseGroups" TValue="int">
+                    <SelectItem Value="1">1</SelectItem>
+                    <SelectItem Value="2">2</SelectItem>
+                </Select>
+            </Field>
             <div class="form-group">
                 <Switch @bind-Checked="@_openRegistrations" TValue="bool">Open registrations</Switch>
             </div>
@@ -95,6 +101,7 @@
     private string? _description = null;
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private MaxTeams _maxTeams;
+    private int _roundRobinPhaseGroups = 1;
     
     private bool _isFree = true;
     private bool _openRegistrations;
@@ -122,7 +129,8 @@
             Location = _location,
             MaxTeams = _maxTeams,
             OpenRegistrations = _openRegistrations,
-            Price = _isFree ? 0 : _price
+            Price = _isFree ? 0 : _price,
+            RoundRobinPhaseGroups = _roundRobinPhaseGroups
         };
         
         try

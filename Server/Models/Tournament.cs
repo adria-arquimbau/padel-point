@@ -18,4 +18,6 @@ public class Tournament
     public bool RegistrationOpen { get; set; }
     public bool ShowBrackets { get; set; }
     public ICollection<Match> RoundRobinMatches { get; set; } = new List<Match>();
+    public int RoundRobinPhaseGroups { get; set; }
 }
+    

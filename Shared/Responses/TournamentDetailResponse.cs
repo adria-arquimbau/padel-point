@@ -12,9 +12,10 @@ public class TournamentDetailResponse
     public bool IsPlayerTheCreator { get; set; }
     public required Guid Id { get; set; }
     public List<CoupleResponse> Couples { get; set; } = new();
-    public bool IsPlayerAlreadySignedIn { get; set; }
+    public bool IsPlayerAlreadySignedIn { get; set; }   
     public decimal Price { get; set; }
     public bool RegistrationsOpen { get; set; } 
     public bool ShowBrackets { get; set; }
     public List<RoundRobinMatchResponse> RoundRobinPhaseMatches { get; set; } = new();
-}
+    public int RoundRobinPhaseGroups { get; set; }
+}   

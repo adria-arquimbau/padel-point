@@ -26,5 +26,7 @@ public class Match
     public int? CourtNumber { get; set; }
     public Guid? TournamentId { get; set; } 
     public Tournament? Tournament { get; set; }
+    public int? RobinPhaseGroup { get; set; }
+    public int? RobinPhaseRound { get; set; }
 }
             

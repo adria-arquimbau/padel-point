@@ -57,6 +57,8 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
     public void Configure(EntityTypeBuilder<Tournament> builder)
     {
         builder.HasKey(m => m.Id);
+        builder.Property(x => x.RoundRobinPhaseGroups)
+            .HasDefaultValue(1);
         builder.Property(mp => mp.Location)
             .HasDefaultValue(MatchLocation.None)
             .HasConversion<string>();

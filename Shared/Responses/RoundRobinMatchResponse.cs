@@ -9,5 +9,6 @@ public class RoundRobinMatchResponse
     public List<PlayerDto> PlayersTeamTwo { get; set; } = new();
     public int AverageElo { get; set; }
     public DateTime StartDateTime { get; set; }
+    public int RoundRobinPhaseGroup { get; set; }
 }
-        
+            

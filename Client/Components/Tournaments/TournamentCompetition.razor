@@ -12,9 +12,26 @@
 else
 {
     <div>
-        @foreach (var match in Tournament.RoundRobinPhaseMatches)
+        <h3>Round Robin Phase</h3>
+        @if (Tournament.RoundRobinPhaseGroups == 1 && Tournament.RoundRobinPhaseMatches.Any())
         {
-            <TournamentMatch Match="@match"></TournamentMatch>
+            @foreach (var match in Tournament.RoundRobinPhaseMatches)
+            {
+                <TournamentMatch Match="@match"></TournamentMatch>
+            }
+        }
+        @if (Tournament.RoundRobinPhaseGroups == 2 && Tournament.RoundRobinPhaseMatches.Any())
+        {
+            <h4>Group 1</h4>
+            @foreach (var match in Tournament.RoundRobinPhaseMatches.Where(x => x.RoundRobinPhaseGroup == 1))
+            {
+                <TournamentMatch Match="@match"></TournamentMatch>
+            }
+            <h4>Group 2</h4>
+            @foreach (var match in Tournament.RoundRobinPhaseMatches.Where(x => x.RoundRobinPhaseGroup == 2))
+            {
+                <TournamentMatch Match="@match"></TournamentMatch>
+            }
         }
     </div>
 }

@@ -66,7 +66,12 @@ public class TournamentController : ControllerBase
             MaxTeams.Sixteen => 16,
             _ => throw new ArgumentOutOfRangeException()
         };
-
+        
+        if (request.RoundRobinPhaseGroups != 1 && request.RoundRobinPhaseGroups != 2)
+        {
+            return Conflict("The number of groups must be 1 or 2");
+        }
+        
         var tournament = new Tournament
         {
             Name = request.Name,
@@ -77,7 +82,8 @@ public class TournamentController : ControllerBase
             Location = request.Location,
             MaxTeams = maxTeams,
             Creator = player,
-            Price = request.Price
+            Price = request.Price,
+            RoundRobinPhaseGroups = request.RoundRobinPhaseGroups
         };
     
         _context.Tournament.Add(tournament);
@@ -106,12 +112,18 @@ public class TournamentController : ControllerBase
             return Conflict("You are not the creator of this tournament");
         }
         
+        if (request.RoundRobinPhaseGroups != 1 && request.RoundRobinPhaseGroups != 2)
+        {
+            return Conflict("The number of groups must be 1 or 2");
+        }
+        
         tournament.Name = request.Name;
         tournament.RegistrationOpen = request.OpenRegistrations;
         tournament.Description = request.Description;
         tournament.StartDate = request.StartDate;
         tournament.Location = request.Location;
         tournament.ShowBrackets = request.ShowBrackets;
+        tournament.RoundRobinPhaseGroups = request.RoundRobinPhaseGroups;
         tournament.MaxTeams = request.MaxTeams switch
         {
             MaxTeams.Eight => 8,
@@ -145,11 +157,13 @@ public class TournamentController : ControllerBase
             {   
                 Id = x.Id,
                 Name = x.Name,
+                RoundRobinPhaseGroups = x.RoundRobinPhaseGroups,
                 Description = x.Description,
                 RoundRobinPhaseMatches = x.RoundRobinMatches.Select(rrm => new RoundRobinMatchResponse
                 {   
                     Id = rrm.Id,
                     StartDateTime = rrm.StartDateTime,
+                    RoundRobinPhaseGroup = rrm.RobinPhaseGroup ?? 0,
                     AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
                     PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
                     {
