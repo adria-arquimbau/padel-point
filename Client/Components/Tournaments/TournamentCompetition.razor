@@ -13,24 +13,27 @@ else
 {
     <div>
         <h3>Round Robin Phase</h3>
-        @if (Tournament.RoundRobinPhaseGroups == 1 && Tournament.RoundRobinPhaseMatches.Any())
+        @if (Tournament.RoundRobinPhaseGroups > 0 && Tournament.RoundRobinPhaseMatches.Any())
         {
-            @foreach (var match in Tournament.RoundRobinPhaseMatches)
+            @for (int groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
             {
-                <TournamentMatch Match="@match"></TournamentMatch>
-            }
-        }
-        @if (Tournament.RoundRobinPhaseGroups == 2 && Tournament.RoundRobinPhaseMatches.Any())
-        {
-            <h4>Group 1</h4>
-            @foreach (var match in Tournament.RoundRobinPhaseMatches.Where(x => x.RoundRobinPhaseGroup == 1))
-            {
-                <TournamentMatch Match="@match"></TournamentMatch>
-            }
-            <h4>Group 2</h4>
-            @foreach (var match in Tournament.RoundRobinPhaseMatches.Where(x => x.RoundRobinPhaseGroup == 2))
-            {
-                <TournamentMatch Match="@match"></TournamentMatch>
+                var groupMatches = Tournament.RoundRobinPhaseMatches
+                    .Where(x => x.RoundRobinPhaseGroup == groupNumber)
+                    .GroupBy(x => x.RoundRobinPhaseRound)
+                    .OrderBy(group => group.Key);
+
+                if (groupMatches.Any())
+                {
+                    <h4>Group @groupNumber</h4>
+                    @foreach (var roundGroup in groupMatches)
+                    {
+                        <h5>Round @roundGroup.Key</h5>
+                        @foreach (var match in roundGroup)
+                        {
+                            <TournamentMatch Match="@match"></TournamentMatch>
+                        }
+                    }
+                }
             }
         }
     </div>
@@ -39,5 +42,4 @@ else
 @code {
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
-    
 }

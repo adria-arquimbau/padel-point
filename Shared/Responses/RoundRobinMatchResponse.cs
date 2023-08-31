@@ -10,5 +10,6 @@ public class RoundRobinMatchResponse
     public int AverageElo { get; set; }
     public DateTime StartDateTime { get; set; }
     public int RoundRobinPhaseGroup { get; set; }
+    public int RoundRobinPhaseRound { get; set; }
 }
             

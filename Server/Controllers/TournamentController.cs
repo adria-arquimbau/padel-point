@@ -164,6 +164,7 @@ public class TournamentController : ControllerBase
                     Id = rrm.Id,
                     StartDateTime = rrm.StartDateTime,
                     RoundRobinPhaseGroup = rrm.RobinPhaseGroup ?? 0,
+                    RoundRobinPhaseRound = rrm.RobinPhaseRound ?? 0,
                     AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
                     PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
                     {

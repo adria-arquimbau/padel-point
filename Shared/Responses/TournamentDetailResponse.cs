@@ -18,4 +18,5 @@ public class TournamentDetailResponse
     public bool ShowBrackets { get; set; }
     public List<RoundRobinMatchResponse> RoundRobinPhaseMatches { get; set; } = new();
     public int RoundRobinPhaseGroups { get; set; }
-}   
+    
+}       
