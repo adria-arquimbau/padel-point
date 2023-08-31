@@ -31,7 +31,15 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
                 .ThenInclude(x => x.Player2)
                 .SingleAsync(cancellationToken: cancellationToken);
 
-            // ... (existing validation checks)
+            if (tournament.Creator.UserId != request.UserId)
+            {
+                throw new UnauthorizedAccessException("You are not the creator of this tournament");
+            }
+
+            if (tournament.MaxTeams != tournament.Teams.Count)
+            {
+                throw new InvalidOperationException("The tournament is not full");
+            }
 
             var teamPairs = tournament.Teams.SelectMany((team1, index1) =>
                 tournament.Teams.Where((team2, index2) => index2 > index1)
