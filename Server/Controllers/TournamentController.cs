@@ -149,6 +149,8 @@ public class TournamentController : ControllerBase
                 RoundRobinPhaseMatches = x.RoundRobinMatches.Select(rrm => new RoundRobinMatchResponse
                 {   
                     Id = rrm.Id,
+                    StartDateTime = rrm.StartDateTime,
+                    AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
                     PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
                     {
                         Id = mp.Player.Id,

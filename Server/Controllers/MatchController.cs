@@ -303,8 +303,10 @@ public class MatchController : ControllerBase
         var player = await _dbContext.Player
             .Where(x => x.Id == playerId)
             .SingleAsync(cancellationToken: cancellationToken);
+        
         var match = await _dbContext.Match
             .Where(x => x.Id == matchId)
+            .Include(x => x.Creator)
             .Include(x => x.MatchPlayers)
             .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);

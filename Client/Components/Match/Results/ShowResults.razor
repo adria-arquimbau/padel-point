@@ -21,9 +21,10 @@
         <ShowSets Match="Match"></ShowSets>
     </div>
 }
-@if (Match is {RequesterIsAPlayer: true })
-{
-    <div class="match-set-results info">
+
+<div class="match-set-results info">
+    @if (Match is {RequesterIsAPlayer: true })
+    {
         <AuthorizeView>
             <Authorized>
                 @if (!Match.ScoreConfirmedTeamOne || !Match.ScoreConfirmedTeamTwo)
@@ -46,27 +47,27 @@
                 }
             </Authorized>
         </AuthorizeView>
-        
+
         <ShowSets Match="Match"></ShowSets>
-        
-        @if (Match is {Finished: false, RequesterIsAPlayer: true })
+    }
+    @if (Match.RequesterIsTheCreator || Match is {Finished: false, RequesterIsAPlayer: true })
+    {
+        @if (Match.Sets is {Count: 0 } && Match.PlayersCount == 4)
         {
-            @if (Match.Sets is {Count: 0 } && Match.PlayersCount == 4)
-            {
-                <div class="button-container">
-                    <Button Size="Size.Small" Color="Color.Primary" Style="font-size: 15px" Clicked="ShowAddResultsModal" Outline>Add results</Button>
-                </div>
-            }
-            @if (Match.Sets is {Count: > 0 })
-            {
-                <div class="button-container">
-                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" Clicked="ShowEditResultsModal" Outline>Edit score</Button>
-                    <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" Clicked="DeleteScoreResult" Outline>Delete score</Button>
-                </div>
-            }
+            <div class="button-container">
+                <Button Size="Size.Small" Color="Color.Primary" Style="font-size: 15px" Clicked="ShowAddResultsModal" Outline>Add results</Button>
+            </div>
         }
-    </div>
-}
+        @if (Match.Sets is {Count: > 0 })
+        {
+            <div class="button-container">
+                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Primary" Clicked="ShowEditResultsModal" Outline>Edit score</Button>
+                <Button Style="font-size: 12px" Size="Size.Small" Color="Color.Danger" Clicked="DeleteScoreResult" Outline>Delete score</Button>
+            </div>
+        }
+    }
+</div>
+
 
 <AddResults Sets="Match?.Sets" Match="Match" Visible="_addResultsVisible" ConfirmationChanged="ResultAdded"></AddResults>
 <ConfirmationModal ConfirmationChanged="ConfirmResult" Visible="_confirmResultVisible" Title="Confirm result" Message="Are you sure you want to confirm the result?"></ConfirmationModal>
