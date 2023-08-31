@@ -1,0 +1,10 @@
+@using EventsManager.Shared.Responses
+
+<div>
+    @Match.Id
+</div>
+
+@code {
+    [Parameter]
+    public RoundRobinMatchResponse Match { get; set; }
+}
