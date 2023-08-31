@@ -401,7 +401,7 @@ public class MatchController : ControllerBase
             .Include(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.MatchPlayers.All(x => x.Player.UserId != userId))
+        if (match.MatchPlayers.Any(x => x.Player.UserId != userId))
         {
             return Conflict("Only players can remove score.");
         }

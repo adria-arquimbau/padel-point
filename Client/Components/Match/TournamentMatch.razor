@@ -1,10 +1,29 @@
 @using EventsManager.Shared.Responses
 
-<div>
+@inject NavigationManager NavigationManager
+
+<div class="match-card" @onclick="GoToMatch">
     @Match.Id
 </div>
 
 @code {
     [Parameter]
     public RoundRobinMatchResponse Match { get; set; }
+
+    private void GoToMatch()
+    {
+        NavigationManager.NavigateTo($"match/{Match.Id}/detail");
+    }
+
 }
+
+<style>
+    .match-card{
+        border-radius: 8px;
+        padding: 10px;
+        background-color: white;
+        margin-bottom: 10px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+    }
+</style>
