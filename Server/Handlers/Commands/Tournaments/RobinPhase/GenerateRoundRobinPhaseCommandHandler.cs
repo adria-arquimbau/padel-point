@@ -49,8 +49,6 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
             var matchStartTime = tournament.StartDate;
             const int matchDuration = 1;
 
-            var matchGenerator = new RoundRobinMatchGenerator();
-
             if (tournament.RoundRobinPhaseGroups > 1)
             {
                 var teamsPerGroup = tournament.Teams.Count / tournament.RoundRobinPhaseGroups;
