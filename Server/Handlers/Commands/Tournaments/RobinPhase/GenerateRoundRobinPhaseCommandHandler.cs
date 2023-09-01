@@ -49,6 +49,7 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
             var matchStartTime = tournament.StartDate;
             const int matchDuration = 1;
 
+            var matches = new List<Match>();
             if (tournament.RoundRobinPhaseGroups > 1)
             {
                 var teamsPerGroup = tournament.Teams.Count / tournament.RoundRobinPhaseGroups;
@@ -73,9 +74,9 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
                             var playersTeam1 = new List<Player> { pair.Team1.Player1, pair.Team1.Player2 };
                             var playersTeam2 = new List<Player> { pair.Team2.Player1, pair.Team2.Player2 };
 
-                            var match = RoundRobinMatchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament, group + 1, round);
+                            var match = RoundRobinMatchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament, group + 1);
 
-                            _context.Match.Add(match);
+                            matches.Add(match);
                         }
                     }
                 }
@@ -87,19 +88,21 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
                     var playersTeam1 = new List<Player> { pair.Team1.Player1, pair.Team1.Player2 };
                     var playersTeam2 = new List<Player> { pair.Team2.Player1, pair.Team2.Player2 };
 
-                    var match = RoundRobinMatchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament, 1, 1);
+                    var match = RoundRobinMatchGenerator.CreateMatch(playersTeam1, playersTeam2, matchStartTime, matchDuration, tournament, 1);
 
-                    _context.Match.Add(match);
+                    matches.Add(match);
                 }
             }
-
+            
+            await _context.Match.AddRangeAsync(matches, cancellationToken);
+            
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
 
 public class RoundRobinMatchGenerator
 {
-    public static Match CreateMatch(List<Player> team1Players, List<Player> team2Players, DateTime matchStartTime, double matchDuration, Tournament tournament, int group, int round)
+    public static Match CreateMatch(List<Player> team1Players, List<Player> team2Players, DateTime matchStartTime, double matchDuration, Tournament tournament, int group)
     {
         var match = new Match
         {
@@ -117,8 +120,7 @@ public class RoundRobinMatchGenerator
             Duration = matchDuration,
             TournamentId = tournament.Id,
             Location = tournament.Location,
-            RobinPhaseGroup = group,
-            RobinPhaseRound = round
+            RobinPhaseGroup = group
             // Set other properties as needed
         };
 
