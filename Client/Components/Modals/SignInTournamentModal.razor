@@ -9,7 +9,7 @@
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationState
-
+@inject IMessageService MessageService
 
 @if (Tournament != null)
 {
@@ -124,6 +124,7 @@
             
             if(response.IsSuccessStatusCode)
             {
+                await MessageService.Info("Don't forget that your partner must confirm his registration to complete your team's registration.", "Team Registration Reminder: Partner Confirmation Required");
                 ToastService.ShowInfo($"You have successfully signed in to {Tournament.Name}!");
                 await DontShow.InvokeAsync();
                 await RefreshTournament.InvokeAsync();
