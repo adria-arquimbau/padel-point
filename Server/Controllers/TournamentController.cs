@@ -45,7 +45,7 @@ public class TournamentController : ControllerBase
                 Location = x.Location,
                 MaxTeams = x.MaxTeams,
                 TeamsCount = x.Teams.Count
-            })
+            }).OrderByDescending(x => x.StartDate)
             .ToListAsync(cancellationToken);
         
         return Ok(tournaments);
