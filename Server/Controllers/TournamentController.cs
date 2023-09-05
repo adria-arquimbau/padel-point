@@ -36,6 +36,7 @@ public class TournamentController : ControllerBase
             {
                 Id = x.Id,
                 Name = x.Name,
+                ImageUri = x.ImageUri,
                 EloAverage = x.Teams.Count == 0 ? 0 : (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
                 RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 Description = x.Description,
@@ -157,6 +158,7 @@ public class TournamentController : ControllerBase
             {   
                 Id = x.Id,
                 Name = x.Name,
+                ImageUri = x.ImageUri,
                 RoundRobinPhaseGroups = x.RoundRobinPhaseGroups,
                 Description = x.Description,
                 RoundRobinPhaseMatches = x.RoundRobinMatches.Select(rrm => new RoundRobinMatchResponse
