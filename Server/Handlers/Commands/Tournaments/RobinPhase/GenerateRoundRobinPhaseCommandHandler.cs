@@ -42,41 +42,47 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
         }
         
         var teams = tournament.Teams.ToList();
+        
+        var groups = GetGroups(teams, tournament);
 
-        if (tournament.RoundRobinPhaseGroups >= 2)
+        var groupNumber = 1;
+        foreach (var group in groups)
         {
-            var groups = GetGroups(teams, tournament);
-    
-            var groupNumber = 1;
-            foreach (var group in groups)
+            var numberOfTeams = group.Count;
+            var numberOfRounds = numberOfTeams - 1;
+
+            for (var round = 1; round <= numberOfRounds; round++)
             {
-                var numberOfTeams = group.Count;
-                var numberOfRounds = numberOfTeams - 1;
-
-                for (var round = 1; round <= numberOfRounds; round++)
+                for (var match = 0; match < numberOfTeams / 2; match++)
                 {
-                    for (var match = 0; match < numberOfTeams / 2; match++)
+                    var team1Players = new List<Player>
                     {
-                        var team1Players = new List<Player> { group[match].Player1, group[match].Player2 };
-                        var team2Players = new List<Player> { group[numberOfTeams - 1 - match].Player1, group[numberOfTeams - 1 - match].Player2 };
+                        group[match].Player1, 
+                        group[match].Player2
+                    };
+                    var team2Players = new List<Player>
+                    {
+                        group[numberOfTeams - 1 - match].Player1, 
+                        group[numberOfTeams - 1 - match].Player2
+                    };
 
-                        var addHours = round * 0.50;
-                        var matchStartTime = tournament.StartDate.AddHours(addHours);
-                        const double matchDuration = 0.30;
+                    var addHours = round * 0.50;
+                    var matchStartTime = tournament.StartDate.AddHours(addHours);
+                    const double matchDuration = 0.50;
 
-                        var matchToCreate = RoundRobinMatchGenerator.CreateMatch(team1Players, team2Players, matchStartTime, matchDuration, tournament, groupNumber, round);
+                    var matchToCreate = RoundRobinMatchGenerator.CreateMatch(team1Players, team2Players, matchStartTime, matchDuration, tournament, groupNumber, round);
 
-                        _context.Match.Add(matchToCreate);
-                    }
-
-                    // Rotate the array
-                    var lastTeam = group[group.Count - 1];  
-                    group.RemoveAt(group.Count - 1);
-                    group.Insert(1, lastTeam);
+                    _context.Match.Add(matchToCreate);
                 }
-                
-                groupNumber++;
-            }   
+
+                // Rotate the array
+                var lastTeam = group[group.Count - 1];  
+                group.RemoveAt(group.Count - 1);
+                group.Insert(1, lastTeam);
+            }
+            
+            groupNumber++;
+             
         }
 
         await _context.SaveChangesAsync(cancellationToken);

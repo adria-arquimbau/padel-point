@@ -113,11 +113,6 @@ public class TournamentController : ControllerBase
             return Conflict("You are not the creator of this tournament");
         }
         
-        if (request.RoundRobinPhaseGroups != 1 && request.RoundRobinPhaseGroups != 2)
-        {
-            return Conflict("The number of groups must be 1 or 2");
-        }
-        
         tournament.Name = request.Name;
         tournament.RegistrationOpen = request.OpenRegistrations;
         tournament.Description = request.Description;
