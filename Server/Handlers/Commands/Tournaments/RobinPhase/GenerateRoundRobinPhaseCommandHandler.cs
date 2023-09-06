@@ -60,8 +60,9 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
                         var team1Players = new List<Player> { group[match].Player1, group[match].Player2 };
                         var team2Players = new List<Player> { group[numberOfTeams - 1 - match].Player1, group[numberOfTeams - 1 - match].Player2 };
 
-                        var matchStartTime = tournament.StartDate.AddMinutes((round - 1) * 0.30);
-                        var matchDuration = 0.30;
+                        var addHours = round * 0.50;
+                        var matchStartTime = tournament.StartDate.AddHours(addHours);
+                        const double matchDuration = 0.30;
 
                         var matchToCreate = RoundRobinMatchGenerator.CreateMatch(team1Players, team2Players, matchStartTime, matchDuration, tournament, groupNumber, round);
 
@@ -69,13 +70,13 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
                     }
 
                     // Rotate the array
-                    var lastTeam = group[group.Count - 1];
+                    var lastTeam = group[group.Count - 1];  
                     group.RemoveAt(group.Count - 1);
                     group.Insert(1, lastTeam);
                 }
                 
                 groupNumber++;
-            }
+            }   
         }
 
         await _context.SaveChangesAsync(cancellationToken);
