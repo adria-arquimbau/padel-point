@@ -12,4 +12,5 @@ public class PlayerDetailResponse
     public Guid Id { get; set; }
     public List<EloHistoryResponse> EloHistory { get; set; } = new();
     public bool IsConfirmed { get; set; }
+    public decimal TrustFactor { get; set; }    
 }   

@@ -23,6 +23,8 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .IsRequired();
         builder.Property(p => p.Elo)
             .IsRequired();
+        builder.Property(p => p.TrustFactor)
+            .HasDefaultValue(25);
         builder.HasOne(p => p.User)
             .WithOne(u => u.Player)
             .HasForeignKey<Player>(x => x.UserId);

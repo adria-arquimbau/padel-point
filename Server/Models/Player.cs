@@ -15,4 +15,5 @@ public class Player
     public DateTime CreationDate { get; set; }  
     public Announcements Announcements { get; set; } = new();
     public InitialLevelForm? InitialLevelForm { get; set; }
-}
+    public decimal TrustFactor { get; set; }
+}   

@@ -100,6 +100,7 @@ public class PlayerController : ControllerBase
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
+                TrustFactor = x.TrustFactor,
                 Country = x.Country,
                 MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                 EloHistory = x.EloHistories
