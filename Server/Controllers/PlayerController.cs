@@ -191,6 +191,7 @@ public class PlayerController : ControllerBase
                 NickName = x.NickName,
                 ImageUrl = x.ImageUrl,
                 Elo = x.Elo,
+                TrustFactor = x.TrustFactor,
                 MatchesPlayed = x.EloHistories.Count(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed),
                 LastEloGained = x.EloHistories
                     .Where(eh => eh.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
