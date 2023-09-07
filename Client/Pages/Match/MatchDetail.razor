@@ -49,6 +49,14 @@
                 </div>
             </div>
         </div>
+        @if (_match.TournamentId != null)
+        {
+            <Divider />
+            <div>
+                <p @onclick="NavigateToTournament">@_match.TournamentName / @_match.TournamentPhase @_match.TournamentRound</p>
+                <img src=@_match.TournamentImageUri alt="header"/>
+            </div>
+        }
         <Divider />
         @if (_match.IsBlocked)
         {
@@ -348,12 +356,18 @@
         }
         
         return "color: rgb(0,119,0);"; 
-    }
+    }   
     
     private static bool IsOpenSlotsState(MatchResponse match)
     {
         return match.PlayersTeamOne.Count < 2 || match.PlayersTeamTwo.Count < 2;
     }
+
+    private void NavigateToTournament()
+    {
+        NavigationManager.NavigateTo($"/tournament/{_match.TournamentId}/detail");
+    }
+
 }
 
 <style>

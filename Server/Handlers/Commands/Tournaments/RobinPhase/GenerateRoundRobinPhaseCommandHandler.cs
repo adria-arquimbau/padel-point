@@ -136,6 +136,7 @@ public class RoundRobinMatchGenerator
             Location = tournament.Location,
             RobinPhaseGroup = group,
             RobinPhaseRound = round,
+            IsCompetitive = true
             // Set other properties as needed
         };
 

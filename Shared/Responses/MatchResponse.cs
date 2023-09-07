@@ -33,8 +33,12 @@ public class MatchResponse
     public List<PromotionResponse> Promotions { get; set; }
     public MatchLocation Location { get; set; }
     public int? MinimumLevel { get; set; }
-    public bool IHaveOpenInvitation { get; set; }
+    public bool IHaveOpenInvitation { get; set; }   
     public bool IsCompetitive { get; set; }
-    public int? CourtNumber { get; set; }   
+    public int? CourtNumber { get; set; }       
     public string? TournamentName { get; set; }
+    public Guid? TournamentId { get; set; }
+    public string TournamentPhase { get; set; } 
+    public string TournamentRound { get; set; }
+    public Uri? TournamentImageUri { get; set; }
 }       
