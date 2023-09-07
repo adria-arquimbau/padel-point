@@ -54,7 +54,7 @@
             <Divider />
             <div>
                 <p @onclick="NavigateToTournament">@_match.TournamentName / @_match.TournamentPhase @_match.TournamentRound</p>
-                <img src=@_match.TournamentImageUri alt="header"/>
+                <img src="@_match.TournamentImageUri" alt="header" style="object-fit: cover; width: 100%; max-height: 150px;" />
             </div>
         }
         <Divider />
