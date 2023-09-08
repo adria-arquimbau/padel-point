@@ -62,7 +62,7 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
             var eloChange = kFactor * (actualScore - expectedScore);
             if (!team1Won)
             {
-                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+                eloChange *= 1.8; // Double the amount of Elo lost if the team lost the match
             }
             var newElo = player.Elo + (int)eloChange;
             
@@ -95,7 +95,7 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
             var eloChange = kFactor * (actualScore - expectedScore);
             if (!team2Won)
             {
-                eloChange *= 2; // Double the amount of Elo lost if the team lost the match
+                eloChange *= 1.8; // Double the amount of Elo lost if the team lost the match
             }
 
             var newElo = player.Elo + (int)eloChange;
