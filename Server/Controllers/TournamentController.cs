@@ -32,6 +32,7 @@ public class TournamentController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var tournaments = await _context.Tournament
+            .Where(x => !x.Name.Contains("TEST"))
             .Select(x => new TournamentResponse
             {
                 Id = x.Id,
