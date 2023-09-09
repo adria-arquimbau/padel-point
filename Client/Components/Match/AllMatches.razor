@@ -27,11 +27,16 @@
         {
             <div @onclick="() => GoToTheMatch(match.Id)" class="match-card" style="position: relative;">
                 
-                 <div style="font-size: 12px; text-align: center;">
-                     @match.StartDateTime.ToLongDateString() /
-                     @match.StartDateTime.ToShortTimeString() -
-                     @match.Duration h
-                 </div>
+                <div style="font-size: 12px; text-align: center;">
+                    @match.StartDateTime.ToLongDateString() /
+                    @match.StartDateTime.ToShortTimeString() -
+                    @match.Duration h
+                </div>
+                <div style="display: flex; flex-direction: row; justify-content: space-between; margin-top: 5px">
+                    <p style="font-size: 10px; margin: 0"><b>Average Elo:</b> @match.AverageElo</p>
+                    <p style="font-size: 10px; margin: 0">@GetLocationFullName(match.Location)</p>
+                    <p style="font-size: 10px; margin: 0">@match.TournamentName</p>
+                </div>
                  @if (match.Promotions.Any())
                  {
                      <FluentDivider></FluentDivider>
@@ -43,34 +48,59 @@
                  <div>
                      
                  </div>
-                <FluentDivider></FluentDivider>
-                 <div style="width: 60%; float: left;">
-                     <p style="font-size: 14px; margin: 0"><b>Average Elo:</b> @match.AverageElo</p>
-                     <p style="font-size: 14px; margin: 0">@GetLocationFullName(match.Location)</p>
-                     <p style="font-size: 14px; margin: 0">@match.TournamentName</p>
-                 </div>
-                 
-                 <div class="player-names">
-                     <div class="player-names-team">
-                         <div class="player-names-team1-title">
-                             Team 1
+                 <FluentDivider></FluentDivider>
+                 <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
+                     <div class="score">
+                         @if (match.Sets != null && match.Sets.Any())
+                         {
+                             @foreach (var set in match.Sets)
+                             {
+                                 <div class="sets">
+                                     <div class="team-score @(set.Team1Score > set.Team2Score ? "winner" : "loser")">
+                                         @set.Team1Score
+                                     </div>
+                                     <div class="team-score @(set.Team2Score > set.Team1Score ? "winner" : "loser")">
+                                         @set.Team2Score
+                                     </div>
+                                 </div>
+                             }
+                         }
+                         else
+                         {
+                             <div class="sets">
+                                 <div class="team-score loser">
+                                    0
+                                 </div>
+                                 <div class="team-score loser">
+                                     0
+                                 </div>
+                             </div>
+                         }
+                     </div>
+                                      
+                     <div class="player-names">
+                         <div class="player-names-team">
+                             <div class="player-names-team1-title">
+                                 Team 1
+                             </div>
+                             <div class="player-names-team1-names">
+                                 <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
+                                 <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
+                             </div>
                          </div>
-                         <div class="player-names-team1-names">
-                             <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(0))</p>
-                             <p style="@GetStyleForPlayerNames(match.PlayersTeamOne.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamOne.ElementAtOrDefault(1))</p>
+                         <Divider Style="margin: 0; width: 120px; float: right;"></Divider>
+                         <div class="player-names-team">
+                             <div class="player-names-team2-title">
+                                 Team 2
+                             </div>
+                             <div class="player-names-team2-names">
+                                 <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
+                                 <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
+                             </div>
                          </div>
                      </div>
-                     <Divider Style="margin: 0; width: 120px; float: right;"></Divider>
-                     <div class="player-names-team">
-                         <div class="player-names-team2-title">
-                             Team 2
-                         </div>
-                         <div class="player-names-team2-names">
-                             <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(0))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(0))</p>
-                             <p style="@GetStyleForPlayerNames(match.PlayersTeamTwo.ElementAtOrDefault(1))">@GetPlayerName(match.PlayersTeamTwo.ElementAtOrDefault(1))</p>
-                         </div>
-                     </div>
                  </div>
+                
                  <div style="clear: both;"></div>
                   @if (match.Finished)
                   {
@@ -234,6 +264,7 @@
         display: flex;
         flex-direction: column;
         align-items: end;
+        margin-top: 7px;
     }
     
     .player-names-team1-title {
@@ -274,6 +305,7 @@
         margin-bottom: 10px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         max-width: 800px;
+        min-width: 350px;
     }   
     
     .all-matches-stamp{
@@ -307,4 +339,35 @@
         margin: 0px;
         padding: 0 0 5px 5px;
     }
+    
+    .score{
+        display: flex;
+        flex-direction: row;
+        position: relative;
+        top: -10px;
+    }
+    
+    .sets{
+        display: flex;
+        flex-direction: column;
+        margin-right: 10px;
+    }
+            
+     .team-score {
+         font-size: 35px;
+         font-weight: bold;
+         white-space: nowrap;
+         overflow: hidden;
+         text-overflow: ellipsis;
+     }
+     
+     .winner {
+         color: rgba(0, 255, 0, 0.5); /* Green color with 50% opacity */
+     }
+     
+     .loser {
+         color: rgba(128, 128, 128, 0.5); /* Gray color with 50% opacity (you can customize the color) */
+     }
+
+
 </style>

@@ -256,6 +256,7 @@ public class MatchController : ControllerBase
             .Include(match => match.EloHistories)
             .Include(match => match.Promotions)
             .Include(match => match.Tournament)
+            .Include(match => match.Sets)
             .ToListAsync(cancellationToken: cancellationToken);
         
         int? requesterElo = null;
@@ -275,6 +276,12 @@ public class MatchController : ControllerBase
             MinimumLevel = x.MinimumLevel,
             RequesterElo = userId != null ? requesterElo : null,
             StartDateTime = x.StartDateTime,
+            Sets = x.Sets.Select(s => new SetDto
+            {
+                SetNumber = s.SetNumber,
+                Team1Score = s.Team1Score,
+                Team2Score = s.Team2Score
+            }).ToList(),
             ScoreConfirmedTeamOne = x.ScoreConfirmedTeamOne,
             ScoreConfirmedTeamTwo = x.ScoreConfirmedTeamTwo,
             Duration = x.Duration,
