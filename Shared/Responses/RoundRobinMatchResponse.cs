@@ -11,5 +11,8 @@ public class RoundRobinMatchResponse
     public DateTime StartDateTime { get; set; }
     public int RoundRobinPhaseGroup { get; set; }
     public int RoundRobinPhaseRound { get; set; }
+    public bool RequesterIsTheCreator { get; set; }
+    public List<SetDto> Sets { get; set; } = new();
+    public bool IsFinished { get; set; }
 }
-            
+                

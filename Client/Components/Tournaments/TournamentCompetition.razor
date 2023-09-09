@@ -15,6 +15,27 @@ else
     {
         <div class="round-robin">
             <h3 class="round-robin-title">Round Robin Phase</h3>
+            @if(Tournament.RoundRobinPhaseGroups > 1)
+            {
+                <p>There are @Tournament.RoundRobinPhaseGroups groups with @Tournament.RoundRobinPhaseMatches.Count() matches in this phase.</p>
+            }
+            else
+            {
+                <p>There is @Tournament.RoundRobinPhaseGroups group with @Tournament.RoundRobinPhaseMatches.Count() matches in this phase.</p>
+            }
+            @if (!Tournament.RoundRobinPhaseMatches.Any(x => x.IsFinished))
+            {
+                <Alert Color="Color.Info" Visible>
+                    Phase in progress...
+                </Alert>
+            }
+            else
+            {
+                <Alert Color="Color.Success" Visible>
+                    Phase finished!
+                </Alert>
+            }
+            
             <div class="group-header-container">
                 @for (int groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
                 {
@@ -73,10 +94,6 @@ else
         flex-direction: column;
         align-items: center; /* Center content horizontally */
         text-align: center; /* Center text horizontally */
-    }
-
-    .group {
-        margin-right: 20px; /* Add some space between groups if desired */
     }
 
     .group-title {

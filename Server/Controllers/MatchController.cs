@@ -96,6 +96,11 @@ public class MatchController : ControllerBase
         {
             return Conflict("Only creator can edit the match");
         }
+
+        if (match.TournamentId != null)
+        {
+            return Conflict("You can't edit a tournament match.");
+        }
         
         if (match is { ScoreConfirmedTeamOne: true, ScoreConfirmedTeamTwo: true })
         {
@@ -349,7 +354,7 @@ public class MatchController : ControllerBase
                 .ThenInclude(x => x.Player)
             .SingleAsync(cancellationToken: cancellationToken);
 
-        if (match.MatchPlayers.All(x => x.Player.UserId != userId))
+        if (match.MatchPlayers.All(x => x.Player.UserId != userId) && match.Creator.UserId != userId)
         {
             return Conflict("Only players can set score.");
         }

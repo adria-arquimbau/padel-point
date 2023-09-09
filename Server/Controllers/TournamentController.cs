@@ -160,7 +160,15 @@ public class TournamentController : ControllerBase
                 RoundRobinPhaseMatches = x.RoundRobinMatches.Select(rrm => new RoundRobinMatchResponse
                 {   
                     Id = rrm.Id,
+                    IsFinished = rrm.ScoreConfirmedTeamOne && rrm.ScoreConfirmedTeamTwo,
                     StartDateTime = rrm.StartDateTime,
+                    RequesterIsTheCreator = x.Creator.UserId == userId,
+                    Sets = rrm.Sets.Select(s => new SetDto
+                    {
+                        SetNumber = s.SetNumber,
+                        Team1Score = s.Team1Score,
+                        Team2Score = s.Team2Score,
+                    }).ToList(),
                     RoundRobinPhaseGroup = rrm.RobinPhaseGroup ?? 0,
                     RoundRobinPhaseRound = rrm.RobinPhaseRound ?? 0,
                     AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
