@@ -374,11 +374,6 @@ public class MatchController : ControllerBase
             return Conflict("You can't set all sets to 0");
         }
 
-        if (match.TournamentId != null)
-        {
-            return Conflict("You can't set score for a tournament match.");
-        }
-
         var score = request.Sets.Select(x => new Set
         {
             SetNumber = x.SetNumber,

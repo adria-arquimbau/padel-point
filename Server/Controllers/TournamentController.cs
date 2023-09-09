@@ -386,11 +386,17 @@ public class TournamentController : ControllerBase
             .Where(x => x.Id == tournamentId)
             .Include(x => x.Creator)
             .Include(x => x.RoundRobinMatches)
+                .ThenInclude(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
         
         if (tournament.Creator.UserId != userId)
         {
             return Conflict("You are not the creator of this tournament");
+        }
+
+        if (tournament.RoundRobinMatches.Any(x => x.Sets.Any()))
+        {
+            return Conflict("You can't delete the round robin phase if there are matches with sets");
         }
         
         _context.Match.RemoveRange(tournament.RoundRobinMatches);
