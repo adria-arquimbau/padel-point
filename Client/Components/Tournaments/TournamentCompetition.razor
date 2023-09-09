@@ -11,35 +11,85 @@
 }
 else
 {
-    <div>
-        <h3>Round Robin Phase</h3>
-        @if (Tournament.RoundRobinPhaseGroups > 0 && Tournament.RoundRobinPhaseMatches.Any())
-        {
-            @for (int groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
-            {
-                var groupMatches = Tournament.RoundRobinPhaseMatches
-                    .Where(x => x.RoundRobinPhaseGroup == groupNumber)
-                    .GroupBy(x => x.RoundRobinPhaseRound)
-                    .OrderBy(group => group.Key);
-
-                if (groupMatches.Any())
+    @if (Tournament.RoundRobinPhaseGroups > 0 && Tournament.RoundRobinPhaseMatches.Any())
+    {
+        <div class="round-robin">
+            <h3 class="round-robin-title">Round Robin Phase</h3>
+            <div class="group-header-container">
+                @for (int groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
                 {
-                    <h4>Group @groupNumber</h4>
-                    @foreach (var roundGroup in groupMatches)
+                    var groupMatches = Tournament.RoundRobinPhaseMatches
+                        .Where(x => x.RoundRobinPhaseGroup == groupNumber)
+                        .GroupBy(x => x.RoundRobinPhaseRound)
+                        .OrderBy(group => group.Key);
+
+                    if (groupMatches.Any())
                     {
-                        <h5>Round @roundGroup.Key</h5>
-                        @foreach (var match in roundGroup)
-                        {
-                            <TournamentMatch Match="@match"></TournamentMatch>
-                        }
+                        <div class="group">
+                            <h4 class="group-title">Group @groupNumber</h4>
+                            @foreach (var roundGroup in groupMatches)
+                            {
+                                <div class="round">
+                                    <h5 style="text-align: left;">Round @roundGroup.Key</h5>
+                                    <div class="round-matches">
+                                        @foreach (var match in roundGroup)
+                                        {
+                                            <TournamentMatch Match="@match"></TournamentMatch>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            <Divider />
+                        </div>
+                        
                     }
                 }
-            }
-        }
-    </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
 }
+
+<style>
+    .round-robin {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center content horizontally */
+        text-align: center; /* Center text horizontally */
+    }
+
+    .round-robin-title {
+        margin-bottom: 10px;
+    }
+
+    .group-header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center content horizontally */
+        text-align: center; /* Center text horizontally */
+    }
+
+    .group {
+        margin-right: 20px; /* Add some space between groups if desired */
+    }
+
+    .group-title {
+        margin-bottom: 5px; /* Add some space below the group title */
+    }
+
+    .round {
+        margin-bottom: 10px;
+    }
+    
+    .round-matches {
+        display: flex;
+        justify-content: center;
+         flex-wrap: wrap;
+    }
+</style>

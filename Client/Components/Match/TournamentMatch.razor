@@ -8,12 +8,9 @@
     <div style="font-size: 12px; text-align: center;">
         @Match.StartDateTime.ToLongDateString() /
         @Match.StartDateTime.ToShortTimeString()
+        <p style="font-size: 10px; margin: 0"><b>Average Elo:</b> @Match.AverageElo</p>
     </div>
     <FluentDivider></FluentDivider>
-    <div style="width: 60%; float: left;">
-        <p style="font-size: 14px; margin: 0"><b>Average Elo:</b> @Match.AverageElo</p>
-    </div>
-                 
     <div class="player-names">
         <div class="player-names-team">
             <div class="player-names-team1-title">
@@ -73,8 +70,10 @@
         background-color: white;
         margin-bottom: 10px;
         margin-top: 10px;
+        margin-right: 5px;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
         max-width: 800px;
+        min-width: 255px;
     }
     
      .player-names {
