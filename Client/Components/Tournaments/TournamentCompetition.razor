@@ -2,9 +2,11 @@
 @using EventsManager.Client.Components.Match
 @using Color = Blazorise.Color
 
-@inject HttpClient Http
 @inject IMessageService MessageService
 @inject IToastService ToastService
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (!Tournament.ShowBrackets)
 {
@@ -15,17 +17,17 @@
 }
 else
 {
-    @if (Tournament.RoundRobinPhaseGroups > 0 && Tournament.RoundRobinPhaseMatches.Any())
+    @if (Tournament.RoundRobinPhaseGroups > 0 && RoundRobinPhaseMatches.Any())
     {
         <div class="round-robin">
             <h3 class="round-robin-title">Round Robin Phase</h3>
             @if(Tournament.RoundRobinPhaseGroups > 1)
             {
-                <p>There are @Tournament.RoundRobinPhaseGroups groups with @Tournament.RoundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There are @Tournament.RoundRobinPhaseGroups groups with @RoundRobinPhaseMatches.Count() matches in this phase.</p>
             }
             else
             {
-                <p>There is @Tournament.RoundRobinPhaseGroups group with @Tournament.RoundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There is @Tournament.RoundRobinPhaseGroups group with @RoundRobinPhaseMatches.Count() matches in this phase.</p>
             }
             @if (!Tournament.RoundRobinPhaseMatches.Any(x => x.IsFinished))
             {
@@ -48,7 +50,7 @@ else
             <div class="group-header-container">
                 @for (var groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
                 {
-                    var groupMatches = Tournament.RoundRobinPhaseMatches
+                    var groupMatches = RoundRobinPhaseMatches
                         .Where(x => x.RoundRobinPhaseGroup == groupNumber)
                         .GroupBy(x => x.RoundRobinPhaseRound)
                         .OrderBy(group => group.Key);
@@ -85,15 +87,58 @@ else
 @code {
     private bool _loading;
 
+    private List<RoundRobinMatchResponse> RoundRobinPhaseMatches = new();
+    
     [Parameter] 
     public TournamentDetailResponse? Tournament { get; set; }
     
-    [Parameter] 
-    public EventCallback RefreshMatch { get; set; }
-    
-    public void RefreshMatchCallback()
+    protected override async Task OnInitializedAsync()
     {
-        RefreshMatch.InvokeAsync();
+        await GetRoundRobinPhase();
+    }
+    
+    private async Task GetRoundRobinPhase()
+    {
+        try
+        {
+            _loading = true;
+            HttpResponseMessage? response;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == false)
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync($"tournament/{Tournament.Id}/round-robin-phase");
+            }
+            else
+            {
+                response = await Http.GetAsync($"tournament/{Tournament.Id}/round-robin-phase");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                RoundRobinPhaseMatches = await response.Content.ReadFromJsonAsync<List<RoundRobinMatchResponse>>();
+                StateHasChanged();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+        
+    }
+    
+    public async Task RefreshMatchCallback()
+    {
+        await GetRoundRobinPhase();
     }
 
     private async Task ConfirmAllMatches()
@@ -109,7 +154,7 @@ else
                 {
                     ToastService.ShowInfo($"All round robin phase matches confirmed.");
                     _loading = false;
-                    await RefreshMatch.InvokeAsync();
+                    await GetRoundRobinPhase();
                 }
                 else
                 {
@@ -128,7 +173,7 @@ else
 
     private bool CanIConfirmAllMatches()
     {
-        var allMatchesHaveASet = Tournament.RoundRobinPhaseMatches
+        var allMatchesHaveASet = RoundRobinPhaseMatches
             .All(x => x.Sets.Any());
         
         return !allMatchesHaveASet;
