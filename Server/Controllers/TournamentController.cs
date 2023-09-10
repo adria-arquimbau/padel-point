@@ -435,7 +435,7 @@ public class TournamentController : ControllerBase
 
         if (matches.Any(x => !x.Sets.Any()))
         {
-            return Conflict("You can't confirm the round robin phase group matches if there are matches without sets");
+            return Conflict("You can't confirm the round robin phase matches if there are matches without sets");
         }
 
         foreach (var match in matches)

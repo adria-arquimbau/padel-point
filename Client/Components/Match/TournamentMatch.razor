@@ -20,10 +20,10 @@
         <div class="score">
             @if (Match.Sets.Any())
             {
-                <div class="team-score">
+                <div class="team-score  @(Match.Sets.FirstOrDefault().Team1Score > Match.Sets.FirstOrDefault().Team2Score ? "winner" : "loser")">
                     @Match.Sets.FirstOrDefault().Team1Score
                 </div>
-                <div class="team-score">
+                <div class="team-score  @(Match.Sets.FirstOrDefault().Team2Score > Match.Sets.FirstOrDefault().Team1Score ? "winner" : "loser")">
                     @Match.Sets.FirstOrDefault().Team2Score
                 </div>
             }
@@ -283,4 +283,12 @@
             overflow: hidden; /* Hide any overflow */
             text-overflow: ellipsis; /* Add an ellipsis for long text */
         }
+        
+         .winner {
+             color: rgba(0, 255, 0, 0.5); /* Green color with 50% opacity */
+         }
+         
+         .loser {
+             color: rgba(128, 128, 128, 0.5); /* Gray color with 50% opacity (you can customize the color) */
+         }
 </style>

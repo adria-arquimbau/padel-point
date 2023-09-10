@@ -30,7 +30,7 @@ else
             @if (!Tournament.RoundRobinPhaseMatches.Any(x => x.IsFinished))
             {
                 <Alert Color="Color.Info" Visible>
-                    Phase in progress... Confirm all matches in each group when finished.
+                    Phase in progress... Confirm all matches when added the result to each one.
                 </Alert>
             }
             else
@@ -38,6 +38,11 @@ else
                 <Alert Color="Color.Success" Visible>
                     Phase finished!
                 </Alert>
+            }
+             @if (Tournament.RoundRobinPhaseMatches
+                .All(x => x.Sets.Any()))
+            {
+                <Button Color="Color.Success" Clicked="ConfirmAllMatches">Confirm all matches</Button>
             }
             
             <div class="group-header-container">
@@ -52,18 +57,6 @@ else
                     {
                         <div class="group">
                             <h4 class="group-title">Group @groupNumber</h4>
-                            @if (Tournament.RoundRobinPhaseMatches
-                                .Where(x => x.RoundRobinPhaseGroup == groupNumber)
-                                .All(x => x.IsFinished))
-                            {
-                                <Alert Color="Color.Success" Visible>
-                                    Group finished!
-                                </Alert>
-                            }
-                            else
-                            {
-                                <Button Disabled="CanIConfirmAllMatches(groupNumber)" Color="Color.Success" Clicked="ConfirmAllMatches">Confirm all matches</Button>
-                            }
                             
                             @foreach (var roundGroup in groupMatches)
                             {
@@ -133,10 +126,9 @@ else
         }
     }   
 
-    private bool CanIConfirmAllMatches(int groupNumber)
+    private bool CanIConfirmAllMatches()
     {
         var allMatchesHaveASet = Tournament.RoundRobinPhaseMatches
-            .Where(x => x.RoundRobinPhaseGroup == groupNumber)
             .All(x => x.Sets.Any());
         
         return !allMatchesHaveASet;

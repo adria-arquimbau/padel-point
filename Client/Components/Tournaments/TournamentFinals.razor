@@ -1,0 +1,11 @@
+﻿@using EventsManager.Shared.Responses
+
+<h3>Tournament Finals</h3>
+
+@code {
+    [Parameter] 
+    public TournamentDetailResponse? Tournament { get; set; }
+    
+    [Parameter] 
+    public EventCallback RefreshMatch { get; set; }
+}
