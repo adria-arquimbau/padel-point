@@ -37,7 +37,7 @@ else
             }
             
             <div class="group-header-container">
-                @for (int groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
+                @for (var groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
                 {
                     var groupMatches = Tournament.RoundRobinPhaseMatches
                         .Where(x => x.RoundRobinPhaseGroup == groupNumber)
@@ -55,7 +55,7 @@ else
                                     <div class="round-matches">
                                         @foreach (var match in roundGroup)
                                         {
-                                            <TournamentMatch Match="@match"></TournamentMatch>
+                                            <TournamentMatch RefreshMatch="RefreshMatchCallback" Match="@match"></TournamentMatch>
                                         }
                                     </div>
                                 </div>
@@ -70,9 +70,19 @@ else
     }
 }
 
+
+
 @code {
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
+    
+    [Parameter] 
+    public EventCallback RefreshMatch { get; set; }
+    
+    public void RefreshMatchCallback()
+    {
+        RefreshMatch.InvokeAsync();
+    }
 }
 
 <style>

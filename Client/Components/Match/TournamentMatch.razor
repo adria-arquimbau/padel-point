@@ -1,18 +1,21 @@
 @using EventsManager.Shared.Responses
-@using Color = System.Drawing.Color
 @using EventsManager.Shared.Dtos
 @using EventsManager.Client.Components.Match.Results
+@using EventsManager.Shared.Requests
+@using Color = Blazorise.Color
 
+@inject IToastService ToastService
 @inject NavigationManager NavigationManager
+@inject HttpClient Http
 
-<div @onclick="GoToMatch" class="match-card" style="position: relative;">
+<div class="match-card" style="position: relative;">
     <div style="font-size: 12px; text-align: center;">
         @Match.StartDateTime.ToLongDateString() /
         @Match.StartDateTime.ToShortTimeString()
         <p style="font-size: 10px; margin: 0"><b>Average Elo:</b> @Match.AverageElo</p>
     </div>
     <FluentDivider></FluentDivider>
-    <div class="main-section">
+    <div @onclick="GoToMatch"  class="main-section">
         <div class="score">
             @if (Match.Sets.Any())
             {
@@ -57,13 +60,55 @@
     </div>
     @if (Match.RequesterIsTheCreator)
     {
-        <Button Size="Size.ExtraSmall" Color="Blazorise.Color.Success" Clicked="AddResults">Add Result</Button>
+        <Button Size="Size.ExtraSmall" Color="Color.Success" Clicked="ShowModal">Add Result</Button>
     }
 </div>
+
+<Modal @ref="_modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Add Result</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <Field>
+                <FieldLabel>Team 1 (@Match.PlayersTeamOne.First().NickName - @Match.PlayersTeamOne.Last().NickName) score</FieldLabel>
+                <NumericPicker TValue="int" @bind-Value="@_team1Score" />
+            </Field>
+            <Field>
+                <FieldLabel>Team 2 (@Match.PlayersTeamTwo.First().NickName - @Match.PlayersTeamTwo.Last().NickName) score</FieldLabel>
+                <NumericPicker TValue="int" @bind-Value="@_team2Score"/>
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+            <Button Color="Color.Primary" Clicked="@AddResult">Save Changes</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
 
 @code {
     [Parameter]
     public RoundRobinMatchResponse Match { get; set; }
+
+    private int _team1Score = 0;
+    private int _team2Score = 0;
+    
+    [Parameter] 
+    public EventCallback RefreshMatch { get; set; }
+    
+    private Modal _modalRef;
+    private bool _loading;
+
+    private Task ShowModal()
+    {
+        return _modalRef.Show();
+    }
+
+    private Task HideModal()
+    {
+        return _modalRef.Hide();
+    }
     
     private string GetPlayerName(PlayerDto? playerDto)
     {
@@ -88,17 +133,52 @@
     {
         NavigationManager.NavigateTo($"match/{Match.Id}/detail");
     }
-
-    private void AddResults()   
+    
+    private async Task AddResult()
     {
-        throw new NotImplementedException();
+        _loading = true;
+    
+        try
+        {
+            var request = new SetMatchScoreRequest
+            {
+                Sets = new List<SetDto>
+                {
+                    new()
+                    {
+                        SetNumber = 1,
+                        Team1Score = _team1Score,
+                        Team2Score = _team2Score
+                    }
+                }
+            };
+            var response = await Http.PostAsJsonAsync($"match/{Match?.Id}/set-score", request);
+            if (response.IsSuccessStatusCode)
+            {
+                ToastService.ShowInfo("Results added.");
+                _loading = false;
+                await _modalRef.Hide();
+                await RefreshMatch.InvokeAsync();
+            }
+            else
+            {
+                Match.Sets = new List<SetDto>();
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        
+        _loading = false;
     }
-
 }
 
 <style>
     .match-card{
-            padding: 10px;
+        padding: 10px;
          background-color: white;
          margin-bottom: 10px;
          margin-top: 10px;
