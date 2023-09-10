@@ -7,6 +7,7 @@
 @inject IToastService ToastService
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject IMessageService MessageService
 
 <div class="match-card" style="position: relative;">
     <div style="font-size: 12px; text-align: center;">
@@ -58,9 +59,13 @@
             </div>
         </div>
     </div>
-    @if (Match.RequesterIsTheCreator)
+    @if (Match.RequesterIsTheCreator && !Match.Sets.Any() && _loading == false)
     {
         <Button Size="Size.ExtraSmall" Color="Color.Success" Clicked="ShowModal">Add Result</Button>
+    }
+    @if (Match.RequesterIsTheCreator && Match.Sets.Any() && _loading == false)
+    {
+        <Button Size="Size.ExtraSmall" Color="Color.Danger" Clicked="DeleteResult">Delete Result</Button>
     }
 </div>
 
@@ -172,9 +177,37 @@
             ToastService.ShowError("Something went wrong, please try again later.");
         }
         
-        _loading = false;
+        _loading = false;   
     }
-}
+
+    private async Task DeleteResult()
+    {
+        if (await MessageService.Confirm("Are you sure you want to delete the match results?", "Delete match results"))
+        {
+            try
+            {
+                _loading = true;
+                var response = await Http.DeleteAsync($"match/{Match?.Id}/remove-score");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowInfo("Results removed.");
+                    await RefreshMatch.InvokeAsync();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch(Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        }
+        _loading = false;
+        }
+    }
 
 <style>
     .match-card{
