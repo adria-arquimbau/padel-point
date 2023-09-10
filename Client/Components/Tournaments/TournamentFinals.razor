@@ -1,6 +1,26 @@
 ﻿@using EventsManager.Shared.Responses
 
-<h3>Tournament Finals</h3>
+@inject IMessageService MessageService
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (_loading)
+{
+    
+}
+else
+{
+    @if (_finalsMatches.Any())
+    {
+        
+    }
+    else
+    {
+        <h3>There are no finals available yet.</h3>
+    }
+}
 
 @code {
     [Parameter] 
@@ -8,4 +28,50 @@
     
     [Parameter] 
     public EventCallback RefreshMatch { get; set; }
+    private List<TournamentFinalsMatchResponse> _finalsMatches = new();
+    private bool _loading = false;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetFinals();
+    }
+    
+    private async Task GetFinals()
+    {
+        try
+        {
+            _loading = true;
+            HttpResponseMessage? response;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == false)
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync($"tournament/{Tournament.Id}/finals");
+            }
+            else
+            {
+                response = await Http.GetAsync($"tournament/{Tournament.Id}/finals");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                _finalsMatches = await response.Content.ReadFromJsonAsync<List<TournamentFinalsMatchResponse>>();
+                StateHasChanged();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+        
+    }
 }

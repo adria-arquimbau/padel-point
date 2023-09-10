@@ -159,6 +159,7 @@ public class TournamentController : ControllerBase
                 ImageUri = x.ImageUri,
                 RoundRobinPhaseGroups = x.RoundRobinPhaseGroups,
                 Description = x.Description,
+                GeneratedRoundRobinPhase = x.RoundRobinMatches.Any(),
                 RegistrationsOpen = x.RegistrationOpen && x.Teams.Count < x.MaxTeams,
                 StartDate = x.StartDate,
                 Location = x.Location,
@@ -469,5 +470,22 @@ public class TournamentController : ControllerBase
         var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
 
         return team1Wins != team2Wins ? (team1Wins > team2Wins ? Shared.Enums.Team.Team1 : Shared.Enums.Team.Team2) : null;
+    }
+    
+    [HttpGet("{tournamentId:guid}/finals")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetFinals([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var roundRobinPhaseInProgress = await _context.Match
+            .AnyAsync(x => x.TournamentId == tournamentId && 
+                           x.RobinPhaseGroup != null && 
+                           !x.ScoreConfirmedTeamOne && 
+                           !x.ScoreConfirmedTeamTwo, 
+                cancellationToken: cancellationToken);
+        
+        
+        return Ok(new List<TournamentFinalsMatchResponse>());
     }
 }

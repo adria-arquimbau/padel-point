@@ -17,19 +17,19 @@
 }
 else
 {
-    @if (Tournament.RoundRobinPhaseGroups > 0 && RoundRobinPhaseMatches.Any())
+    @if (Tournament.RoundRobinPhaseGroups > 0 && _roundRobinPhaseMatches.Any())
     {
         <div class="round-robin">
             <h3 class="round-robin-title">Round Robin Phase</h3>
             @if(Tournament.RoundRobinPhaseGroups > 1)
             {
-                <p>There are @Tournament.RoundRobinPhaseGroups groups with @RoundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There are @Tournament.RoundRobinPhaseGroups groups with @_roundRobinPhaseMatches.Count() matches in this phase.</p>
             }
             else
             {
-                <p>There is @Tournament.RoundRobinPhaseGroups group with @RoundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There is @Tournament.RoundRobinPhaseGroups group with @_roundRobinPhaseMatches.Count() matches in this phase.</p>
             }
-            @if (!Tournament.RoundRobinPhaseMatches.Any(x => x.IsFinished))
+            @if (!_roundRobinPhaseMatches.Any(x => x.IsFinished))
             {
                 <Alert Color="Color.Info" Visible>
                     Phase in progress... Confirm all matches when added the result to each one.
@@ -41,7 +41,7 @@ else
                     Phase finished!
                 </Alert>
             }
-             @if (Tournament.RoundRobinPhaseMatches
+             @if (_roundRobinPhaseMatches
                 .All(x => x.Sets.Any()))
             {
                 <Button Color="Color.Success" Clicked="ConfirmAllMatches">Confirm all matches</Button>
@@ -50,7 +50,7 @@ else
             <div class="group-header-container">
                 @for (var groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
                 {
-                    var groupMatches = RoundRobinPhaseMatches
+                    var groupMatches = _roundRobinPhaseMatches
                         .Where(x => x.RoundRobinPhaseGroup == groupNumber)
                         .GroupBy(x => x.RoundRobinPhaseRound)
                         .OrderBy(group => group.Key);
@@ -87,7 +87,7 @@ else
 @code {
     private bool _loading;
 
-    private List<RoundRobinMatchResponse> RoundRobinPhaseMatches = new();
+    private List<RoundRobinMatchResponse> _roundRobinPhaseMatches = new();
     
     [Parameter] 
     public TournamentDetailResponse? Tournament { get; set; }
@@ -116,7 +116,7 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                RoundRobinPhaseMatches = await response.Content.ReadFromJsonAsync<List<RoundRobinMatchResponse>>();
+                _roundRobinPhaseMatches = await response.Content.ReadFromJsonAsync<List<RoundRobinMatchResponse>>();
                 StateHasChanged();
             }
             else
@@ -173,7 +173,7 @@ else
 
     private bool CanIConfirmAllMatches()
     {
-        var allMatchesHaveASet = RoundRobinPhaseMatches
+        var allMatchesHaveASet = _roundRobinPhaseMatches
             .All(x => x.Sets.Any());
         
         return !allMatchesHaveASet;

@@ -16,7 +16,7 @@ public class TournamentDetailResponse
     public decimal Price { get; set; }
     public bool RegistrationsOpen { get; set; } 
     public bool ShowBrackets { get; set; }
-    public List<RoundRobinMatchResponse> RoundRobinPhaseMatches { get; set; } = new();
+    public bool GeneratedRoundRobinPhase { get; set; }
     public int RoundRobinPhaseGroups { get; set; }
     public Uri? ImageUri { get; set; }
 }           

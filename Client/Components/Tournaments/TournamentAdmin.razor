@@ -15,11 +15,11 @@
 </div>
 
 <div class="tournament-card-creator-actions">
-    @if (!Tournament.RoundRobinPhaseMatches.Any())
+    @if (!Tournament.GeneratedRoundRobinPhase && _loading == false)
     {
         <Button Size="Size.Small" Color="Color.Info" Clicked="GenerateRoundRobinPhase">Generate round robin phase</Button>
     }
-    @if (Tournament.RoundRobinPhaseMatches.Any())
+    @if (Tournament.GeneratedRoundRobinPhase && _loading == false)
     {
         <Button Size="Size.Small" Color="Color.Danger" Clicked="DeleteRoundRobinPhase">Delete round robin phase</Button>
     }
@@ -35,6 +35,7 @@
     public EventCallback RefreshTournament { get; set; }
     
     private bool _showEdit;
+    private bool _loading;
     private bool _showBrackets;
 
     private void OpenEditModal()
@@ -53,6 +54,7 @@
         {
             try
             {
+                _loading = true;
                 var response = await Http.DeleteAsync($"tournament/{Tournament.Id}");
 
                 if (response.IsSuccessStatusCode)
@@ -71,7 +73,7 @@
             }
             finally
             {
-                
+                _loading = false;
             }
         }
     }
@@ -82,6 +84,7 @@
         {
             try
             {
+                _loading = true;
                 var response = await Http.PostAsync($"tournament/{Tournament.Id}/generate-round-robin-phase", null);
 
                 if (response.IsSuccessStatusCode)
@@ -101,7 +104,7 @@
             }
             finally
             {
-                
+                _loading = false;
             }
         }
     }
