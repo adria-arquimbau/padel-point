@@ -2,6 +2,10 @@
 @using EventsManager.Client.Components.Match
 @using Color = Blazorise.Color
 
+@inject HttpClient Http
+@inject IMessageService MessageService
+@inject IToastService ToastService
+
 @if (!Tournament.ShowBrackets)
 {
     <Alert Style="margin-top: 10px" Color="Color.Info" Visible>
@@ -26,7 +30,7 @@ else
             @if (!Tournament.RoundRobinPhaseMatches.Any(x => x.IsFinished))
             {
                 <Alert Color="Color.Info" Visible>
-                    Phase in progress...
+                    Phase in progress... Confirm all matches in each group when finished.
                 </Alert>
             }
             else
@@ -48,6 +52,19 @@ else
                     {
                         <div class="group">
                             <h4 class="group-title">Group @groupNumber</h4>
+                            @if (Tournament.RoundRobinPhaseMatches
+                                .Where(x => x.RoundRobinPhaseGroup == groupNumber)
+                                .All(x => x.IsFinished))
+                            {
+                                <Alert Color="Color.Success" Visible>
+                                    Group finished!
+                                </Alert>
+                            }
+                            else
+                            {
+                                <Button Disabled="CanIConfirmAllMatches(groupNumber)" Color="Color.Success" Clicked="ConfirmAllMatches">Confirm all matches</Button>
+                            }
+                            
                             @foreach (var roundGroup in groupMatches)
                             {
                                 <div class="round">
@@ -73,7 +90,9 @@ else
 
 
 @code {
-    [Parameter]
+    private bool _loading;
+
+    [Parameter] 
     public TournamentDetailResponse? Tournament { get; set; }
     
     [Parameter] 
@@ -83,6 +102,46 @@ else
     {
         RefreshMatch.InvokeAsync();
     }
+
+    private async Task ConfirmAllMatches()
+    {
+        if (await MessageService.Confirm("Are you sure you want to confirm all matches result?", "Confirm match results"))
+        {
+            _loading = true;
+        
+            try
+            {
+                var response = await Http.PostAsync($"tournament/{Tournament.Id}/confirm-round-robin-phase-matches", null);
+                if (response.IsSuccessStatusCode)
+                {
+                    ToastService.ShowInfo($"All round robin phase matches confirmed.");
+                    _loading = false;
+                    await RefreshMatch.InvokeAsync();
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    ToastService.ShowError(error);
+                }
+            }
+            catch (Exception)
+            {
+                ToastService.ShowError("Something went wrong, please try again later.");
+            }
+        
+            _loading = false;   
+        }
+    }   
+
+    private bool CanIConfirmAllMatches(int groupNumber)
+    {
+        var allMatchesHaveASet = Tournament.RoundRobinPhaseMatches
+            .Where(x => x.RoundRobinPhaseGroup == groupNumber)
+            .All(x => x.Sets.Any());
+        
+        return !allMatchesHaveASet;
+    }
+
 }
 
 <style>

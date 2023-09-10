@@ -47,7 +47,7 @@ public class MatchManagerController : ControllerBase
             foreach (var player in playersFromTheMatch)
             {
                 var eloHistoryForThePlayer = eloHistoriesFromTheMatch
-                    .SingleOrDefault(x => x.PlayerId == player.Id);
+                    .FirstOrDefault(x => x.PlayerId == player.Id);
 
                 if (eloHistoryForThePlayer is not null)
                 {

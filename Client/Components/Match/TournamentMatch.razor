@@ -63,7 +63,7 @@
     {
         <Button Size="Size.ExtraSmall" Color="Color.Success" Clicked="ShowModal">Add Result</Button>
     }
-    @if (Match.RequesterIsTheCreator && Match.Sets.Any() && _loading == false)
+    @if (Match.RequesterIsTheCreator && Match.Sets.Any() && _loading == false && Match.IsFinished == false)
     {
         <Button Size="Size.ExtraSmall" Color="Color.Danger" Clicked="DeleteResult">Delete Result</Button>
     }

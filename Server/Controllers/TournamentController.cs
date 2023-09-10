@@ -32,6 +32,7 @@ public class TournamentController : ControllerBase
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         var tournaments = await _context.Tournament
+            .AsNoTracking()
             .Where(x => !x.Name.Contains("TEST"))
             .Select(x => new TournamentResponse
             {
@@ -149,6 +150,7 @@ public class TournamentController : ControllerBase
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var tournament = await _context.Tournament
+            .AsNoTracking()
             .Where(x => x.Id == tournamentId)
             .Select(x => new TournamentDetailResponse
             {   
@@ -301,6 +303,7 @@ public class TournamentController : ControllerBase
         var lowerTerm = term.ToLower();
 
         var players = await _context.Player
+            .AsNoTracking()
             .Where(p => p.NickName.ToLower().Contains(lowerTerm) && p.UserId != userId)
             .ToListAsync(cancellationToken: cancellationToken);
 
@@ -411,5 +414,47 @@ public class TournamentController : ControllerBase
         await _context.SaveChangesAsync(cancellationToken);
         
         return Ok();
+    }
+    
+    [HttpPost("{tournamentId:guid}/confirm-round-robin-phase-matches")]
+    [Authorize(Roles = "User")]
+    public async Task<IActionResult> ConfirmRoundRobinPhaseMatches([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var matches = await _context.Match
+            .Where(x => x.TournamentId == tournamentId && x.RobinPhaseGroup != null)
+            .Include(x => x.Creator)
+            .Include(x => x.Sets)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        if (matches.Any(x => x.Creator.UserId != userId))
+        {
+            return Conflict("You are not the creator of this tournament");
+        }
+
+        if (matches.Any(x => !x.Sets.Any()))
+        {
+            return Conflict("You can't confirm the round robin phase group matches if there are matches without sets");
+        }
+
+        foreach (var match in matches)
+        {
+           match.ScoreConfirmedTeamOne = true;
+           match.ScoreConfirmedTeamTwo = true;
+           match.Winner = CalculateMatchWinner(match.Sets.ToList());
+        }
+        
+        await _context.SaveChangesAsync(cancellationToken);
+        
+        return Ok();
+    }
+        
+    private static Shared.Enums.Team? CalculateMatchWinner(IReadOnlyCollection<Set> sets)
+    {
+        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
+        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
+
+        return team1Wins != team2Wins ? (team1Wins > team2Wins ? Shared.Enums.Team.Team1 : Shared.Enums.Team.Team2) : null;
     }
 }
