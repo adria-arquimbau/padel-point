@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using EventsManager.Shared.Enums;
 using Team = EventsManager.Shared.Enums.Team;
 
 namespace EventsManager.Server.Handlers.Commands.Tournaments.RobinPhase;
@@ -89,9 +90,35 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
     }
 
     private static IEnumerable<List<Models.Team>> GetGroups(List<Models.Team> teams, Tournament tournament)
-    {
-        var random = new Random();
+{
+    var random = new Random();
 
+    if (tournament.RoundRobinType == RoundRobinType.BestPlayersLeadGroups)
+    {
+        // Order teams by the average Elo of their players in descending order
+        teams = teams.OrderByDescending(t => (t.Player1.Elo + t.Player2.Elo) / 2).ToList();
+
+        // Calculate the number of teams per group
+        var teamsPerGroup = teams.Count / tournament.RoundRobinPhaseGroups;
+
+        // Create and distribute teams to groups in a continuous manner
+        var groups = new List<List<Models.Team>>();
+        for (var i = 0; i < tournament.RoundRobinPhaseGroups; i++)
+        {
+            groups.Add(new List<Models.Team> { teams[i] });
+        }
+
+        // Distribute the remaining teams
+        for (var i = tournament.RoundRobinPhaseGroups; i < teams.Count; i++)
+        {
+            groups[i % tournament.RoundRobinPhaseGroups].Add(teams[i]);
+        }
+
+        // Now, 'groups' contains your divided teams with the best teams leading each group.
+        return groups;
+    }
+    else
+    {
         // Shuffle the teams randomly
         teams = teams.OrderBy(t => random.Next()).ToList();
 
@@ -112,6 +139,9 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
         // Now, 'groups' contains your randomly divided teams in the specified number of groups.
         return groups;
     }
+}
+    
+
 }
 
 public class RoundRobinMatchGenerator

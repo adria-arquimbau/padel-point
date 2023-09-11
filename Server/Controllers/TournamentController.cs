@@ -132,7 +132,6 @@ public class TournamentController : ControllerBase
         };
         tournament.Price = request.Price;
         
-        
         // var maxTeams = request.MaxTeams switch
         // {
         //     MaxTeams.Eight => 8,
@@ -207,7 +206,7 @@ public class TournamentController : ControllerBase
     public async Task<IActionResult> GetRoundRobinPhase([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+        
         var matches = await _context.Match
             .AsNoTracking() 
             .Where(x => x.TournamentId == tournamentId && x.RobinPhaseGroup != null)
