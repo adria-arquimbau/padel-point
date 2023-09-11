@@ -74,6 +74,13 @@
                     <SelectItem Value="4">4</SelectItem>
                 </Select>
             </Field>
+            <Field>
+                <FieldLabel>Round robin type</FieldLabel>
+                <Select @bind-SelectedValue="@Tournament.RoundRobinType" TValue="RoundRobinType">
+                    <SelectItem Value="RoundRobinType.Random">Random groups</SelectItem>
+                    <SelectItem Value="RoundRobinType.BestPlayersLeadGroups">Best players lead groups</SelectItem>
+                </Select>
+            </Field>
             <div class="form-group">
                 <Switch @bind-Checked="@Tournament.RegistrationsOpen" TValue="bool">Open registrations</Switch>
             </div>

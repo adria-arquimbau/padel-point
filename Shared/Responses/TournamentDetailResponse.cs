@@ -18,5 +18,6 @@ public class TournamentDetailResponse
     public bool ShowBrackets { get; set; }
     public bool GeneratedRoundRobinPhase { get; set; }
     public int RoundRobinPhaseGroups { get; set; }
-    public Uri? ImageUri { get; set; }
+    public Uri? ImageUri { get; set; }  
+    public RoundRobinType RoundRobinType { get; set; }
 }           

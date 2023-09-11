@@ -13,5 +13,6 @@ public class TournamentRequest
     public bool OpenRegistrations { get; set; }
     public bool ShowBrackets { get; set; }
     public int RoundRobinPhaseGroups { get; set; }
+    public RoundRobinType RoundRobinType { get; set; }
 }   
-    
+        
