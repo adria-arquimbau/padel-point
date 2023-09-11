@@ -64,6 +64,9 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
         builder.Property(mp => mp.Location)
             .HasDefaultValue(MatchLocation.None)
             .HasConversion<string>();
+        builder.Property(mp => mp.RoundRobinType)
+            .HasDefaultValue(RoundRobinType.Random)
+            .HasConversion<string>();
     }
 }
 

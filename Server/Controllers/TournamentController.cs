@@ -86,6 +86,7 @@ public class TournamentController : ControllerBase
             MaxTeams = maxTeams,
             Creator = player,
             Price = request.Price,
+            RoundRobinType = request.RoundRobinType,
             RoundRobinPhaseGroups = request.RoundRobinPhaseGroups
         };
     
@@ -121,6 +122,7 @@ public class TournamentController : ControllerBase
         tournament.StartDate = request.StartDate;
         tournament.Location = request.Location;
         tournament.ShowBrackets = request.ShowBrackets;
+        tournament.RoundRobinType = request.RoundRobinType;
         tournament.RoundRobinPhaseGroups = request.RoundRobinPhaseGroups;
         tournament.MaxTeams = request.MaxTeams switch
         {
