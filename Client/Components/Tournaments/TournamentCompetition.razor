@@ -21,18 +21,18 @@ else
     {
         <div class="round-robin">
             <h3 class="round-robin-title">Round Robin Phase</h3>
-            @if(Tournament.RoundRobinPhaseGroups > 1)
+            @if (Tournament.RoundRobinPhaseGroups > 1)
             {
-                <p>There are @Tournament.RoundRobinPhaseGroups groups with @_roundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There are @Tournament.RoundRobinPhaseGroups groups.</p>
             }
             else
             {
-                <p>There is @Tournament.RoundRobinPhaseGroups group with @_roundRobinPhaseMatches.Count() matches in this phase.</p>
+                <p>There is @Tournament.RoundRobinPhaseGroups group.</p>
             }
-            @if (!_roundRobinPhaseMatches.Any(x => x.IsFinished))
+            @if (!_roundRobinPhaseMatches.Any(x => x.Rounds.Any(r => r.Matches.Any(m => !m.IsFinished))))
             {
                 <Alert Color="Color.Info" Visible>
-                    Phase in progress... Confirm all matches when added the result to each one.
+                    Phase in progress... Confirm all matches when adding the result to each one.
                 </Alert>
             }
             else
@@ -41,62 +41,51 @@ else
                     Phase finished!
                 </Alert>
             }
-             @if (_roundRobinPhaseMatches
-                .All(x => x.Sets.Any()))
+            @if (_roundRobinPhaseMatches
+                .All(x => x.Rounds.All(r => r.Matches.All(m => m.Sets.Any()))))
             {
                 <Button Color="Color.Success" Clicked="ConfirmAllMatches">Confirm all matches</Button>
             }
-            
-            <div class="group-header-container">
-                @for (var groupNumber = 1; groupNumber <= Tournament.RoundRobinPhaseGroups; groupNumber++)
-                {
-                    var groupMatches = _roundRobinPhaseMatches
-                        .Where(x => x.RoundRobinPhaseGroup == groupNumber)
-                        .GroupBy(x => x.RoundRobinPhaseRound)
-                        .OrderBy(group => group.Key);
 
-                    if (groupMatches.Any())
-                    {
-                        <div class="group">
-                            <h4 class="group-title">Group @groupNumber</h4>
-                            
-                            @foreach (var roundGroup in groupMatches)
-                            {
-                                <div class="round">
-                                    <h5 style="text-align: left;">Round @roundGroup.Key</h5>
-                                    <div class="round-matches">
-                                        @foreach (var match in roundGroup)
-                                        {
-                                            <TournamentMatch RefreshMatch="RefreshMatchCallback" Match="@match"></TournamentMatch>
-                                        }
-                                    </div>
+            <div class="group-header-container">
+                @foreach (var group in _roundRobinPhaseMatches)
+                {
+                    <div class="group">
+                        <h4 class="group-title">Group @group.GroupNumber</h4><p style="font-size: 10px">Average elo: @group.AverageElo</p>
+
+                        @foreach (var round in group.Rounds)
+                        {
+                            <div class="round">
+                                <h5 style="text-align: left;">Round @round.RoundNumber</h5>
+                                <div class="round-matches">
+                                    @foreach (var match in round.Matches)
+                                    {
+                                        <TournamentMatch RefreshMatch="RefreshMatchCallback" Match="@match"></TournamentMatch>
+                                    }
                                 </div>
-                            }
-                            <Divider />
-                        </div>
-                        
-                    }
+                            </div>
+                        }
+                        <Divider />
+                    </div>
                 }
             </div>
         </div>
     }
 }
 
-
-
 @code {
     private bool _loading;
 
-    private List<RoundRobinMatchResponse> _roundRobinPhaseMatches = new();
-    
-    [Parameter] 
+    private List<RoundRobinGroupResponse> _roundRobinPhaseMatches = new();
+
+    [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
         await GetRoundRobinPhase();
     }
-    
+
     private async Task GetRoundRobinPhase()
     {
         try
@@ -116,7 +105,7 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                _roundRobinPhaseMatches = await response.Content.ReadFromJsonAsync<List<RoundRobinMatchResponse>>();
+                _roundRobinPhaseMatches = await response.Content.ReadFromJsonAsync<List<RoundRobinGroupResponse>>();
                 StateHasChanged();
             }
             else
@@ -133,9 +122,9 @@ else
         {
             _loading = false;
         }
-        
+
     }
-    
+
     public async Task RefreshMatchCallback()
     {
         await GetRoundRobinPhase();
@@ -146,7 +135,7 @@ else
         if (await MessageService.Confirm("Are you sure you want to confirm all matches result?", "Confirm match results"))
         {
             _loading = true;
-        
+
             try
             {
                 var response = await Http.PostAsync($"tournament/{Tournament.Id}/confirm-round-robin-phase-matches", null);
@@ -166,20 +155,21 @@ else
             {
                 ToastService.ShowError("Something went wrong, please try again later.");
             }
-        
-            _loading = false;   
+
+            _loading = false;
         }
-    }   
+    }
 
     private bool CanIConfirmAllMatches()
     {
         var allMatchesHaveASet = _roundRobinPhaseMatches
-            .All(x => x.Sets.Any());
-        
+            .All(x => x.Rounds.All(r => r.Matches.All(m => m.Sets.Any())));
+
         return !allMatchesHaveASet;
     }
 
 }
+
 
 <style>
     .round-robin {

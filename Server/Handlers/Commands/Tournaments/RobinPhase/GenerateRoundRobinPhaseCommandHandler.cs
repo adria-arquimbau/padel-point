@@ -2,11 +2,6 @@
 using EventsManager.Server.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using EventsManager.Shared.Enums;
 using Team = EventsManager.Shared.Enums.Team;
 
@@ -144,7 +139,7 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
 
 }
 
-public class RoundRobinMatchGenerator
+public static class RoundRobinMatchGenerator
 {
     public static Match CreateMatch(List<Player> team1Players, List<Player> team2Players, DateTime matchStartTime, double matchDuration, Tournament tournament, int group, int round)
     {

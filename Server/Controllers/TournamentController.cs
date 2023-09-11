@@ -206,43 +206,61 @@ public class TournamentController : ControllerBase
     public async Task<IActionResult> GetRoundRobinPhase([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
-        var matches = await _context.Match
-            .AsNoTracking() 
+
+        var groups = await _context.Match
+            .AsNoTracking()
             .Where(x => x.TournamentId == tournamentId && x.RobinPhaseGroup != null)
-            .Select(rrm => new RoundRobinMatchResponse
+            .GroupBy(rrm => rrm.RobinPhaseGroup)
+            .Select(group => new RoundRobinGroupResponse
             {
-                Id = rrm.Id,
-                IsFinished = rrm.ScoreConfirmedTeamOne && rrm.ScoreConfirmedTeamTwo,
-                StartDateTime = rrm.StartDateTime,
-                RequesterIsTheCreator = rrm.Creator.UserId == userId,
-                Sets = rrm.Sets.Select(s => new SetDto
-                {
-                    SetNumber = s.SetNumber,
-                    Team1Score = s.Team1Score,
-                    Team2Score = s.Team2Score,
-                }).ToList(),
-                RoundRobinPhaseGroup = rrm.RobinPhaseGroup ?? 0,
-                RoundRobinPhaseRound = rrm.RobinPhaseRound ?? 0,
-                AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
-                PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
-                {
-                    Id = mp.Player.Id,
-                    NickName = mp.Player.NickName,
-                    ImageUrl = mp.Player.ImageUrl,
-                    Elo = mp.Player.Elo
-                }).ToList(),
-                PlayersTeamTwo = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team2).Select(mp => new PlayerDto
-                {
-                    Id = mp.Player.Id,
-                    NickName = mp.Player.NickName,
-                    ImageUrl = mp.Player.ImageUrl,
-                    Elo = mp.Player.Elo
-                }).ToList(),
-            }).ToListAsync(cancellationToken: cancellationToken);
-           
-        return Ok(matches);
-    }   
+                GroupNumber = group.Key.Value,
+                Rounds = group
+                    .GroupBy(rrm => rrm.RobinPhaseRound)
+                    .Select(roundGroup => new RoundRobinRoundResponse
+                    {
+                        RoundNumber = roundGroup.Key.Value,
+                        Matches = roundGroup.Select(rrm => new RoundRobinMatchResponse
+                        {
+                            Id = rrm.Id,
+                            IsFinished = rrm.ScoreConfirmedTeamOne && rrm.ScoreConfirmedTeamTwo,
+                            StartDateTime = rrm.StartDateTime,
+                            RequesterIsTheCreator = rrm.Creator.UserId == userId,
+                            Sets = rrm.Sets.Select(s => new SetDto
+                            {
+                                SetNumber = s.SetNumber,
+                                Team1Score = s.Team1Score,
+                                Team2Score = s.Team2Score,
+                            }).ToList(),
+                            RoundRobinPhaseGroup = rrm.RobinPhaseGroup ?? 0,
+                            RoundRobinPhaseRound = rrm.RobinPhaseRound ?? 0,
+                            AverageElo = (int)Math.Round(rrm.MatchPlayers.Average(mp => mp.Player.Elo)),
+                            PlayersTeamOne = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team1).Select(mp => new PlayerDto
+                            {
+                                Id = mp.Player.Id,
+                                NickName = mp.Player.NickName,
+                                ImageUrl = mp.Player.ImageUrl,
+                                Elo = mp.Player.Elo
+                            }).ToList(),
+                            PlayersTeamTwo = rrm.MatchPlayers.Where(mp => mp.Team == Shared.Enums.Team.Team2).Select(mp => new PlayerDto
+                            {
+                                Id = mp.Player.Id,
+                                NickName = mp.Player.NickName,
+                                ImageUrl = mp.Player.ImageUrl,
+                                Elo = mp.Player.Elo
+                            }).ToList(),
+                        }).ToList(),
+                    })
+                    .ToList()
+            })
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        foreach (var group in groups)
+        {
+            group.AverageElo = (int)Math.Round(group.Rounds.SelectMany(round => round.Matches).Average(m => m.AverageElo));
+        }
+
+        return Ok(groups);
+    }
     
     [HttpDelete("{tournamentId:guid}")]
     [Authorize(Roles = "User")]
@@ -486,7 +504,7 @@ public class TournamentController : ControllerBase
                            !x.ScoreConfirmedTeamTwo, 
                 cancellationToken: cancellationToken);
         
-        
+            
         return Ok(new List<TournamentFinalsMatchResponse>());
     }
 }
