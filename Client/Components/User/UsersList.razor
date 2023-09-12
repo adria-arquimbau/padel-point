@@ -18,6 +18,7 @@
         <tr>
             <th scope="col">User Name</th>
             <th scope="col">Registration date</th>
+            <th scope="col">Email confirmed</th>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
             <tr class="regular-user" @onclick="@(() => OpenModal(user))">
                 <td>@user.UserName</td>
                 <td>@user.RegistrationDate</td>
+                <td>@user.EmailConfirmed</td>
             </tr>
         }
         </tbody>
