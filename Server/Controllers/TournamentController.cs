@@ -414,6 +414,7 @@ public class TournamentController : ControllerBase
         try
         {
             await _mediator.Send(new GenerateRoundRobinPhaseCommandRequest(tournamentId, userId), cancellationToken);
+            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
         }
         catch (Exception e)
         {
@@ -490,7 +491,8 @@ public class TournamentController : ControllerBase
         
         if (tournament.CompetitionStyle == CompetitionStyle.RoundRobinPhaseAndFinals)
         {
-            
+            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
+            //TODO: Generate finals
         }
         
         await _context.SaveChangesAsync(cancellationToken);
