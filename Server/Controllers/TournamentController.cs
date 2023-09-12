@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
-using EventsManager.Server.Handlers.Commands.Tournaments.CalculatePositions;
 using EventsManager.Server.Handlers.Commands.Tournaments.RobinPhase;
+using EventsManager.Server.Handlers.Queries.Tournaments.GetPositions.CalculatePositions;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
@@ -172,7 +172,7 @@ public class TournamentController : ControllerBase
                 Price = x.Price,
                 IsPlayerTheCreator = userId != null && x.Creator.UserId == userId,
                 IsPlayerAlreadySignedIn = userId != null && x.Teams.Any(t => t.Player1.UserId == userId || t.Player2.UserId == userId),
-                Couples = x.Teams.Select(c => new CoupleResponse
+                Couples = x.Teams.Select(c => new TeamResponse
                 {
                     Id = c.Id,
                     AverageElo = (int)Math.Round(x.Teams.Average(t => (t.Player1.Elo + t.Player2.Elo) / 2)),
@@ -414,7 +414,6 @@ public class TournamentController : ControllerBase
         try
         {
             await _mediator.Send(new GenerateRoundRobinPhaseCommandRequest(tournamentId, userId), cancellationToken);
-            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
         }
         catch (Exception e)
         {
@@ -485,13 +484,11 @@ public class TournamentController : ControllerBase
 
         if (tournament.CompetitionStyle == CompetitionStyle.RoundRobinPhaseOnly)
         {
-            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
             tournament.Finished = true;
         }
         
         if (tournament.CompetitionStyle == CompetitionStyle.RoundRobinPhaseAndFinals)
         {
-            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
             //TODO: Generate finals
         }
         
@@ -523,5 +520,16 @@ public class TournamentController : ControllerBase
         
             
         return Ok(new List<TournamentFinalsMatchResponse>());
+    }
+    
+    [HttpGet("{tournamentId:guid}/positions")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPositions([FromRoute] Guid tournamentId, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var response = await _mediator.Send(new CalculateTournamentPositionsQueryRequest(tournamentId, userId), cancellationToken);
+        
+        return Ok(response);
     }
 }

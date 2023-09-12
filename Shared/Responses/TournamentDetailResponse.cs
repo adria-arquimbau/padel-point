@@ -11,7 +11,7 @@ public class TournamentDetailResponse
     public int MaxTeams { get; set; }   
     public bool IsPlayerTheCreator { get; set; }
     public required Guid Id { get; set; }
-    public List<CoupleResponse> Couples { get; set; } = new();
+    public List<TeamResponse> Couples { get; set; } = new();
     public bool IsPlayerAlreadySignedIn { get; set; }   
     public decimal Price { get; set; }
     public bool RegistrationsOpen { get; set; } 

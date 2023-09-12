@@ -1,6 +1,6 @@
 ﻿namespace EventsManager.Shared.Responses;
 
-public class CoupleResponse
+public class TeamResponse
 {
     public PlayerDetailResponse Player1 { get; set; }
     public PlayerDetailResponse Player2 { get; set; }
