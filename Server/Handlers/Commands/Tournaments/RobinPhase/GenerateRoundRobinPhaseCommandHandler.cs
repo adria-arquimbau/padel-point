@@ -85,58 +85,60 @@ public class GenerateRoundRobinPhaseCommandHandler : IRequestHandler<GenerateRou
     }
 
     private static IEnumerable<List<Models.Team>> GetGroups(List<Models.Team> teams, Tournament tournament)
-{
-    var random = new Random();
-
-    if (tournament.RoundRobinType == RoundRobinType.BestPlayersLeadGroups)
     {
-        // Order teams by the average Elo of their players in descending order
-        teams = teams.OrderByDescending(t => (t.Player1.Elo + t.Player2.Elo) / 2).ToList();
+        var random = new Random();
 
-        // Calculate the number of teams per group
-        var teamsPerGroup = teams.Count / tournament.RoundRobinPhaseGroups;
-
-        // Create and distribute teams to groups in a continuous manner
-        var groups = new List<List<Models.Team>>();
-        for (var i = 0; i < tournament.RoundRobinPhaseGroups; i++)
+        if (tournament.RoundRobinType == RoundRobinType.BestPlayersLeadGroups)
         {
-            groups.Add(new List<Models.Team> { teams[i] });
-        }
+            // Order teams by the average Elo of their players in descending order
+            teams = teams.OrderByDescending(t => (t.Player1.Elo + t.Player2.Elo) / 2).ToList();
 
-        // Distribute the remaining teams
-        for (var i = tournament.RoundRobinPhaseGroups; i < teams.Count; i++)
+            // Calculate the number of teams per group
+            var teamsPerGroup = teams.Count / tournament.RoundRobinPhaseGroups;
+
+            // Create and distribute teams to groups in a continuous manner
+            var groups = new List<List<Models.Team>>();
+            for (var i = 0; i < tournament.RoundRobinPhaseGroups; i++)
+            {
+                groups.Add(new List<Models.Team> { teams[i] });
+            }
+
+            // Distribute the remaining teams
+            for (var i = tournament.RoundRobinPhaseGroups; i < teams.Count; i++)
+            {
+                // Calculate the group index for the current team
+                var groupIndex = i % tournament.RoundRobinPhaseGroups;
+
+                // Add the team to the group
+                groups[groupIndex].Add(teams[i]);
+            }
+
+            // Now, 'groups' contains your divided teams with the best teams leading each group.
+            return groups;
+        }
+        else
         {
-            groups[i % tournament.RoundRobinPhaseGroups].Add(teams[i]);
-        }
+            // Shuffle the teams randomly
+            teams = teams.OrderBy(t => random.Next()).ToList();
 
-        // Now, 'groups' contains your divided teams with the best teams leading each group.
-        return groups;
+            // Calculate the number of teams per group
+            var teamsPerGroup = teams.Count / tournament.RoundRobinPhaseGroups;
+
+            // Create and distribute teams to groups
+            var groups = Enumerable.Range(0, tournament.RoundRobinPhaseGroups)
+                .Select(i => teams.Skip(i * teamsPerGroup).Take(teamsPerGroup).ToList())
+                .ToList();
+
+            // Handle any remaining teams (if teams.Count is not a multiple of numberOfGroups)
+            for (var i = 0; i < teams.Count % tournament.RoundRobinPhaseGroups; i++)
+            {
+                groups[i].Add(teams[i + (tournament.RoundRobinPhaseGroups * teamsPerGroup)]);
+            }
+
+            // Now, 'groups' contains your randomly divided teams in the specified number of groups.
+            return groups;
+        }
     }
-    else
-    {
-        // Shuffle the teams randomly
-        teams = teams.OrderBy(t => random.Next()).ToList();
-
-        // Calculate the number of teams per group
-        var teamsPerGroup = teams.Count / tournament.RoundRobinPhaseGroups;
-
-        // Create and distribute teams to groups
-        var groups = Enumerable.Range(0, tournament.RoundRobinPhaseGroups)
-            .Select(i => teams.Skip(i * teamsPerGroup).Take(teamsPerGroup).ToList())
-            .ToList();
-
-        // Handle any remaining teams (if teams.Count is not a multiple of numberOfGroups)
-        for (var i = 0; i < teams.Count % tournament.RoundRobinPhaseGroups; i++)
-        {
-            groups[i].Add(teams[i + (tournament.RoundRobinPhaseGroups * teamsPerGroup)]);
-        }
-
-        // Now, 'groups' contains your randomly divided teams in the specified number of groups.
-        return groups;
-    }
-}
-    
-
 }
 
 public static class RoundRobinMatchGenerator
