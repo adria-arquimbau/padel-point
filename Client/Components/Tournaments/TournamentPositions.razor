@@ -8,13 +8,21 @@
 @inject IHttpClientFactory HttpClientFactory
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>Tournament Positions</h3>
-
-@foreach (var team in _positions)
+@if (_loading)
 {
-    <p>Position @team.Position</p>
-    <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
+    <LoadingSpinner></LoadingSpinner>
 }
+else
+{
+    <h3>Tournament Positions</h3>
+
+    foreach (var team in _positions)
+    {
+        <p>Position @team.Position</p>
+        <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
+    }
+}
+
 
 @code {
     [Parameter]
