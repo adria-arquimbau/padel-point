@@ -28,6 +28,7 @@
             <Tab Name="teams">Teams</Tab>
             <Tab Name="roundRobin">Round Robin</Tab>
             <Tab Name="finals">Finals</Tab>
+            <Tab Name="positions">Positions</Tab>
             @if (Tournament.IsPlayerTheCreator)
             {
                 <Tab Name="admin">Admin</Tab>
@@ -66,6 +67,9 @@
             </TabPanel>
             <TabPanel Name="finals">
                 <TournamentFinals RefreshMatch="Refresh" Tournament="@Tournament"></TournamentFinals>
+            </TabPanel>
+            <TabPanel Name="positions">
+                <TournamentPositions></TournamentPositions>
             </TabPanel>
             @if (Tournament.IsPlayerTheCreator)
             {
