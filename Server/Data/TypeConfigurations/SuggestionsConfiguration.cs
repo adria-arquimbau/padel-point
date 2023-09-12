@@ -1,5 +1,6 @@
 ﻿using EventsManager.Server.Models;
 using EventsManager.Shared.Enums;
+using EventsManager.Shared.Responses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Team = EventsManager.Server.Models.Team;
@@ -66,6 +67,9 @@ public class TournamentConfiguration : IEntityTypeConfiguration<Tournament>
             .HasConversion<string>();
         builder.Property(mp => mp.RoundRobinType)
             .HasDefaultValue(RoundRobinType.Random)
+            .HasConversion<string>();
+        builder.Property(mp => mp.CompetitionStyle)
+            .HasDefaultValue(CompetitionStyle.RoundRobinPhaseOnly)
             .HasConversion<string>();
     }
 }
