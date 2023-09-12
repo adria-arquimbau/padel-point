@@ -494,7 +494,7 @@ public class TournamentController : ControllerBase
         
         await _context.SaveChangesAsync(cancellationToken);
         
-        return Ok();
+        return Ok(); 
     }
         
     private static Shared.Enums.Team? CalculateMatchWinner(IReadOnlyCollection<Set> sets)
