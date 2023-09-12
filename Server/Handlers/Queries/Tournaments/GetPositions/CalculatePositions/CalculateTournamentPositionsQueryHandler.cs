@@ -28,13 +28,13 @@ public class CalculateTournamentPositionsQueryHandler : IRequestHandler<Calculat
         
         if (tournament.RoundRobinMatches.All(x => !x.Sets.Any()))
         {
-            return tournament.Teams
+            var orderedByPositionTeams = tournament.Teams
                 .OrderByDescending(x => x.Player1.Elo + x.Player2.Elo / 2)
                 .Select(x => new TournamentTeamPositionResponse
                 {
-                    Position = 1, //TODO: how to calculate position
+                    Position = 0,
                     Team = new TeamResponse
-                    {
+                    {   
                         Id = x.Id,
                         AverageElo = x.Player1.Elo + x.Player2.Elo / 2,
                         Player1 = new PlayerDetailResponse
@@ -56,6 +56,14 @@ public class CalculateTournamentPositionsQueryHandler : IRequestHandler<Calculat
                     }
                 })
                 .ToList();
+
+            for (var i = 0; i < orderedByPositionTeams.Count; i++)
+            {
+                var team = orderedByPositionTeams[i];
+                team.Position = i + 1;
+            }
+
+            return orderedByPositionTeams;
         }
 
         return new List<TournamentTeamPositionResponse>();
