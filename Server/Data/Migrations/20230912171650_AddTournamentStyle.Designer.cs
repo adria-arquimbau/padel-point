@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventsManager.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230912162540_AddCompetitionStyle")]
-    partial class AddCompetitionStyle
+    [Migration("20230912171650_AddTournamentStyle")]
+    partial class AddTournamentStyle
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -628,6 +628,9 @@ namespace EventsManager.Server.Data.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ImageUri")
                         .HasColumnType("nvarchar(max)");

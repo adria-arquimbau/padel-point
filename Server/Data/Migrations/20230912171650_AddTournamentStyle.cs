@@ -5,7 +5,7 @@
 namespace EventsManager.Server.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCompetitionStyle : Migration
+    public partial class AddTournamentStyle : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,6 +16,13 @@ namespace EventsManager.Server.Data.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 defaultValue: "RoundRobinPhaseOnly");
+
+            migrationBuilder.AddColumn<bool>(
+                name: "Finished",
+                table: "Tournament",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
         }
 
         /// <inheritdoc />
@@ -23,6 +30,10 @@ namespace EventsManager.Server.Data.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CompetitionStyle",
+                table: "Tournament");
+
+            migrationBuilder.DropColumn(
+                name: "Finished",
                 table: "Tournament");
         }
     }

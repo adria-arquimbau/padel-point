@@ -1,5 +1,4 @@
 using EventsManager.Server.Data;
-using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Responses;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

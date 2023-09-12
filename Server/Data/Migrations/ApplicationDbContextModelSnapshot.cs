@@ -626,6 +626,9 @@ namespace EventsManager.Server.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Finished")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ImageUri")
                         .HasColumnType("nvarchar(max)");
 
