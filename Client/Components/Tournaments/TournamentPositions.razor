@@ -1,6 +1,73 @@
+@using EventsManager.Shared.Responses
+@using EventsManager.Client.Components.Players
+@using System.Net
+
+@inject IMessageService MessageService
+@inject IToastService ToastService
+@inject HttpClient Http
+@inject IHttpClientFactory HttpClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>Tournament Positions</h3>
 
-@code {
-    
+@foreach (var team in _positions)
+{
+    <p>Position @team.Position</p>
+    <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
 }
+
+@code {
+    [Parameter]
+    public TournamentDetailResponse? Tournament { get; set; }
+    
+    private List<TournamentTeamPositionResponse> _positions;
+    private bool _loading;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await GetRoundRobinPhase();
+    }
+
+    private async Task GetRoundRobinPhase()
+    {
+        try
+        {
+            _loading = true;
+            HttpResponseMessage? response;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == false)
+            {
+                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+                response = await http.GetAsync($"tournament/{Tournament.Id}/positions");
+            }
+            else
+            {
+                response = await Http.GetAsync($"tournament/{Tournament.Id}/positions");
+            }
+
+            if (response.IsSuccessStatusCode)
+            {
+                _positions = await response.Content.ReadFromJsonAsync<List<TournamentTeamPositionResponse>>();
+                StateHasChanged();
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                ToastService.ShowError(error);
+            }
+        }
+        catch (Exception)
+        {
+            ToastService.ShowError("Something went wrong, please try again later.");
+        }
+        finally
+        {
+            _loading = false;
+        }
+
+    }
+}
+
+<style>
+    
+</style>

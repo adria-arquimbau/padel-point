@@ -26,6 +26,7 @@ public class CalculateTournamentPositionsQueryHandler : IRequestHandler<Calculat
                 .ThenInclude(x => x.Sets)
             .SingleAsync(cancellationToken: cancellationToken);
         
+        //If the tournament doesnt have yet any match with punctuation
         if (tournament.RoundRobinMatches.All(x => !x.Sets.Any()))
         {
             var orderedByPositionTeams = tournament.Teams
@@ -64,6 +65,11 @@ public class CalculateTournamentPositionsQueryHandler : IRequestHandler<Calculat
             }
 
             return orderedByPositionTeams;
+        }
+
+        if (tournament.RoundRobinMatches.Any(x => x.Sets.Any()))
+        {
+            
         }
 
         return new List<TournamentTeamPositionResponse>();
