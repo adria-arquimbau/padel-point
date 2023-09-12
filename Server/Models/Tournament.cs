@@ -17,9 +17,10 @@ public class Tournament
     public decimal Price { get; set; }
     public bool RegistrationOpen { get; set; }
     public bool ShowBrackets { get; set; }
+    public bool Finished { get; set; }
     public ICollection<Match> RoundRobinMatches { get; set; } = new List<Match>();
     public int RoundRobinPhaseGroups { get; set; }
-    public Uri? ImageUri { get; set; }  
+    public Uri? ImageUri { get; set; }
     public RoundRobinType RoundRobinType { get; set; }
     public CompetitionStyle CompetitionStyle { get; set; }
 }

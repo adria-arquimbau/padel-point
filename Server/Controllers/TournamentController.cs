@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using EventsManager.Server.Data;
+using EventsManager.Server.Handlers.Commands.Tournaments.CalculatePositions;
 using EventsManager.Server.Handlers.Commands.Tournaments.RobinPhase;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
@@ -457,27 +458,39 @@ public class TournamentController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        var matches = await _context.Match
-            .Where(x => x.TournamentId == tournamentId && x.RobinPhaseGroup != null)
+        var tournament = await _context.Tournament
+            .Where(x => x.Id == tournamentId)
             .Include(x => x.Creator)
-            .Include(x => x.Sets)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .Include(x => x.RoundRobinMatches)
+                .ThenInclude(x => x.Sets)
+            .SingleAsync(cancellationToken: cancellationToken);
 
-        if (matches.Any(x => x.Creator.UserId != userId))
+        if (tournament.Creator.UserId != userId)
         {
             return Conflict("You are not the creator of this tournament");
         }
 
-        if (matches.Any(x => !x.Sets.Any()))
+        if (tournament.RoundRobinMatches.Any(x => !x.Sets.Any()))
         {
             return Conflict("You can't confirm the round robin phase matches if there are matches without sets");
         }
 
-        foreach (var match in matches)
+        foreach (var match in tournament.RoundRobinMatches)
         {
            match.ScoreConfirmedTeamOne = true;
            match.ScoreConfirmedTeamTwo = true;
            match.Winner = CalculateMatchWinner(match.Sets.ToList());
+        }
+
+        if (tournament.CompetitionStyle == CompetitionStyle.RoundRobinPhaseOnly)
+        {
+            await _mediator.Send(new CalculateTournamentPositionsCommandRequest(tournamentId, userId), cancellationToken);
+            tournament.Finished = true;
+        }
+        
+        if (tournament.CompetitionStyle == CompetitionStyle.RoundRobinPhaseAndFinals)
+        {
+            
         }
         
         await _context.SaveChangesAsync(cancellationToken);
