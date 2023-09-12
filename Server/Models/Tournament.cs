@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using EventsManager.Shared.Enums;
+﻿using EventsManager.Shared.Enums;
+using EventsManager.Shared.Responses;
 
 namespace EventsManager.Server.Models;
 
@@ -19,7 +19,8 @@ public class Tournament
     public bool ShowBrackets { get; set; }
     public ICollection<Match> RoundRobinMatches { get; set; } = new List<Match>();
     public int RoundRobinPhaseGroups { get; set; }
-    public Uri? ImageUri { get; set; }
+    public Uri? ImageUri { get; set; }  
     public RoundRobinType RoundRobinType { get; set; }
+    public CompetitionStyle CompetitionStyle { get; set; }
 }
             

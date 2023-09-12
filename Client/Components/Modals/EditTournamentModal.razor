@@ -75,6 +75,13 @@
                 </Select>
             </Field>
             <Field>
+                <FieldLabel>Competition style</FieldLabel>
+                <Select @bind-SelectedValue="@Tournament.CompetitionStyle" TValue="CompetitionStyle">
+                    <SelectItem Value="CompetitionStyle.RoundRobinPhaseOnly">Only Round Robin Phase</SelectItem>
+                    <SelectItem Value="CompetitionStyle.RoundRobinPhaseAndFinals">Round Robin Phase and Finals</SelectItem>
+                </Select>
+            </Field>
+            <Field>
                 <FieldLabel>Round robin type</FieldLabel>
                 <Select @bind-SelectedValue="@Tournament.RoundRobinType" TValue="RoundRobinType">
                     <SelectItem Value="RoundRobinType.Random">Random groups</SelectItem>
@@ -176,7 +183,8 @@
             Price = _isFree ? 0 : Tournament.Price,
             ShowBrackets = Tournament.ShowBrackets,
             RoundRobinPhaseGroups = Tournament.RoundRobinPhaseGroups,
-            RoundRobinType = Tournament.RoundRobinType
+            RoundRobinType = Tournament.RoundRobinType,
+            CompetitionStyle = Tournament.CompetitionStyle
         };
         
         try

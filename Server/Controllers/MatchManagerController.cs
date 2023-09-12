@@ -2,7 +2,6 @@ using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
-using EventsManager.Shared.Enums;
 using EventsManager.Shared.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

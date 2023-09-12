@@ -1,7 +1,6 @@
 ﻿using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.CalculateEloResultAfterMatch;
 using EventsManager.Server.Models;
-using EventsManager.Shared.Enums;
 using EventsManager.Shared.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

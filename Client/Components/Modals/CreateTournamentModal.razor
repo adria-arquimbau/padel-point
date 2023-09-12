@@ -70,6 +70,13 @@
                 </Select>
             </Field>
             <Field>
+                <FieldLabel>Competition style</FieldLabel>
+                <Select @bind-SelectedValue="@_competitionStyle" TValue="CompetitionStyle">
+                    <SelectItem Value="CompetitionStyle.RoundRobinPhaseOnly">Only Round Robin Phase</SelectItem>
+                    <SelectItem Value="CompetitionStyle.RoundRobinPhaseAndFinals">Round Robin Phase and Finals</SelectItem>
+                </Select>
+            </Field>
+            <Field>
                 <FieldLabel>Round robin type</FieldLabel>
                 <Select @bind-SelectedValue="@_roundRobinType" TValue="RoundRobinType">
                     <SelectItem Value="RoundRobinType.Random">Random groups</SelectItem>
@@ -105,13 +112,13 @@
     public EventCallback DontShow { get; set; }
         
     private DateTime _startDate = DateTime.Now;
-    private DateTime _startTime = DateTime.Now;
     private string? _name = null;
     private string? _description = null;
     private MatchLocation _location = MatchLocation.PadelBaseSalzburg;
     private MaxTeams _maxTeams;
     private int _roundRobinPhaseGroups = 1;
     private RoundRobinType _roundRobinType = RoundRobinType.Random;
+    private CompetitionStyle _competitionStyle = CompetitionStyle.RoundRobinPhaseOnly;
     
     private bool _isFree = true;
     private bool _openRegistrations;
@@ -141,7 +148,8 @@
             OpenRegistrations = _openRegistrations,
             Price = _isFree ? 0 : _price,
             RoundRobinPhaseGroups = _roundRobinPhaseGroups,
-            RoundRobinType = _roundRobinType
+            RoundRobinType = _roundRobinType,
+            CompetitionStyle = _competitionStyle
         };
         
         try

@@ -87,7 +87,8 @@ public class TournamentController : ControllerBase
             Creator = player,
             Price = request.Price,
             RoundRobinType = request.RoundRobinType,
-            RoundRobinPhaseGroups = request.RoundRobinPhaseGroups
+            RoundRobinPhaseGroups = request.RoundRobinPhaseGroups,
+            CompetitionStyle = request.CompetitionStyle
         };
     
         _context.Tournament.Add(tournament);
@@ -124,6 +125,7 @@ public class TournamentController : ControllerBase
         tournament.ShowBrackets = request.ShowBrackets;
         tournament.RoundRobinType = request.RoundRobinType;
         tournament.RoundRobinPhaseGroups = request.RoundRobinPhaseGroups;
+        tournament.CompetitionStyle = request.CompetitionStyle;
         tournament.MaxTeams = request.MaxTeams switch
         {
             MaxTeams.Eight => 8,
