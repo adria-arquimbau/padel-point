@@ -14,29 +14,32 @@
 }
 else
 {
-    <h3>Tournament Positions</h3>
-
-    foreach (var team in _positions)
+    @if (_positions.Any())
     {
-        <p>Position @team.Position</p>
-        <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
+        <h3>Tournament Positions</h3>
+
+        foreach (var team in _positions)
+        {
+            <p>Position @team.Position</p>
+            <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
+        }
     }
-}
 
 
 @code {
+
     [Parameter]
     public TournamentDetailResponse? Tournament { get; set; }
-    
-    private List<TournamentTeamPositionResponse> _positions;
+
+    private List<TournamentTeamPositionResponse> _positions = new();
     private bool _loading;
-    
+
     protected override async Task OnInitializedAsync()
     {
-        await GetRoundRobinPhase();
+        await GetPositions();
     }
 
-    private async Task GetRoundRobinPhase()
+    private async Task GetPositions()
     {
         try
         {
@@ -74,8 +77,6 @@ else
         }
 
     }
-}
 
-<style>
-    
-</style>
+}    
+}
