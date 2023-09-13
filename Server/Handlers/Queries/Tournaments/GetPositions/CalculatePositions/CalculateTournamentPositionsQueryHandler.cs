@@ -41,14 +41,17 @@ public class CalculateTournamentPositionsQueryHandler : IRequestHandler<Calculat
                         Player1 = new PlayerDetailResponse
                         {
                             Id = x.Player1Id,
+                            IsConfirmed = x.Player1Confirmed,
+                            TrustFactor = 0,
                             NickName = x.Player1.NickName,
                             Country = x.Player1.Country,
                             ImageUrl = x.Player1.ImageUrl,
-                            Elo = x.Player1.Elo
+                            Elo = x.Player1.Elo,
                         },
                         Player2 = new PlayerDetailResponse
                         {
                             Id = x.Player2Id,
+                            IsConfirmed = x.Player2Confirmed,
                             NickName = x.Player2.NickName,
                             Country = x.Player2.Country,
                             ImageUrl = x.Player2.ImageUrl,

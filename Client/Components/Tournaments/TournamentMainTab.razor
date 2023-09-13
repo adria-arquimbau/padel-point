@@ -69,7 +69,7 @@
                 <TournamentFinals RefreshMatch="Refresh" Tournament="@Tournament"></TournamentFinals>
             </TabPanel>
             <TabPanel Name="positions">
-                <TournamentPositions></TournamentPositions>
+                <TournamentPositions Tournament="Tournament"></TournamentPositions>
             </TabPanel>
             @if (Tournament.IsPlayerTheCreator)
             {

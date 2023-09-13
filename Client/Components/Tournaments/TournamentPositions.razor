@@ -6,7 +6,6 @@
 @inject IToastService ToastService
 @inject HttpClient Http
 @inject IHttpClientFactory HttpClientFactory
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (_loading)
 {
@@ -16,11 +15,9 @@ else
 {
     @if (_positions.Any())
     {
-        <h3>Tournament Positions</h3>
-
         foreach (var team in _positions)
         {
-            <p>Position @team.Position</p>
+            <p>#@team.Position</p>
             <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
         }
     }
@@ -36,7 +33,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //await GetPositions();
+        await GetPositions();
     }
 
     private async Task GetPositions()
@@ -44,21 +41,12 @@ else
         try
         {
             _loading = true;
-            HttpResponseMessage? response;
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity?.IsAuthenticated == false)
-            {
-                var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
-                response = await http.GetAsync($"tournament/{Tournament.Id}/positions");
-            }
-            else
-            {
-                response = await Http.GetAsync($"tournament/{Tournament.Id}/positions");
-            }
+            var http = HttpClientFactory.CreateClient("PadelPoint.ServerAPI.Anonymous");
+            var response = await http.GetAsync($"tournament/{Tournament.Id}/positions");
 
             if (response.IsSuccessStatusCode)
             {
-                //_positions = await response.Content.ReadFromJsonAsync<List<TournamentTeamPositionResponse>>();
+                _positions = await response.Content.ReadFromJsonAsync<List<TournamentTeamPositionResponse>>();
                 StateHasChanged();
             }
             else
