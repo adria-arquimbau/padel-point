@@ -24,7 +24,7 @@ else
             <TeamPlayerCard Couple="team.Team"></TeamPlayerCard>
         }
     }
-
+}
 
 @code {
 
@@ -58,7 +58,7 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                _positions = await response.Content.ReadFromJsonAsync<List<TournamentTeamPositionResponse>>();
+                //_positions = await response.Content.ReadFromJsonAsync<List<TournamentTeamPositionResponse>>();
                 StateHasChanged();
             }
             else
@@ -77,6 +77,4 @@ else
         }
 
     }
-
-}    
 }
