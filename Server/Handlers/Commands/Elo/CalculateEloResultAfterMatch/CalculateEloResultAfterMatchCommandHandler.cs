@@ -34,8 +34,11 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
         // Assume team1 won if they have a higher total score than team2
         var team1TotalScore = match.Sets.Sum(set => set.Team1Score);
         var team2TotalScore = match.Sets.Sum(set => set.Team2Score);
-        var team1Won = team1TotalScore > team2TotalScore;
-        var team2Won = team2TotalScore > team1TotalScore;
+        
+        var winner = CalculateMatchWinner(match.Sets.ToList());
+
+        var team1Won = winner == Team.Team1;
+        var team2Won = winner == Team.Team2;
         
         foreach (var player in team1)
         {
@@ -64,7 +67,7 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
             {
                 eloChange *= 1.8; // Double the amount of Elo lost if the team lost the match
             }
-            var newElo = player.Elo + (int)eloChange;
+            var newElo = player.Elo + (int)Math.Round(eloChange, MidpointRounding.AwayFromZero);
             
             CreateEloHistory(player, newElo, match);
             player.Elo = newElo;
@@ -98,8 +101,7 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
                 eloChange *= 1.8; // Double the amount of Elo lost if the team lost the match
             }
 
-            var newElo = player.Elo + (int)eloChange;
-            
+            var newElo = player.Elo + (int)Math.Round(eloChange, MidpointRounding.AwayFromZero);            
             CreateEloHistory(player, newElo, match);
             player.Elo = newElo;
         }
@@ -142,5 +144,13 @@ public class CalculateEloResultAfterMatchCommandHandler : IRequestHandler<Calcul
                 Description = "Your elo has changed, your new elo points are " + newElo,
             });
         
+    }
+    
+    private static Team CalculateMatchWinner(IReadOnlyCollection<Set> sets)
+    {
+        var team1Wins = sets.Count(set => set.Team1Score > set.Team2Score);
+        var team2Wins = sets.Count(set => set.Team2Score > set.Team1Score);
+        
+        return team1Wins > team2Wins ? Team.Team1 : Team.Team2;
     }
 }
