@@ -29,18 +29,6 @@ else
             {
                 <p>There is @Tournament.RoundRobinPhaseGroups group.</p>
             }
-            @if (!_roundRobinPhaseMatches.Any(x => x.Rounds.Any(r => r.Matches.Any(m => !m.IsFinished))))
-            {
-                <Alert Color="Color.Info" Visible>
-                    Phase in progress... Confirm all matches when adding the result to each one.
-                </Alert>
-            }
-            else
-            {
-                <Alert Color="Color.Success" Visible>
-                    Phase finished!
-                </Alert>
-            }
             @if (_roundRobinPhaseMatches
                 .All(x => x.Rounds.All(r => r.Matches.All(m => m.Sets.Any()))))
             {
