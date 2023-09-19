@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EventsManager.Server.Data.TypeConfigurations;
 
-public class SuggestionsConfiguration : IEntityTypeConfiguration<Suggestion>
+public class PromotionConfiguration : IEntityTypeConfiguration<Promotion>
 {
-    public void Configure(EntityTypeBuilder<Suggestion> builder) 
+    public void Configure(EntityTypeBuilder<Promotion> builder)
     {
-        builder.HasKey(x => x.Id);
+        builder.HasKey(u => u.Id);
     }
 }
