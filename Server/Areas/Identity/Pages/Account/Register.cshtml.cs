@@ -160,6 +160,7 @@ public class RegisterModel : PageModel
                 var newPlayer = new Player
                 {
                     Id = Guid.Parse(user.Id),
+                    Email = Input.Email,
                     User = user,
                     NickName = Input.UserName,
                     Elo = 0,

@@ -196,6 +196,7 @@ namespace EventsManager.Server.Areas.Identity.Pages.Account
                         var newPlayer = new Player
                         {
                             Id = Guid.Parse(user.Id),
+                            Email = Input.Email,
                             User = user,
                             NickName = Input.UserName,
                             Elo = 0,
