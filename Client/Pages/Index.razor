@@ -31,15 +31,20 @@
     </Authorized>
 </AuthorizeView>
 <Divider></Divider>
-@if (!_loadingAllData)
-{
-    <div>Hours played: @_allData?.TotalHours</div>
-    <div>Sets played: @_allData?.Sets</div>
-    <div>Points gained: @_allData?.PointsGained</div>
-    <div>Points lost: @_allData?.PointsLost</div>
-    <div>Matches played: @_allData?.Matches</div>
-}
-<Divider></Divider>
+<AuthorizeView>
+    <Authorized>
+        @if (!_loadingAllData)
+        {
+            <div>Hours played: @_allData?.TotalHours</div>
+            <div>Sets played: @_allData?.Sets</div>
+            <div>Points gained: @_allData?.PointsGained</div>
+            <div>Points lost: @_allData?.PointsLost</div>
+            <div>Matches played: @_allData?.Matches</div>
+        }
+        <Divider></Divider>
+    </Authorized>
+</AuthorizeView>
+
 <NineTPadelBanner></NineTPadelBanner>
 
 <AuthorizeView>
