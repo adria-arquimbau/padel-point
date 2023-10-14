@@ -35,11 +35,13 @@
     <Authorized>
         @if (!_loadingAllData)
         {
-            <div>Hours played: @_allData?.TotalHours</div>
-            <div>Sets played: @_allData?.Sets</div>
-            <div>Points gained: @_allData?.PointsGained</div>
-            <div>Points lost: @_allData?.PointsLost</div>
-            <div>Matches played: @_allData?.Matches</div>
+            <div style="margin: 5px">
+                <div style="font-size: 10px; color: #6c757d">Hours played: @_allData?.TotalHours</div>
+                <div style="font-size: 10px; color: #6c757d">Sets played: @_allData?.Sets</div>
+                <div style="font-size: 10px; color: #6c757d">Points gained: @_allData?.PointsGained</div>
+                <div style="font-size: 10px; color: #6c757d">Points lost: @_allData?.PointsLost</div>
+                <div style="font-size: 10px; color: #6c757d">Matches played: @_allData?.Matches</div>
+            </div>
         }
         <Divider></Divider>
     </Authorized>
