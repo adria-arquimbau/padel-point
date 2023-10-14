@@ -31,6 +31,12 @@
     </Authorized>
 </AuthorizeView>
 <Divider></Divider>
+Hours played: @_allData?.TotalHours
+Sets played: @_allData?.Sets
+Points gained: @_allData?.PointsGained
+Points lost: @_allData?.PointsLost
+Matches played: @_allData?.Matches
+<Divider></Divider>
 <NineTPadelBanner></NineTPadelBanner>
 
 <AuthorizeView>
@@ -44,11 +50,12 @@
 @code
 {
     private AnnouncementDevelopmentResponse? _announcementDevelopmentResponse;
+    private AllDataResponse? _allData;
     
     protected override async Task OnInitializedAsync()
     {
         await GetInfo();    
-    }
+    }   
     
     private async Task GetInfo()    
     {
@@ -59,6 +66,27 @@
             if (response.IsSuccessStatusCode)
             {
                 _announcementDevelopmentResponse = await response.Content.ReadFromJsonAsync<AnnouncementDevelopmentResponse>();
+            }
+            else
+            {
+              
+            }
+        }
+        catch (Exception)
+        {
+    // ignored
+        }
+    }
+    
+    private async Task GetAllData()    
+    {
+        try
+        {
+            var response = await Http.GetAsync($"Match/all-data");
+
+            if (response.IsSuccessStatusCode)
+            {
+                _allData = await response.Content.ReadFromJsonAsync<AllDataResponse>();
             }
             else
             {

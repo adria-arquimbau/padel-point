@@ -30,6 +30,37 @@ public class MatchController : ControllerBase
         _mediator = mediator;
     }
 
+    [HttpGet("all-data")]
+    [AllowAnonymous]
+    public async Task<IActionResult> AllData(CancellationToken cancellationToken)
+    {
+        var totalHours = await _dbContext.Match
+            .SumAsync(x => x.Duration, cancellationToken: cancellationToken);
+
+        var matches = await _dbContext.Match
+            .CountAsync(cancellationToken: cancellationToken);
+        
+        var sets = await _dbContext.Set
+            .CountAsync(cancellationToken: cancellationToken);
+        
+        var pointsGained = await _dbContext.EloHistories
+            .Where(x => x.EloChange > 0)
+            .SumAsync(x => x.EloChange, cancellationToken: cancellationToken);
+
+        var pointsLost = await _dbContext.EloHistories
+            .Where(x => x.EloChange < 0)
+            .SumAsync(x => x.EloChange, cancellationToken: cancellationToken);
+        
+        return Ok(new AllDataResponse
+        {
+            TotalHours = totalHours,
+            Matches = matches,
+            Sets = sets,
+            PointsGained = pointsGained,
+            PointsLost = pointsLost
+        });
+    }
+
     [HttpPost]
     [Authorize(Roles = "User")]
     public async Task<IActionResult> Create([FromBody] CreateMatchRequest request, CancellationToken cancellationToken)
