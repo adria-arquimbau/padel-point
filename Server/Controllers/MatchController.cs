@@ -44,11 +44,11 @@ public class MatchController : ControllerBase
             .CountAsync(cancellationToken: cancellationToken);
         
         var pointsGained = await _dbContext.EloHistories
-            .Where(x => x.EloChange > 0)
+            .Where(x => x.EloChange > 0 && x.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
             .SumAsync(x => x.EloChange, cancellationToken: cancellationToken);
 
         var pointsLost = await _dbContext.EloHistories
-            .Where(x => x.EloChange < 0)
+            .Where(x => x.EloChange < 0 && x.ChangeReason == ChangeEloHistoryReason.MatchPlayed)
             .SumAsync(x => x.EloChange, cancellationToken: cancellationToken);
         
         return Ok(new AllDataResponse
