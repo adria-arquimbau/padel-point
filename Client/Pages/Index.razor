@@ -31,11 +31,14 @@
     </Authorized>
 </AuthorizeView>
 <Divider></Divider>
-Hours played: @_allData?.TotalHours
-Sets played: @_allData?.Sets
-Points gained: @_allData?.PointsGained
-Points lost: @_allData?.PointsLost
-Matches played: @_allData?.Matches
+@if (!_loadingAllData)
+{
+    <div>Hours played: @_allData?.TotalHours</div>
+    <div>Sets played: @_allData?.Sets</div>
+    <div>Points gained: @_allData?.PointsGained</div>
+    <div>Points lost: @_allData?.PointsLost</div>
+    <div>Matches played: @_allData?.Matches</div>
+}
 <Divider></Divider>
 <NineTPadelBanner></NineTPadelBanner>
 
@@ -52,9 +55,12 @@ Matches played: @_allData?.Matches
     private AnnouncementDevelopmentResponse? _announcementDevelopmentResponse;
     private AllDataResponse? _allData;
     
+    private bool _loadingAllData = false;
+    
     protected override async Task OnInitializedAsync()
     {
         await GetInfo();    
+        await GetAllData();
     }   
     
     private async Task GetInfo()    
@@ -82,6 +88,7 @@ Matches played: @_allData?.Matches
     {
         try
         {
+            _loadingAllData = true;
             var response = await Http.GetAsync($"Match/all-data");
 
             if (response.IsSuccessStatusCode)
@@ -96,6 +103,10 @@ Matches played: @_allData?.Matches
         catch (Exception)
         {
     // ignored
+        }
+        finally
+        {
+            _loadingAllData = false;
         }
     }
 }
