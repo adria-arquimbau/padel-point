@@ -1,4 +1,4 @@
-using System.Security.Claims;
+/*using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Handlers.Queries.Matches.Get;
@@ -524,4 +524,4 @@ public class MatchController : ControllerBase
         
         return Ok();
     }
-}
+}*/

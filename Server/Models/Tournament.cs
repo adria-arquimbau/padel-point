@@ -13,7 +13,7 @@ public class Tournament
     public required MatchLocation Location { get; set; }
     public ICollection<Team> Teams { get; set; } = new List<Team>();
     public int MaxTeams { get; set; }
-    public Player Creator { get; set; }
+    public required Player Creator { get; set; }
     public decimal Price { get; set; }
     public bool RegistrationOpen { get; set; }
     public bool ShowBrackets { get; set; }

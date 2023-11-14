@@ -395,7 +395,8 @@ public class TournamentController : ControllerBase
             Player1 = player1,
             Player1Confirmed = true,
             Player2 = player2,
-            CreationDate = DateTime.UtcNow
+            CreationDate = DateTime.UtcNow,
+            Tournament = tournament
         };
         
         tournament.Teams.Add(newTeam);

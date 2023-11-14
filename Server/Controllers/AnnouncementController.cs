@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿/*
+using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Elo.InitialPlayerSkillCalibrationCommandHandler;
 using EventsManager.Shared.Exceptions;
@@ -80,3 +81,4 @@ public class AnnouncementController : ControllerBase
         return Ok();
     }
 }
+*/

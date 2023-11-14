@@ -10,5 +10,5 @@ public class Team
     public Guid Player2Id { get; set; }
     public bool Player2Confirmed { get; set; }
     public required DateTime CreationDate { get; set; }
-    public Tournament Tournament { get; set; }
+    public required Tournament Tournament { get; set; }
 }

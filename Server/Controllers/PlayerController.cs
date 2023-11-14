@@ -1,4 +1,4 @@
-using System.Security.Claims;
+/*using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Shared.Dtos;
 using EventsManager.Shared.Enums;
@@ -270,4 +270,4 @@ public class PlayerController : ControllerBase
         
         return Ok();
     }
-}
+}*/

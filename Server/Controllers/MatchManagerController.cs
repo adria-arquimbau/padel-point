@@ -1,4 +1,4 @@
-using EventsManager.Server.Data;
+/*using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.Matches.ConfirmTeam;
 using EventsManager.Server.Models;
 using EventsManager.Shared.Dtos;
@@ -275,4 +275,4 @@ public class MatchManagerController : ControllerBase
 
         return 24;
     }
-}
+}*/

@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿/*using System.Security.Claims;
 using EventsManager.Server.Data;
 using EventsManager.Server.Handlers.Commands.User.ConfirmEmail;
 using EventsManager.Server.Handlers.Commands.User.DeleteUser;
@@ -88,4 +88,4 @@ public class UserController : ControllerBase
         await _mediator.Send(new DeleteUserCommandRequest(userId));
         return Ok();
     }
-}
+}*/
